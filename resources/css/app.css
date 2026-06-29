@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --color-primary: 16 85% 58%;
+        --color-accent: 160 50% 45%;
+        --color-secondary: 30 30% 94%;
+    }
+}
+
+@layer components {
+    .btn-primary {
+        @apply bg-[#f07a3a] hover:bg-[#d8652a] text-white font-bold py-2 px-4 rounded-lg transition-colors;
+    }
+    
+    .btn-accent {
+        @apply bg-[#39ac8c] hover:bg-[#2d8a70] text-white font-bold py-2 px-4 rounded-lg transition-colors;
+    }
+}
+
+/* ---- Custom animations (moved from auth.blade.php) ---- */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-slow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 6s ease-in-out infinite;
+}
+
+.text-shadow-white {
+    text-shadow: 0 2px 20px rgba(255,255,255,0.1);
+}
