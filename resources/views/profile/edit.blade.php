@@ -12,15 +12,15 @@
             </a>
             <div>
                 <h2 class="font-extrabold text-2xl text-[#1B3B36] dark:text-white tracking-tight leading-none">
-                    {{ __('Profile Settings') }}
+                    {{ __('messages.pe_title') }}
                 </h2>
-                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Manage your account details and verification</p>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{{ __('messages.pe_subtitle') }}</p>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12 bg-secondary/30 dark:bg-neutral-950/30">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6 sm:py-12 bg-secondary/30 dark:bg-neutral-950/30">
+        <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 space-y-4 sm:space-y-6">
 
             <!-- ========================================== -->
             <!-- PROFILE PHOTO & COVER                      -->
@@ -52,7 +52,7 @@
                         </svg>
                         
                         <span class="text-white text-xs font-bold mt-2 drop-shadow-md {{ auth()->user()->cover_photo ? 'opacity-0 group-hover:opacity-100' : 'opacity-100' }} transition-opacity">
-                            {{ auth()->user()->cover_photo ? 'Change Cover' : 'Add Cover Photo' }}
+                            {{ auth()->user()->cover_photo ? __('messages.pe_change_cover') : __('messages.pe_add_cover') }}
                         </span>
                         
                         <input type="file" id="cover_photo" name="cover_photo" class="hidden" accept="image/*">
@@ -82,18 +82,18 @@
                     <div class="mt-2 flex items-center gap-2 flex-wrap">
                         <!-- Role Badge -->
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent dark:bg-accent/20">
-                            {{ auth()->user()->role === 'admin' ? 'Admin' : 'User' }}
+                            {{ auth()->user()->role === 'admin' ? __('messages.pe_badge_admin') : __('messages.pe_badge_user') }}
                         </span>
                         <!-- ID Validation Status -->
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
                             {{ auth()->user()->id_validation_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 
                                (auth()->user()->id_validation_status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 
                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400') }}">
-                            ID: {{ ucfirst(auth()->user()->id_validation_status) }}
+                            {{ __('messages.pe_badge_id', ['status' => ucfirst(auth()->user()->id_validation_status)]) }}
                         </span>
                         @if(auth()->user()->isSitter())
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                                Level {{ auth()->user()->sitter_level }}
+                                {{ __('messages.pf_badge_level', ['level' => auth()->user()->sitter_level]) }}
                             </span>
                         @endif
                     </div>
@@ -103,39 +103,39 @@
             <!-- ========================================== -->
             <!-- ID VERIFICATION                            -->
             <!-- ========================================== -->
-            <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-8">
-                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">ID Verification</h3>
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-8">
+                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">{{ __('messages.pe_id_verification') }}</h3>
                 @include('profile.partials.update-id-form')
             </div>
 
             <!-- ========================================== -->
             <!-- PROFILE INFORMATION                        -->
             <!-- ========================================== -->
-            <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-8">
-                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">Profile Information</h3>
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-8">
+                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">{{ __('messages.pe_profile_information') }}</h3>
                 @include('profile.partials.update-profile-information-form')
             </div>
 
             <!-- ========================================== -->
             <!-- LOCATION SETTINGS                          -->
             <!-- ========================================== -->
-            <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-8">
-                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">Location & Contact</h3>
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-8">
+                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">{{ __('messages.pe_location_contact') }}</h3>
                 @include('profile.partials.update-location-form')
             </div>
 
             <!-- ========================================== -->
             <!-- UPDATE PASSWORD                            -->
             <!-- ========================================== -->
-            <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-8">
-                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">Update Password</h3>
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-8">
+                <h3 class="text-lg font-black text-[#1B3B36] dark:text-white mb-4">{{ __('messages.pe_update_password_title') }}</h3>
                 @include('profile.partials.update-password-form')
             </div>
 
             <!-- ========================================== -->
             <!-- DELETE ACCOUNT                             -->
             <!-- ========================================== -->
-            <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-8">
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-8">
                 @include('profile.partials.delete-user-form')
             </div>
 
@@ -157,7 +157,7 @@
                 body: formData
             }).then(res => res.json()).then(data => {
                 if (data.success) location.reload();
-            }).catch(() => alert('Failed to upload photo.'));
+            }).catch(() => alert(@js(__('messages.pe_upload_failed'))));
         });
     </script>
 </x-app-layout>

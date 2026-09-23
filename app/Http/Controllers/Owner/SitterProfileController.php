@@ -4,32 +4,59 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Models\PetType;
+use App\Models\Availability;
+use Illuminate\Support\Facades\Auth;
 
 class SitterProfileController extends Controller
 {
     public function show($id)
     {
-        // Load only reviews (and reviewer user)
-        $sitter = User::with(['reviews.user'])->findOrFail($id);
+        $sitter = User::with([
+                'sitterProfile',
+                'pets',
+                'comments.user',           // top-level comments with user
+                'comments.replies.user',   // nested replies with user
+            ])
+            ->findOrFail($id);
 
-        if (!$sitter->isSitter()) {
-            abort(404, 'This user is not a registered sitter.');
+        if (!$sitter->sitterProfile) {
+            abort(404, 'This user does not have a sitter profile.');
         }
 
-        // Add an empty comments collection so the view works
-        $sitter->comments = collect([]);
+        $profile = $sitter->sitterProfile;
 
-        // Computed attributes (with fallbacks)
-        $sitter->average_rating = $sitter->reviews->avg('rating') ?? 0;
-        $sitter->reviews_count = $sitter->reviews->count();
-        $sitter->daily_rate = $sitter->rate_per_visit ?? 300;
-        $sitter->provides_food = $sitter->can_provide_food ?? false;
-        $sitter->food_arrangement = $sitter->food_preference ?? 'Both options available';
-        $sitter->available_dates_count = 0; // Replace with actual logic later
-        $sitter->accepted_pets = $sitter->pet_types ?? 'dog, cat';
-        $sitter->bio = $sitter->bio ?? 'I love caring for pets and ensuring they feel safe and happy.';
+        // Pet types
+        $petTypeIds = $profile->preferred_pet_types ?? [];
+        $petTypeNames = \App\Models\PetType::whereIn('id', $petTypeIds)->pluck('name')->toArray();
 
-        return view('owner.sitter_profile', compact('sitter'));
+        // Available dates
+        $availableDatesCount = \App\Models\Availability::where('sitter_id', $sitter->id)
+            ->where('date', '>=', now()->toDateString())
+            ->where('is_available', true)
+            ->count();
+
+        // Attach computed values
+        $sitter->display_name = trim($sitter->f_name . ' ' . $sitter->l_name) ?: 'Sitter';
+        $sitter->average_rating = $profile->average_ratings ?? 0;
+        $sitter->reviews_count = $profile->total_bookings ?? 0;
+        $sitter->daily_rate = $profile->base_rate ?? 0;
+        $sitter->level = (int) ($profile->sitter_type ?? 1);
+        $sitter->available_dates_count = $availableDatesCount;
+        $sitter->pet_types_list = !empty($petTypeNames) ? strtolower(implode(', ', $petTypeNames)) : 'Not specified';
+        $sitter->bio_text = $profile->bio ?? 'This sitter hasn\'t added a bio yet.';
+
+        $sitter->food_arrangement = match ($profile->food_preference ?? '') {
+            'owner_provides' => 'Owner provides food',
+            'sitter_provides' => 'Sitter provides food',
+            'flexible' => 'Flexible (both options)',
+            default => 'Not set',
+        };
+
+        // Empty reviews for now (kay wala pa kay Review model)
+        $sitter->setRelation('reviews', collect([]));
+
+        return view('owner.sitter_profile', compact('sitter', 'profile'));
     }
+    
 }

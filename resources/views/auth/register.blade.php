@@ -36,24 +36,60 @@
             @csrf
 
             <!-- ========================================== -->
-            <!-- NAME FIELD                                -->
+            <!-- NAME FIELDS: First, Middle, Last          -->
             <!-- ========================================== -->
             <div class="space-y-1.5">
-                <label for="name" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                <!-- Group label (optional) -->
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                     {{ __('Full Name') }}
                 </label>
-                <div class="relative rounded-xl shadow-sm">
-                    <input id="name"
-                           class="block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium"
-                           type="text"
-                           name="name"
-                           placeholder="Juan Dela Cruz"
-                           value="{{ old('name') }}"
-                           required
-                           autofocus
-                           autocomplete="name" />
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- First Name -->
+                    <div>
+                        <label for="f_name" class="block text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-0.5">
+                            {{ __('First') }}
+                        </label>
+                        <input id="f_name"
+                               class="block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium"
+                               type="text"
+                               name="f_name"
+                               placeholder="e.g. Juan"
+                               value="{{ old('f_name') }}"
+                               required
+                               autofocus
+                               autocomplete="given-name" />
+                        <x-input-error :messages="$errors->get('f_name')" class="text-xs font-semibold text-red-500 mt-1" />
+                    </div>
+                    <!-- Middle Name -->
+                    <div>
+                        <label for="m_name" class="block text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-0.5">
+                            {{ __('Middle') }}
+                        </label>
+                        <input id="m_name"
+                               class="block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium"
+                               type="text"
+                               name="m_name"
+                               placeholder="(optional)"
+                               value="{{ old('m_name') }}"
+                               autocomplete="additional-name" />
+                        <x-input-error :messages="$errors->get('m_name')" class="text-xs font-semibold text-red-500 mt-1" />
+                    </div>
+                    <!-- Last Name -->
+                    <div>
+                        <label for="l_name" class="block text-[10px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-0.5">
+                            {{ __('Last') }}
+                        </label>
+                        <input id="l_name"
+                               class="block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium"
+                               type="text"
+                               name="l_name"
+                               placeholder="e.g. Dela Cruz"
+                               value="{{ old('l_name') }}"
+                               required
+                               autocomplete="family-name" />
+                        <x-input-error :messages="$errors->get('l_name')" class="text-xs font-semibold text-red-500 mt-1" />
+                    </div>
                 </div>
-                <x-input-error :messages="$errors->get('name')" class="text-xs font-semibold text-red-500 mt-1" />
             </div>
 
             <!-- ========================================== -->

@@ -22,7 +22,9 @@ class User extends Authenticatable
         // ========================================== //
         // PROFILE INFORMATION FIELDS                 //
         // ========================================== //
-        'name',
+        'f_name',         
+        'm_name',          
+        'l_name',   
         'email',
         'date_of_birth',
         'gender',
@@ -58,6 +60,16 @@ class User extends Authenticatable
         'id_validation_status',
         'id_type',          
         'selfie_photo',
+        'admin_notes',
+        'id_reviewed_by',
+        'id_reviewed_at',
+        'face_match_score',
+        'document_authenticity',
+        'liveness_detection',
+        'id_expired',
+        'name_match',
+        'birthdate_match',
+        'locale',
         
         // ========================================== //
         // SYSTEM & STATUS                          //
@@ -93,6 +105,9 @@ class User extends Authenticatable
             'last_active_at' => 'datetime',
             'id_validation_status' => 'string',
             'date_of_birth' => 'date',
+            'id_reviewed_at'    => 'datetime',
+            'id_expired'        => 'boolean',
+            'face_match_score'  => 'float',
         ];
     }
 
@@ -122,23 +137,17 @@ class User extends Authenticatable
      */
     public function isSitter(): bool
     {
-        return $this->is_sitter && $this->sitter_status === 'approved';
+        return $this->is_sitter && $this->id_validation_status === 'verified';
     }
 
-    /**
-     * Check if user has a pending sitter application
-     */
     public function hasPendingSitterApplication(): bool
     {
-        return $this->is_sitter && $this->sitter_status === 'pending';
+        return $this->is_sitter && $this->id_validation_status === 'pending';
     }
 
-    /**
-     * Check if user's sitter application was rejected
-     */
     public function isSitterRejected(): bool
     {
-        return $this->is_sitter && $this->sitter_status === 'rejected';
+        return $this->is_sitter && $this->id_validation_status === 'rejected';
     }
 
     /**
@@ -164,6 +173,42 @@ class User extends Authenticatable
     {
         return $this->id_validation_status === 'verified';
     }
+
+       /**
+     * Full name without suffix — for admin tables and modal
+     */
+    public function getFullNameAttribute(): string
+    {
+        return trim(($this->f_name ?? '') . ' ' . ($this->l_name ?? ''));
+    }
+
+    /**
+     * Role label — 'owner' or 'sitter'
+     */
+    public function getIdRoleAttribute(): string
+    {
+        return $this->is_sitter ? 'sitter' : 'owner';
+    }
+
+    /**
+     * Government ID image URL for admin modal
+     */
+    public function getGovIdUrlAttribute(): ?string
+    {
+        return $this->gov_id_path
+            ? \Illuminate\Support\Facades\Storage::url($this->gov_id_path)
+            : null;
+    }
+
+    /**
+     * Selfie image URL for admin modal
+     */
+    public function getSelfieUrlAttribute(): ?string
+    {
+        return $this->selfie_photo
+            ? \Illuminate\Support\Facades\Storage::url($this->selfie_photo)
+            : null;
+    } 
 
     // ========================================== //
     // SITTER LEVEL METHODS                       //
@@ -215,13 +260,15 @@ class User extends Authenticatable
     /**
      * Get profile photo URL or avatar fallback
      */
+    
     public function getProfilePhotoUrlAttribute(): string
     {
         if ($this->profile_photo) {
             return asset('storage/' . $this->profile_photo);
         }
         
-        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=f07a3a&color=fff&size=100';
+        $nameToUse = $this->f_name ?? $this->email;
+        return 'https://ui-avatars.com/api/?name=' . urlencode($nameToUse) . '&background=f07a3a&color=fff&size=100';
     }
 
     /**
@@ -237,6 +284,11 @@ class User extends Authenticatable
      */
     public function getDisplayNameAttribute(): string
     {
+        $fullName = trim($this->f_name . ' ' . $this->l_name);
+        if ($fullName === '') {
+            $fullName = $this->email; // fallback to email if no names
+        }
+        
         $suffix = '';
         if ($this->isAdmin()) {
             $suffix = ' (Admin)';
@@ -244,7 +296,7 @@ class User extends Authenticatable
             $suffix = ' ★' . $this->getSitterLevelBadge();
         }
         
-        return $this->name . $suffix;
+        return $fullName . $suffix;
     }
 
     /**
@@ -287,6 +339,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the user's sitter profile (if user is a sitter)
+     */
+    public function sitterProfile()
+    {
+        return $this->hasOne(SitterProfile::class, 'user_id');
+    }
+
+    /**
      * Get all bookings where user is the sitter
      */
     public function bookingsAsSitter()
@@ -302,13 +362,33 @@ class User extends Authenticatable
         return $this->hasMany(Review::class, 'sitter_id');
     }
 
-    /**
-     * Get all comments about this user (as sitter)
+   /**
+     * Comments written by this user
      */
-    public function comments()
+    public function commentsWritten()
+    {
+        return $this->hasMany(Comment::class, 'user_id');
+    }
+
+    /**
+     * Comments received by this user (as a sitter)
+     */
+    public function commentsReceived()
     {
         return $this->hasMany(Comment::class, 'sitter_id');
     }
+
+    /**
+     * Alias for commentsReceived (para sa sitter profile page)
+     */
+    public function comments()
+    {
+        return $this->hasMany(Comment::class, 'sitter_id')
+                    ->whereNull('parent_id')
+                    ->with('replies.user', 'user')
+                    ->orderBy('created_at', 'desc');
+    }
+
 
     /**
      * Get average rating of this user (as sitter)
@@ -362,4 +442,29 @@ class User extends Authenticatable
     {
         return $query->where('role', 'admin');
     }
+
+    // app/Models/User.php
+
+    public function setting()
+    {
+        return $this->hasOne(Setting::class);
+    }
+
+    /**
+     * Get setting with automatic fallback (creates if missing)
+     */
+    public function getSettingAttribute()
+    {
+        return $this->relationLoaded('setting')
+            ? $this->getRelation('setting')
+            : ($this->setting()->firstOrCreate([])); // lazy create
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (User $user) {
+            $user->setting()->create([]);
+        });
+    }
+
 }

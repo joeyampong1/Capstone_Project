@@ -7,7 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -60,7 +60,7 @@ class ProfileController extends Controller
     }
 
     // ========================================== //
-    // 🔥 NEW: Update Profile Photo               //
+    // Update Profile Photo                       //
     // ========================================== //
     public function updatePhoto(Request $request)
     {
@@ -86,14 +86,14 @@ class ProfileController extends Controller
     public function updateLocation(Request $request)
     {
         $request->validate([
-            'location' => 'required|string|max:255',
-            'latitude' => 'nullable|numeric|between:-90,90',
+            'location'  => 'required|string|max:255',
+            'latitude'  => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
         $user = $request->user();
-        $user->location = $request->location;
-        $user->latitude = $request->latitude;
+        $user->location  = $request->location;
+        $user->latitude  = $request->latitude;
         $user->longitude = $request->longitude;
         $user->save();
 
@@ -102,7 +102,7 @@ class ProfileController extends Controller
 
     public function updateId(Request $request)
     {
-        $user = $request->user();
+        $user   = $request->user();
         $action = $request->input('action');
 
         // Step 1: Save ID type
@@ -142,4 +142,95 @@ class ProfileController extends Controller
 
         return back()->withErrors(['error' => 'Invalid action.']);
     }
+
+    // ========================================== //
+    // Toggle Sitter Mode                         //
+    // ========================================== //
+    /**
+     * Toggle Sitter Mode using the existing is_sitter boolean.
+     * Only available for approved sitters.
+     */
+    public function toggleSitterMode()
+    {
+        $user = auth()->user();
+
+        // Only users who were approved as sitters can toggle
+        if ($user->sitter_status !== 'approved') {
+            return back()->with('error', 'Only approved pet sitters can toggle Sitter Mode.');
+        }
+
+        $user->update([
+            'is_sitter' => ! $user->is_sitter,
+        ]);
+
+        return back()->with(
+            'status',
+            $user->fresh()->is_sitter
+                ? 'Sitter Mode is ON. You are now browsing as a Pet Sitter.'
+                : 'Sitter Mode is OFF. You are now browsing as a Pet Owner.'
+        );
+    }
+
+    // ========================================== //
+    // Update Sitter Settings                     //
+    // ========================================== //
+    /**
+     * Update sitter-specific settings (rate, food preference, etc.)
+     * Only available for approved sitters.
+     */
+    public function updateSitterSettings(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->sitter_status !== 'approved') {
+            return back()->with('error', 'Only approved pet sitters can update these settings.');
+        }
+
+        $validated = $request->validate([
+            'rate_per_visit'   => 'nullable|numeric|min:0|max:99999',
+            'food_preference'  => 'nullable|in:owner_provides,sitter_provides,flexible',
+            'bio'              => 'nullable|string|max:2000',
+            'pet_types'        => 'nullable|string|max:255',
+            'can_provide_food' => 'nullable|boolean',
+        ]);
+
+        // Handle can_provide_food checkbox (unchecked = not present in request)
+        $validated['can_provide_food'] = $request->boolean('can_provide_food');
+
+        $user->update($validated);
+
+        return redirect()
+            ->route('profile.edit')
+            ->with('status', 'sitter-settings-updated');
+    }
+
+    /**
+     * Update user's preferred language.
+     */
+/**
+ * Update user's preferred language.
+ */
+    public function updateLanguage(Request $request)
+    {
+        $request->validate([
+            'locale' => 'required|in:en,fil,es,fr',
+        ]);
+
+        $locale = $request->input('locale');
+
+        $request->user()->update([
+            'locale' => $locale,
+        ]);
+
+        // Apply instantly for the current request
+        app()->setLocale($locale);
+        session(['locale' => $locale]);
+
+        return response()->json([
+            'success' => true,
+            'locale'  => $locale,
+            'message' => 'Language updated successfully.',
+        ]);
+    }
+
 }

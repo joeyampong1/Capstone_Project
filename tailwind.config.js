@@ -3,6 +3,9 @@ import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config} */
 export default {
+   
+    darkMode: 'class',
+
     content: [
         './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
         './storage/framework/views/*.php',
@@ -14,7 +17,6 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
-            // ✅ These are all the themes colors
             colors: {
                 primary: {
                     50: '#fef3ed',
@@ -22,7 +24,7 @@ export default {
                     200: '#f8c5a8',
                     300: '#f5a67d',
                     400: '#f18851',
-                    500: '#f07a3a',   
+                    500: '#f07a3a',
                     600: '#d8652a',
                     700: '#b85222',
                     800: '#943f1a',
@@ -35,7 +37,7 @@ export default {
                     200: '#a9ddcc',
                     300: '#7ecbb3',
                     400: '#53ba99',
-                    500: '#39ac8c',   
+                    500: '#39ac8c',
                     600: '#2d8a70',
                     700: '#216854',
                     800: '#154638',

@@ -1,21 +1,21 @@
 <section>
-    <form method="post" action="{{ route('profile.id') }}" enctype="multipart/form-data" class="space-y-6">
+    <form method="post" action="{{ route('profile.id') }}" enctype="multipart/form-data" class="space-y-4 sm:space-y-6">
         @csrf
 
         {{-- ============================================================ --}}
         {{-- STEP INDICATOR                                                --}}
         {{-- ============================================================ --}}
-        <div class="flex items-center justify-between gap-2 mb-6">
+        <div class="flex items-center justify-between gap-1 sm:gap-2 mb-4 sm:mb-6">
 
             {{-- Step 1: Select & Upload ID --}}
             <div class="flex-1 text-center">
                 <div class="flex flex-col items-center">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold
                         {{ $user->gov_id_path ? 'bg-green-500 text-white' : 'bg-primary text-white' }}">
                         {{ $user->gov_id_path ? '✓' : '1' }}
                     </div>
-                    <span class="text-[10px] font-bold mt-1 {{ $user->gov_id_path ? 'text-green-500' : 'text-primary' }}">
-                        Upload ID
+                    <span class="text-[9px] sm:text-[10px] font-bold mt-1 leading-tight {{ $user->gov_id_path ? 'text-green-500' : 'text-primary' }}">
+                        {{ __('messages.pf_step_upload_id') }}
                     </span>
                 </div>
             </div>
@@ -26,13 +26,13 @@
             {{-- Step 2: Selfie --}}
             <div class="flex-1 text-center">
                 <div class="flex flex-col items-center">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold
                         {{ $user->selfie_photo ? 'bg-green-500 text-white' : ($user->gov_id_path ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400') }}">
                         {{ $user->selfie_photo ? '✓' : '2' }}
                     </div>
-                    <span class="text-[10px] font-bold mt-1
+                    <span class="text-[9px] sm:text-[10px] font-bold mt-1 leading-tight
                         {{ $user->selfie_photo ? 'text-green-500' : ($user->gov_id_path ? 'text-primary' : 'text-gray-400') }}">
-                        Selfie with ID
+                        {{ __('messages.pf_step_selfie_id') }}
                     </span>
                 </div>
             </div>
@@ -50,9 +50,9 @@
                             default    => 'bg-gray-200 text-gray-400',
                         };
                         $statusLabel = match($user->id_validation_status) {
-                            'verified' => 'Verified',
-                            'pending'  => 'Verifying',
-                            default    => 'Submit',
+                            'verified' => __('messages.pf_step_status_verified'),
+                            'pending'  => __('messages.pf_step_status_verifying'),
+                            default    => __('messages.pf_step_status_submit'),
                         };
                         $statusIcon = match($user->id_validation_status) {
                             'verified' => '✓',
@@ -65,10 +65,10 @@
                             default    => 'text-gray-400',
                         };
                     @endphp
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold {{ $statusDot }}">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold {{ $statusDot }}">
                         {{ $statusIcon }}
                     </div>
-                    <span class="text-[10px] font-bold mt-1 {{ $statusText }}">
+                    <span class="text-[9px] sm:text-[10px] font-bold mt-1 leading-tight {{ $statusText }}">
                         {{ $statusLabel }}
                     </span>
                 </div>
@@ -80,12 +80,12 @@
         {{-- STEP 1: SELECT ID TYPE + UPLOAD ID (combined, no page reload) --}}
         {{-- ============================================================ --}}
         @if(!$user->gov_id_path)
-            <div class="p-6 rounded-xl bg-primary/5 border-2 border-dashed border-primary/30">
-                <div class="text-center space-y-4">
-                    <div class="text-5xl">🪪</div>
-                    <h4 class="text-lg font-black text-[#1B3B36] dark:text-white">Upload Your Government ID</h4>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
-                        First, choose your ID type. Then upload a clear photo of it.
+            <div class="p-4 sm:p-6 rounded-xl bg-primary/5 border-2 border-dashed border-primary/30">
+                <div class="text-center space-y-3 sm:space-y-4">
+                    <div class="text-4xl sm:text-5xl">🪪</div>
+                    <h4 class="text-base sm:text-lg font-black text-[#1B3B36] dark:text-white">{{ __('messages.pf_upload_gov_id') }}</h4>
+                    <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
+                        {{ __('messages.pf_upload_gov_id_desc') }}
                     </p>
 
                     {{-- 1a: ID type dropdown --}}
@@ -95,14 +95,14 @@
                                        bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white
                                        focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
                                        transition text-sm font-medium">
-                            <option value="">— Select ID type —</option>
-                            <option value="passport"        {{ old('id_type') === 'passport'        ? 'selected' : '' }}>Passport</option>
-                            <option value="drivers_license" {{ old('id_type') === 'drivers_license' ? 'selected' : '' }}>Driver's License</option>
-                            <option value="umid"            {{ old('id_type') === 'umid'            ? 'selected' : '' }}>UMID</option>
-                            <option value="postal_id"       {{ old('id_type') === 'postal_id'       ? 'selected' : '' }}>Postal ID</option>
-                            <option value="voters_id"       {{ old('id_type') === 'voters_id'       ? 'selected' : '' }}>Voter's ID</option>
-                            <option value="national_id"     {{ old('id_type') === 'national_id'     ? 'selected' : '' }}>National ID</option>
-                            <option value="other"           {{ old('id_type') === 'other'           ? 'selected' : '' }}>Other</option>
+                            <option value="">{{ __('messages.pf_select_id_type') }}</option>
+                            <option value="passport"        {{ old('id_type') === 'passport'        ? 'selected' : '' }}>{{ __('messages.pf_id_passport') }}</option>
+                            <option value="drivers_license" {{ old('id_type') === 'drivers_license' ? 'selected' : '' }}>{{ __('messages.pf_id_drivers_license') }}</option>
+                            <option value="umid"            {{ old('id_type') === 'umid'            ? 'selected' : '' }}>{{ __('messages.pf_id_umid') }}</option>
+                            <option value="postal_id"       {{ old('id_type') === 'postal_id'       ? 'selected' : '' }}>{{ __('messages.pf_id_postal') }}</option>
+                            <option value="voters_id"       {{ old('id_type') === 'voters_id'       ? 'selected' : '' }}>{{ __('messages.pf_id_voters') }}</option>
+                            <option value="national_id"     {{ old('id_type') === 'national_id'     ? 'selected' : '' }}>{{ __('messages.pf_id_national') }}</option>
+                            <option value="other"           {{ old('id_type') === 'other'           ? 'selected' : '' }}>{{ __('messages.pf_id_other') }}</option>
                         </select>
                         <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('id_type')" />
                     </div>
@@ -111,11 +111,10 @@
                     <div id="gov_id_upload_wrapper"
                          class="{{ old('id_type') ? '' : 'hidden' }} space-y-3">
 
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
-                            Upload a clear photo of your
-                            <span id="id_type_label" class="font-semibold text-[#1B3B36] dark:text-white">ID</span>.
+                        <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                            {!! __('messages.pf_upload_id_hint', ['id' => '<span id="id_type_label" class="font-semibold text-[#1B3B36] dark:text-white">ID</span>']) !!}
                         </p>
-                        <p class="text-xs text-neutral-400">Accepted: JPG, PNG • Max size: 5MB</p>
+                        <p class="text-xs text-neutral-400">{{ __('messages.pf_id_accepted') }}</p>
                         <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('gov_id_path')" />
 
                         <input id="gov_id_path" name="gov_id_path" type="file" accept="image/*" class="hidden">
@@ -123,9 +122,9 @@
                         {{-- Before file chosen --}}
                         <label id="gov_id_select_btn" for="gov_id_path"
                                class="inline-block bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                      px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition
+                                      px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
                                       transform hover:-translate-y-0.5 cursor-pointer">
-                            Select ID →
+                            {{ __('messages.pf_select_id_btn') }}
                         </label>
 
                         {{-- After file chosen --}}
@@ -136,9 +135,9 @@
                             </p>
                             <button type="submit" name="action" value="upload_id"
                                     class="bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                           px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition
+                                           px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
                                            transform hover:-translate-y-0.5">
-                                Upload ID →
+                                {{ __('messages.pf_upload_id_btn') }}
                             </button>
                         </div>
                     </div>
@@ -151,15 +150,14 @@
         {{-- STEP 2: SELFIE WITH ID                                        --}}
         {{-- ============================================================ --}}
         @if($user->gov_id_path && !$user->selfie_photo)
-            <div class="p-6 rounded-xl bg-primary/5 border-2 border-dashed border-primary/30">
-                <div class="text-center space-y-4">
-                    <div class="text-5xl">📸</div>
-                    <h4 class="text-lg font-black text-[#1B3B36] dark:text-white">Take a Selfie with Your ID</h4>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
-                        Hold your <strong>{{ ucfirst(str_replace('_', ' ', $user->id_type ?? 'ID')) }}</strong>
-                        next to your face. Both must be clearly visible.
+            <div class="p-4 sm:p-6 rounded-xl bg-primary/5 border-2 border-dashed border-primary/30">
+                <div class="text-center space-y-3 sm:space-y-4">
+                    <div class="text-4xl sm:text-5xl">📸</div>
+                    <h4 class="text-base sm:text-lg font-black text-[#1B3B36] dark:text-white">{{ __('messages.pf_take_selfie_id') }}</h4>
+                    <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
+                        {!! __('messages.pf_selfie_hint', ['id' => '<strong>' . ucfirst(str_replace('_', ' ', $user->id_type ?? 'ID')) . '</strong>']) !!}
                     </p>
-                    <p class="text-xs text-neutral-400">Accepted: JPG, PNG • Max size: 5MB</p>
+                    <p class="text-xs text-neutral-400">{{ __('messages.pf_id_accepted') }}</p>
                     <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('selfie_photo')" />
 
                     <input id="selfie_photo" name="selfie_photo" type="file" accept="image/*" class="hidden">
@@ -167,9 +165,9 @@
                     {{-- Before file chosen --}}
                     <label id="selfie_select_btn" for="selfie_photo"
                            class="inline-block bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                  px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition
+                                  px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
                                   transform hover:-translate-y-0.5 cursor-pointer">
-                        Select Selfie →
+                        {{ __('messages.pf_select_selfie_btn') }}
                     </label>
 
                     {{-- After file chosen --}}
@@ -180,9 +178,9 @@
                         </p>
                         <button type="submit" name="action" value="upload_selfie"
                                 class="bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                       px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition
+                                       px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
                                        transform hover:-translate-y-0.5">
-                            Next →
+                            {{ __('messages.pf_next_btn') }}
                         </button>
                     </div>
                 </div>
@@ -193,18 +191,18 @@
         {{-- STEP 3: SUBMIT FOR VERIFICATION                               --}}
         {{-- ============================================================ --}}
         @if($user->gov_id_path && $user->selfie_photo && $user->id_validation_status === 'unverified')
-            <div class="p-6 rounded-xl border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-950/20">
-                <div class="text-center space-y-4">
-                    <div class="text-5xl">📋</div>
-                    <h4 class="text-lg font-black text-yellow-700 dark:text-yellow-400">Ready to Submit</h4>
-                    <p class="text-sm text-yellow-600 dark:text-yellow-400 max-w-sm mx-auto">
-                        Your ID and selfie have been uploaded. Submit them for review.
+            <div class="p-4 sm:p-6 rounded-xl border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-950/20">
+                <div class="text-center space-y-3 sm:space-y-4">
+                    <div class="text-4xl sm:text-5xl">📋</div>
+                    <h4 class="text-base sm:text-lg font-black text-yellow-700 dark:text-yellow-400">{{ __('messages.pf_ready_submit') }}</h4>
+                    <p class="text-xs sm:text-sm text-yellow-600 dark:text-yellow-400 max-w-sm mx-auto">
+                        {{ __('messages.pf_ready_submit_desc') }}
                     </p>
                     <button type="submit" name="action" value="submit_verification"
                             class="bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                   px-8 py-3 rounded-xl shadow-md hover:shadow-lg transition
+                                   px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
                                    transform hover:-translate-y-0.5">
-                        Submit for Verification →
+                        {{ __('messages.pf_submit_verification') }}
                     </button>
                 </div>
             </div>
@@ -214,12 +212,12 @@
         {{-- PENDING                                                        --}}
         {{-- ============================================================ --}}
         @if($user->id_validation_status === 'pending')
-            <div class="p-6 rounded-xl border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-950/20">
+            <div class="p-4 sm:p-6 rounded-xl border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-950/20">
                 <div class="flex flex-col items-center text-center space-y-3">
-                    <div class="text-5xl">⏳</div>
-                    <h4 class="text-lg font-black text-yellow-700 dark:text-yellow-400">Verification in Progress</h4>
-                    <p class="text-sm text-yellow-600 dark:text-yellow-400 max-w-sm">
-                        We're reviewing your submitted documents. This usually takes 1–2 business days.
+                    <div class="text-4xl sm:text-5xl">⏳</div>
+                    <h4 class="text-base sm:text-lg font-black text-yellow-700 dark:text-yellow-400">{{ __('messages.pf_verifying_progress') }}</h4>
+                    <p class="text-xs sm:text-sm text-yellow-600 dark:text-yellow-400 max-w-sm">
+                        {{ __('messages.pf_verifying_desc') }}
                     </p>
                 </div>
             </div>
@@ -229,17 +227,17 @@
         {{-- VERIFIED                                                       --}}
         {{-- ============================================================ --}}
         @if($user->id_validation_status === 'verified')
-            <div class="p-6 rounded-xl border-2 border-green-500 bg-green-50 dark:bg-green-950/20">
+            <div class="p-4 sm:p-6 rounded-xl border-2 border-green-500 bg-green-50 dark:bg-green-950/20">
                 <div class="flex flex-col items-center text-center space-y-3">
-                    <div class="text-5xl">✅</div>
-                    <h4 class="text-lg font-black text-green-600 dark:text-green-400">Identity Verified!</h4>
-                    <p class="text-sm text-green-600 dark:text-green-400 max-w-sm">
-                        Your identity has been successfully verified. You can now:
+                    <div class="text-4xl sm:text-5xl">✅</div>
+                    <h4 class="text-base sm:text-lg font-black text-green-600 dark:text-green-400">{{ __('messages.pf_verified_title') }}</h4>
+                    <p class="text-xs sm:text-sm text-green-600 dark:text-green-400 max-w-sm">
+                        {{ __('messages.pf_verified_desc') }}
                     </p>
                     <ul class="text-xs text-green-600 dark:text-green-400 text-left space-y-1">
-                        <li>✓ Post sitting requests</li>
-                        <li>✓ Apply to become a sitter</li>
-                        <li>✓ Receive higher trust ratings</li>
+                        <li>{{ __('messages.pf_verified_item_1') }}</li>
+                        <li>{{ __('messages.pf_verified_item_2') }}</li>
+                        <li>{{ __('messages.pf_verified_item_3') }}</li>
                     </ul>
                 </div>
             </div>
@@ -249,16 +247,16 @@
         {{-- REJECTED                                                       --}}
         {{-- ============================================================ --}}
         @if($user->id_validation_status === 'rejected')
-            <div class="p-6 rounded-xl border-2 border-red-500 bg-red-50 dark:bg-red-950/20">
+            <div class="p-4 sm:p-6 rounded-xl border-2 border-red-500 bg-red-50 dark:bg-red-950/20">
                 <div class="flex flex-col items-center text-center space-y-3">
-                    <div class="text-5xl">❌</div>
-                    <h4 class="text-lg font-black text-red-600 dark:text-red-400">Verification Failed</h4>
-                    <p class="text-sm text-red-600 dark:text-red-400 max-w-sm">
-                        Your submission was rejected. Please upload a clear selfie holding your valid ID and try again.
+                    <div class="text-4xl sm:text-5xl">❌</div>
+                    <h4 class="text-base sm:text-lg font-black text-red-600 dark:text-red-400">{{ __('messages.pf_failed_title') }}</h4>
+                    <p class="text-xs sm:text-sm text-red-600 dark:text-red-400 max-w-sm">
+                        {{ __('messages.pf_failed_desc') }}
                     </p>
                     <a href="#" onclick="document.getElementById('retry_form').submit()"
                        class="text-sm font-bold text-primary hover:underline">
-                        Retry Verification →
+                        {{ __('messages.pf_retry') }}
                     </a>
                 </div>
             </div>
@@ -268,7 +266,7 @@
         @if(session('status') === 'id-updated')
             <p x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)"
                class="text-sm font-medium text-green-600 dark:text-green-400">
-                ✅ Photo uploaded successfully.
+                {{ __('messages.pf_photo_uploaded') }}
             </p>
         @endif
 
@@ -278,13 +276,13 @@
 <script>
 (function () {
     const idLabels = {
-        passport:        'Passport',
-        drivers_license: "Driver's License",
-        umid:            'UMID',
-        postal_id:       'Postal ID',
-        voters_id:       "Voter's ID",
-        national_id:     'National ID',
-        other:           'Government-issued ID',
+        passport:        @js(__('messages.pf_id_passport')),
+        drivers_license: @js(__('messages.pf_id_drivers_license')),
+        umid:            @js(__('messages.pf_id_umid')),
+        postal_id:       @js(__('messages.pf_id_postal')),
+        voters_id:       @js(__('messages.pf_id_voters')),
+        national_id:     @js(__('messages.pf_id_national')),
+        other:           @js(__('messages.pf_id_doc')),
     };
 
     // ── Step 1: reveal upload area when ID type is picked ──────────────
@@ -294,7 +292,7 @@
 
     function syncIdType(value) {
         if (value) {
-            if (idTypeLabel) idTypeLabel.textContent = idLabels[value] ?? 'ID';
+            if (idTypeLabel) idTypeLabel.textContent = idLabels[value] ?? @js(__('messages.pf_id_fallback'));
             uploadWrapper?.classList.remove('hidden');
         } else {
             uploadWrapper?.classList.add('hidden');

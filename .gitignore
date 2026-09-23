@@ -22,3 +22,13 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# ==========================================
+# DEBUG / SCRAPED / SENSITIVE FILES
+# ==========================================
+cookies.txt
+fetch.json
+send_result.json
+login.html
+login_response.html
+messages_page.html

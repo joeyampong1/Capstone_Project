@@ -3,42 +3,135 @@
 namespace App\Http\Controllers\Sitter;
 
 use App\Http\Controllers\Controller;
+use App\Models\SitterProfile;
+use App\Models\PetType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
 {
     public function create()
     {
-        return view('sitter.sitter_application');
+        $petTypes = PetType::all();
+        $sitterProfile = auth()->user()->sitterProfile;
+        
+        return view('sitters.sitter_application', compact('petTypes', 'sitterProfile'));
     }
 
     public function store(Request $request)
     {
-        $user = auth()->user();
-
-        $validated = $request->validate([
-            'bio' => 'nullable|string',
-            'rate_per_visit' => 'nullable|numeric|min:0',
-            'pet_types' => 'nullable|string|max:255',
-            'food_preference' => 'nullable|in:owner_provides,sitter_provides,flexible',
-            'can_provide_food' => 'sometimes|boolean',
+        $request->validate([
+            'bio' => 'required|string|max:2000',
+            'years_experience' => 'required|numeric|min:0|max:50',
+            'sitter_level' => 'required|in:1,2,3',
+            'rate_per_visit' => 'required|numeric|min:0',
+            'food_preference' => 'required|in:owner_provides,sitter_provides,flexible',
+            'food_budget' => 'nullable|numeric|min:0',
+            'preferred_pet_types' => 'nullable|array',
+            'preferred_pet_types.*' => 'exists:pet_types,id',
+            'preferred_pet_sizes' => 'nullable|array',
+            'preferred_pet_sizes.*' => 'in:small,medium,large,giant',
+            'min_pets_capacity' => 'nullable|integer|min:0|max:20',
+            'max_pets_capacity' => 'nullable|integer|min:1|max:20',
+            // MULTIPLE FILES
+            'certificates' => 'nullable|array',
+            'certificates.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        $user->bio = $validated['bio'];
-        $user->rate_per_visit = $validated['rate_per_visit'];
-        $user->pet_types = $validated['pet_types'];
-        $user->food_preference = $validated['food_preference'];
-        $user->can_provide_food = $request->has('can_provide_food');
-        
-        // If user is not yet a sitter, set application status
-        if (!$user->is_sitter) {
-            $user->is_sitter = true;
-            $user->sitter_status = 'pending';
-            $user->sitter_applied_at = now();
+        $user = auth()->user();
+
+        // Handle multiple certificate uploads
+        $certPaths = [];
+        if ($request->hasFile('certificates')) {
+            foreach ($request->file('certificates') as $file) {
+                $certPaths[] = $file->store('sitter-certificates', 'public');
+            }
         }
 
+        $sitterProfile = $user->sitterProfile ?? new SitterProfile();
+        $sitterProfile->user_id = $user->id;
+        $sitterProfile->bio = $request->bio;
+        $sitterProfile->experience_years = $request->years_experience;
+        $sitterProfile->sitter_type = $request->sitter_level;
+        $sitterProfile->base_rate = $request->rate_per_visit;
+        $sitterProfile->food_preference = $request->food_preference;
+        $sitterProfile->food_budget = $request->food_budget ?? ($request->food_preference === 'sitter_provides' ? 100 : 0);
+        $sitterProfile->preferred_pet_types = $request->input('preferred_pet_types', []);
+        $sitterProfile->preferred_pet_sizes = $request->input('preferred_pet_sizes', []);
+        $sitterProfile->min_pets_capacity = $request->min_pets_capacity;
+        $sitterProfile->max_pets_capacity = $request->max_pets_capacity;
+        if (!empty($certPaths)) {
+            $sitterProfile->certificates_path = $certPaths;
+        }
+        $sitterProfile->is_active = true;
+        $sitterProfile->save();
+
+        $user->is_sitter = true;
+        $user->sitter_status = 'pending';
+        $user->sitter_applied_at = Carbon::now();
         $user->save();
 
-        return redirect()->route('sitter.application.create')->with('status', 'Application submitted successfully!');
+        return redirect()->route('sitter.application')->with('status', 'Application submitted successfully!');
+    }
+
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+        $sitterProfile = $user->sitterProfile;
+
+        if (!$sitterProfile) {
+            return redirect()->route('sitter.application')->withErrors(['error' => 'No sitter application found.']);
+        }
+
+        $request->validate([
+            'bio' => 'required|string|max:2000',
+            'years_experience' => 'required|numeric|min:0|max:50',
+            'sitter_level' => 'required|in:1,2,3',
+            'rate_per_visit' => 'required|numeric|min:0',
+            'food_preference' => 'required|in:owner_provides,sitter_provides,flexible',
+            'food_budget' => 'nullable|numeric|min:0',
+            'preferred_pet_types' => 'nullable|array',
+            'preferred_pet_types.*' => 'exists:pet_types,id',
+            'preferred_pet_sizes' => 'nullable|array',
+            'preferred_pet_sizes.*' => 'in:small,medium,large,giant',
+            'min_pets_capacity' => 'nullable|integer|min:0|max:20',
+            'max_pets_capacity' => 'nullable|integer|min:1|max:20',
+            // MULTIPLE FILES
+            'certificates' => 'nullable|array',
+            'certificates.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $sitterProfile->bio = $request->bio;
+        $sitterProfile->experience_years = $request->years_experience;
+        $sitterProfile->sitter_type = $request->sitter_level;
+        $sitterProfile->base_rate = $request->rate_per_visit;
+        $sitterProfile->food_preference = $request->food_preference;
+        $sitterProfile->food_budget = $request->food_budget ?? ($request->food_preference === 'sitter_provides' ? 100 : 0);
+        $sitterProfile->preferred_pet_types = $request->input('preferred_pet_types', []);
+        $sitterProfile->preferred_pet_sizes = $request->input('preferred_pet_sizes', []);
+        $sitterProfile->min_pets_capacity = $request->min_pets_capacity;
+        $sitterProfile->max_pets_capacity = $request->max_pets_capacity;
+
+        // Handle multiple certificate uploads
+        if ($request->hasFile('certificates')) {
+            // Delete old certificates (loop through array)
+            if (!empty($sitterProfile->certificates_path) && is_array($sitterProfile->certificates_path)) {
+                foreach ($sitterProfile->certificates_path as $oldPath) {
+                    Storage::disk('public')->delete($oldPath);
+                }
+            }
+
+            // Store new certificates
+            $certPaths = [];
+            foreach ($request->file('certificates') as $file) {
+                $certPaths[] = $file->store('sitter-certificates', 'public');
+            }
+            $sitterProfile->certificates_path = $certPaths;
+        }
+
+        $sitterProfile->save();
+
+        return redirect()->route('sitter.application')->with('status', 'Application updated successfully.');
     }
 }
