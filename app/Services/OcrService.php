@@ -187,13 +187,50 @@ class OcrService
 
     private function extractName(string $text): ?string
     {
+        $name = null;
+
         if (preg_match('/\b([A-Z]{2,},\s+[A-Z][A-Z\s]+?)(?=\n|Nationality|Date)/i', $text, $m)) {
-            return trim($m[1]);
+            $name = trim($m[1]);
+        } elseif (preg_match('/(?:name|pangalan)[:\s]+([A-Z][A-Z\s,\.]+)/i', $text, $m)) {
+            $name = trim($m[1]);
         }
-        if (preg_match('/(?:name|pangalan)[:\s]+([A-Z][A-Z\s,\.]+)/i', $text, $m)) {
-            return trim($m[1]);
+
+        if ($name) {
+            // Common OCR misreads correction
+            $name = $this->correctOcrMisreads($name);
         }
-        return null;
+
+        return $name;
+    }
+
+    /**
+     * Correct common OCR misreads sa names.
+     */
+    private function correctOcrMisreads(string $name): string
+    {
+        // Listahan sa common misreads sa Filipino names
+        $corrections = [
+            // "OR" → "JR" (Junior suffix)
+            '/\b([A-Z]+)\s+OR\s+([A-Z]+)\b/' => '$1 JR $2',
+
+            // "OR" sa katapusan sa name (e.g., "JOEY OR")
+            '/\b([A-Z]+)\s+OR\b/' => '$1 JR',
+
+            // "0" → "O" (zero to letter O)
+            '/\b([A-Z])0([A-Z]+)/' => '$1O$2',
+
+            // "1" → "I" (one to letter I)
+            '/\b([A-Z])1([A-Z]+)/' => '$1I$2',
+
+            // "5" → "S" (five to letter S)
+            '/\b([A-Z])5([A-Z]+)/' => '$1S$2',
+        ];
+
+        foreach ($corrections as $pattern => $replacement) {
+            $name = preg_replace($pattern, $replacement, $name);
+        }
+
+        return $name;
     }
 
     private function extractIdNumber(string $text): ?string

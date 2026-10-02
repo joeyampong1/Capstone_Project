@@ -2466,4 +2466,9 @@ return [
     'otb_overdue'               => 'Overdue — nakatakda :time',
     'otb_view_details'          => 'Tingnan ang detalye ng bisita →',
 
+
+    // Onboarding profile completeness
+    'onboard_profile_incomplete_title' => 'Hindi Kumpleto ang Profile',
+    'onboard_profile_incomplete_desc'  => 'Pakikompleto ang impormasyon ng iyong profile (petsa ng kapanganakan, kasarian, contact, address) bago i-verify ang iyong ID.',
+    'onboard_complete_profile'         => 'Kumpletuhin ang Profile',
 ];

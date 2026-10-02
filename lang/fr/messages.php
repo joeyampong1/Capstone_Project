@@ -582,8 +582,14 @@ return [
     'idv_ocr_match_hint'   => "Vérifiez le nom sur la pièce d'identité avec le profil de l'utilisateur",
     'idv_ocr_failed_desc'  => "L'OCR n'a pas pu extraire les détails. Veuillez vérifier manuellement la photo de la pièce d'identité.",
 
+    'idv_reject_confirm_title' => 'Rejeter cette vérification ?',
+    'idv_reject_confirm_desc'  => 'L\'utilisateur sera invité à soumettre à nouveau ses documents.',
+    'idv_reject_warning'       => 'Cela informera l\'utilisateur que sa vérification a été rejetée. Il peut réessayer avec des photos plus claires.',
+    'idv_cancel'               => 'Annuler',
+    'idv_yes_reject'           => 'Oui, rejeter',
+
     // ========================================== //
-    // SUPPORT INBOX (Admin)                       //
+    // SUPPORT INBOX (Admin)                      //
     // ========================================== //
     'inbox_title'              => 'Boîte de Support',
     'inbox_subtitle'           => 'Messages et signalements de problèmes des propriétaires et gardiens',
@@ -865,7 +871,7 @@ return [
     'sv_reject_note'           => 'Le motif sera envoyé par notification et email au candidat.',
     'sv_yes_reject'            => 'Oui, Rejeter',
 
-        // ========================================== //
+    // ========================================== //
     // USER MANAGEMENT (Admin)                     //
     // ========================================== //
     'um_title'                 => 'Gestion des Utilisateurs',
@@ -931,6 +937,26 @@ return [
     'um_ban_ph'                => 'ex., Plusieurs plaintes vérifiées de mauvaise conduite.',
     'um_yes_ban'               => 'Oui, Bannir l\'Utilisateur',
 
+    'um_tooltip_delete'   => "Supprimer l'Utilisateur",
+    'um_delete_title'     => "Supprimer le Compte Utilisateur ?",
+    'um_delete_warning'   => 'Le compte sera masqué des utilisateurs actifs. Vous pouvez le restaurer dans les 30 jours.',
+    'um_delete_confirm_js'=> 'Êtes-vous absolument sûr de vouloir supprimer cet utilisateur ? Cette action peut être annulée par l\'admin.',
+    'um_yes_delete'       => 'Oui, Supprimer',
+
+    // Promote / Demote
+    'um_tooltip_promote'   => 'Promouvoir en Admin',
+    'um_tooltip_demote'    => 'Rétrograder de Admin',
+    'um_confirm_promote'   => 'Promouvoir :name en Administrateur ?',
+    'um_confirm_demote'    => 'Rétrograder :name d\'Administrateur en Propriétaire ?',
+
+    // Promote / Demote modals
+    'um_promote_title'    => 'Promouvoir en Admin ?',
+    'um_promote_warning'  => 'Cet utilisateur obtiendra tous les privilèges d\'administrateur et l\'accès à toutes les fonctionnalités.',
+    'um_yes_promote'      => 'Oui, Promouvoir',
+    'um_demote_title'     => 'Rétrograder de Admin ?',
+    'um_demote_warning'   => 'Cet utilisateur perdra tous les privilèges d\'administrateur et deviendra Propriétaire.',
+    'um_yes_demote'       => 'Oui, Rétrograder',
+
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -975,7 +1001,7 @@ return [
 
     'ud_back_btn'              => '← Retour',
 
-        // ========================================== //
+    // ========================================== //
     // ADMIN HOME (Creative Homepage)              //
     // ========================================== //
     'ah_title'                 => 'Accueil Admin',
@@ -1275,6 +1301,11 @@ return [
     'onboard_later'         => 'Plus tard',
     'onboard_continue'      => 'Continuer',
     'onboard_verify_title'  => 'Vérifiez Votre Identité',
+
+    // Profile completeness
+    'onboard_profile_incomplete_title' => 'Profil incomplet',
+    'onboard_profile_incomplete_desc'  => 'Veuillez compléter les informations de votre profil (date de naissance, sexe, contact, adresse) avant de vérifier votre identité.',
+    'onboard_complete_profile'         => 'Compléter le profil',
 
     // ========================================== //
     // HELP & SUPPORT (Owner/Sitter)               //
@@ -1808,7 +1839,7 @@ return [
     'sp_pets_not_specified'   => 'Non spécifié',
     'sp_sitter_fallback'      => 'Gardien',
 
-        'pf_title'                 => 'Profil',
+    'pf_title'                 => 'Profil',
     'pf_role_sitter_level'     => 'Gardien • Niveau :level',
     'pf_role_owner'            => 'Propriétaire',
     'pf_location_not_set'      => 'Localisation non définie',
@@ -1948,7 +1979,33 @@ return [
     'pf_password'              => 'Mot de Passe',
     'pf_cancel'                => 'Annuler',
 
-        'ss_title'                 => 'Paramètres Système',
+    'pf_open_camera'         => 'Ouvrir la caméra',
+    'pf_choose_gallery'      => 'Choisir dans la galerie',
+    'pf_retry_camera'        => 'Reprendre',
+    'pf_retry_gallery'       => 'Choisir un autre',
+    'pf_camera_denied'       => 'Accès caméra refusé. Veuillez autoriser l\'accès ou utiliser la galerie.',
+    'pf_camera_title'        => 'Prendre une photo',
+    'pf_id_camera_title'     => 'Capturez votre pièce d\'identité',
+    'pf_selfie_camera_title' => 'Selfie avec la pièce d\'identité',
+    'pf_capture_photo'       => 'Capturer',
+    'pf_cancel'              => 'Annuler',
+
+    // ID Extraction Result
+    'pf_ocr_success_title'     => 'Pièce d\'identité lue avec succès',
+    'pf_ocr_success_desc'      => 'Nous avons réussi à lire les détails de votre pièce d\'identité.',
+    'pf_ocr_failed_title'      => 'Impossible de lire votre pièce d\'identité',
+    'pf_ocr_failed_desc'       => 'Veuillez réessayer avec une photo plus claire. Assurez-vous que tout le texte est lisible et que l\'éclairage est bon.',
+    'pf_ocr_label_name'        => 'Nom',
+    'pf_ocr_label_id'          => 'Numéro d\'identification',
+
+    // Profile Incomplete Warning (Step 3)
+    'pf_profile_incomplete_title' => 'Complétez votre profil',
+    'pf_profile_incomplete_desc'  => 'Avant de soumettre pour la vérification d\'identité, veuillez compléter les informations de votre profil.',
+    'pf_complete_profile_btn'     => 'Compléter le profil',
+    'pf_missing_field'            => 'Manquant',
+
+
+    'ss_title'                 => 'Paramètres Système',
     'ss_subtitle'              => 'Gérez vos préférences de compte et configurations',
 
     'ss_sitter_mode'           => 'Mode Gardien',
@@ -2055,7 +2112,7 @@ return [
     'ss_delete'                => 'Supprimer',
     'ss_save_settings'         => 'Enregistrer les Paramètres',
 
-        'sa_title'                 => 'Postuler comme Gardien',
+    'sa_title'                 => 'Postuler comme Gardien',
     'sa_subtitle'              => 'Complétez votre profil de gardien pour commencer à accepter des réservations',
     'sa_back_dashboard'        => 'Retour au Tableau de Bord',
     'sa_sitter_details'        => 'Détails du Gardien',
@@ -2174,7 +2231,7 @@ return [
     'sav_sat'                   => 'Sam',
     'sav_today'                 => "Aujourd'hui",
 
-        'sbv_title'                 => 'Visites de Réservation',
+    'sbv_title'                 => 'Visites de Réservation',
     'sbv_booking_ref'           => 'Référence de Réservation',
     'sbv_pet'                   => 'Animal',
     'sbv_pet_default'           => 'Animal',
@@ -2447,4 +2504,9 @@ return [
     'otb_overdue'               => 'En retard — prévu :time',
     'otb_view_details'          => 'Voir les détails de la visite →',
 
+
+    // Onboarding profile completeness
+    'onboard_profile_incomplete_title' => 'Profil incomplet',
+    'onboard_profile_incomplete_desc'  => 'Veuillez compl�ter les informations de votre profil (date de naissance, sexe, contact, adresse) avant de v�rifier votre identit�.',
+    'onboard_complete_profile'         => 'Compl�ter le profil',
 ];

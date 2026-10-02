@@ -210,6 +210,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/verification/id/{id}/download', [IdVerificationController::class, 'download'])
             ->name('verification.id.download');
 
+        Route::post('/verification/id/{id}/update-ocr', [IdVerificationController::class, 'updateOcrName'])  ->name('verification.id.updateOcr');
+
         // Verification — Sitter
         Route::get('/verification/sitter', [SitterVerificationController::class, 'index'])
             ->name('verification.sitter');

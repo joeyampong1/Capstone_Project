@@ -582,6 +582,12 @@ return [
     'idv_ocr_match_hint'   => 'Verificar el nombre del ID con el perfil del usuario',
     'idv_ocr_failed_desc'  => 'El OCR no pudo extraer los detalles. Por favor revise la foto del ID manualmente.',
 
+    'idv_reject_confirm_title' => '¿Rechazar esta verificación?',
+    'idv_reject_confirm_desc'  => 'Se le pedirá al usuario que vuelva a enviar sus documentos.',
+    'idv_reject_warning'       => 'Esto notificará al usuario que su verificación fue rechazada. Puede intentarlo de nuevo con fotos más claras.',
+    'idv_cancel'               => 'Cancelar',
+    'idv_yes_reject'           => 'Sí, rechazar',
+
     // ========================================== //
     // SUPPORT INBOX (Admin)                       //
     // ========================================== //
@@ -1295,11 +1301,6 @@ return [
     'onboard_later'         => 'Más tarde',
     'onboard_continue'      => 'Continuar',
     'onboard_verify_title'  => 'Verifica Tu Identidad',
-
-    // Profile completeness
-    'onboard_profile_incomplete_title' => 'Perfil incompleto',
-    'onboard_profile_incomplete_desc'  => 'Complete la información de su perfil (fecha de nacimiento, género, contacto, dirección) antes de verificar su identificación.',
-    'onboard_complete_profile'         => 'Completar perfil',
 
     // ========================================== //
     // HELP & SUPPORT (Owner/Sitter)               //
@@ -2498,4 +2499,14 @@ return [
     'otb_overdue'               => 'Vencido — programado :time',
     'otb_view_details'          => 'Ver detalles de la visita →',
 
+    // Onboarding profile completeness
+    "onboard_profile_incomplete_title" => "Perfil incompleto",
+    "onboard_profile_incomplete_desc"  => "Complete la información de su perfil (fecha de nacimiento, género, contacto, dirección) antes de verificar su identificación.",
+    "onboard_complete_profile"         => "Completar perfil",
+
+
+    // Onboarding profile completeness
+    'onboard_profile_incomplete_title' => 'Perfil incompleto',
+    'onboard_profile_incomplete_desc'  => 'Complete la informaci�n de su perfil (fecha de nacimiento, g�nero, contacto, direcci�n) antes de verificar su identificaci�n.',
+    'onboard_complete_profile'         => 'Completar perfil',
 ];

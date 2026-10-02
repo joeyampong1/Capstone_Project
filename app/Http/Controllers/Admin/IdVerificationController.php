@@ -118,5 +118,18 @@ class IdVerificationController extends Controller
 
         return response()->download($zipPath)->deleteFileAfterSend(true);
     }
-    
+
+    public function updateOcrName(Request $request, $id)
+        {
+            $request->validate(['ocr_name' => 'required|string|max:255']);
+
+            $user = User::findOrFail($id);
+            $ocr = $user->ocr_result;
+            $ocr['name'] = $request->ocr_name;
+            $user->ocr_result = $ocr;
+            $user->save();
+
+            return response()->json(['success' => true]);
+        }
+
 }

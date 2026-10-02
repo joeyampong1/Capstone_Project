@@ -31,7 +31,6 @@
         default  => 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300',
     };
 
-    // Localized status labels
     $statusLabel = fn (?string $s) => match (strtolower((string) $s)) {
         'pending'  => __('messages.status_pending'),
         'verified' => __('messages.status_verified'),
@@ -39,7 +38,6 @@
         default    => ucfirst(str_replace('_', ' ', (string) ($s ?? 'unknown'))),
     };
 
-    // Localized role labels
     $roleLabel = fn (?string $r) => match (strtolower((string) $r)) {
         'owner'  => __('messages.role_owner'),
         'sitter' => __('messages.role_sitter'),
@@ -50,7 +48,6 @@
      | Modal payload
      |------------------------------------------------------------------*/
     $modalRows = $verifications->map(function ($u) use ($initials, $statusLabel, $roleLabel) {
-        // Extract OCR data
         $ocr = $u->ocr_result ?? [];
         $ocrSuccess = $ocr['success'] ?? false;
 
@@ -86,8 +83,6 @@
                 'name_match'      => $u->name_match,
                 'birthdate_match' => $u->birthdate_match,
             ],
-
-            // OCR RESULT
             'ocr' => [
                 'success'    => $ocrSuccess,
                 'name'       => $ocr['name']      ?? null,
@@ -96,7 +91,6 @@
                 'raw_text'   => $ocr['raw_text']  ?? null,
                 'error'      => $ocr['error']     ?? null,
             ],
-
             'notes' => $u->admin_notes ?? '',
         ];
     })->values();
@@ -128,11 +122,23 @@
             rows: @js($modalRows),
             selected: null,
             showDetail: false,
+            rejectModal: false,
 
             openDetail(id) {
                 this.selected = this.rows.find(r => r.id === id) ?? null;
                 this.showDetail = !!this.selected;
             },
+
+            openRejectModal() {
+                this.rejectModal = true;
+            },
+
+            confirmReject() {
+                if (this.$refs.rejectForm) {
+                    this.$refs.rejectForm.submit();
+                }
+            },
+
             overallResult(row) {
                 const a = row.api || {};
                 const norm = (v) => {
@@ -420,7 +426,7 @@
                 </div>
             </div>
 
-            {{-- ④ VERIFICATION DETAILS MODAL — gi-move SA SULOD sa x-data --}}
+            {{-- ④ VERIFICATION DETAILS MODAL --}}
             <div x-show="showDetail"
                  x-cloak
                  class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:px-4 sm:py-8 bg-black/50 backdrop-blur-sm overflow-y-auto"
@@ -497,9 +503,7 @@
                                                     class="w-full h-full object-cover rounded-lg cursor-pointer transition group-hover:opacity-80"
                                                     @click="window.open(selected.id_front, '_blank')">
 
-                                                {{-- Hover overlay with icons --}}
                                                 <div class="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition bg-black/40 rounded-lg pointer-events-none">
-                                                    {{-- View icon --}}
                                                     <button type="button"
                                                             @click.stop="window.open(selected.id_front, '_blank')"
                                                             class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
@@ -509,7 +513,6 @@
                                                         </svg>
                                                     </button>
 
-                                                    {{-- Download icon --}}
                                                     <a :href="selected.id_front"
                                                     download="id_front.jpg"
                                                     @click.stop
@@ -541,9 +544,7 @@
                                                     class="w-full h-full object-cover rounded-lg cursor-pointer transition group-hover:opacity-80"
                                                     @click="window.open(selected.selfie, '_blank')">
 
-                                                {{-- Hover overlay with icons --}}
                                                 <div class="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition bg-black/40 rounded-lg pointer-events-none">
-                                                    {{-- View icon --}}
                                                     <button type="button"
                                                             @click.stop="window.open(selected.selfie, '_blank')"
                                                             class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
@@ -553,7 +554,6 @@
                                                         </svg>
                                                     </button>
 
-                                                    {{-- Download icon --}}
                                                     <a :href="selected.selfie"
                                                     download="selfie.jpg"
                                                     @click.stop
@@ -599,7 +599,6 @@
                                             <span class="font-bold text-[#1B3B36] dark:text-white text-right break-words" x-text="selected?.ocr?.dob || '—'"></span>
                                         </div>
 
-                                        {{-- Comparison: OCR name vs user's registered name --}}
                                         <div class="mt-3 pt-3 border-t border-gray-200 dark:border-neutral-700">
                                             <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">{{ __('messages.idv_ocr_compare') }}</p>
                                             <div class="flex items-center gap-2 text-xs">
@@ -686,8 +685,9 @@
                             <div class="space-y-2">
                                 <div class="flex flex-col gap-2">
 
-                                    {{-- Approve --}}
-                                    <form method="POST" :action="approveUrl()" x-show="selected?.status !== 'verified'">
+                                    {{-- Approve — hide kung verified/rejected --}}
+                                    <form method="POST" :action="approveUrl()"
+                                          x-show="!['rejected', 'verified'].includes(selected?.status)">
                                         @csrf
                                         <input type="hidden" name="admin_notes" :value="selected?.notes ?? ''">
                                         <button type="submit"
@@ -699,12 +699,14 @@
                                         </button>
                                     </form>
 
-                                    {{-- Reject --}}
-                                    <form method="POST" :action="rejectUrl()" x-show="selected?.status !== 'rejected'"
-                                          @submit="if (!confirm('{{ __('messages.idv_confirm_reject') }}')) $event.preventDefault()">
+                                    {{-- Reject — hide kung verified/rejected --}}
+                                    <form method="POST" :action="rejectUrl()"
+                                          x-show="!['rejected', 'verified'].includes(selected?.status)"
+                                          x-ref="rejectForm">
                                         @csrf
                                         <input type="hidden" name="admin_notes" :value="selected?.notes ?? ''">
-                                        <button type="submit"
+                                        <button type="button"
+                                                @click="openRejectModal()"
                                                 class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-sm rounded-xl transition">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -747,6 +749,54 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            {{-- ⑤ REJECT CONFIRMATION MODAL --}}
+            <div x-show="rejectModal" x-cloak x-transition.opacity
+                 class="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                 @click.away="rejectModal = false"
+                 @keydown.escape.window="rejectModal = false">
+
+                <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-md w-full p-5 sm:p-6"
+                     @click.stop>
+
+                    {{-- Header --}}
+                    <div class="flex items-start gap-3 mb-4">
+                        <div class="w-11 h-11 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 class="text-base font-black text-[#1B3B36] dark:text-white">
+                                {{ __('messages.idv_reject_confirm_title') }}
+                            </h3>
+                            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                                {{ __('messages.idv_reject_confirm_desc') }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Warning --}}
+                    <div class="p-3 mb-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                        <p class="text-[11px] text-red-700 dark:text-red-400 font-bold">
+                            ⚠️ {{ __('messages.idv_reject_warning') }}
+                        </p>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div class="flex gap-2">
+                        <button type="button" @click="rejectModal = false"
+                                class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            {{ __('messages.idv_cancel') }}
+                        </button>
+
+                        <button type="button" @click="confirmReject()"
+                                class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs transition shadow-md hover:shadow-lg">
+                            {{ __('messages.idv_yes_reject') }}
+                        </button>
+                    </div>
                 </div>
             </div>
 

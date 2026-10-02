@@ -483,31 +483,34 @@
                     </ul>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-2 pt-2">
-                    @if(!$profileComplete)
-                        <div class="w-full mb-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                            <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <div>
-                                    <p class="text-xs font-bold text-amber-700 dark:text-amber-400">
-                                        {{ __('messages.onboard_profile_incomplete_title') }}
-                                    </p>
-                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
-                                        {{ __('messages.onboard_profile_incomplete_desc') }}
-                                    </p>
-                                </div>
+                {{-- Warning box — separate sa buttons --}}
+                @if(!$profileComplete)
+                    <div class="mb-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-amber-700 dark:text-amber-400">
+                                    {{ __('messages.onboard_profile_incomplete_title') }}
+                                </p>
+                                <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                    {{ __('messages.onboard_profile_incomplete_desc') }}
+                                </p>
                             </div>
                         </div>
-                    @endif
+                    </div>
+                @endif
+
+                {{-- Buttons row — 2 columns --}}
+                <div class="flex flex-col sm:flex-row gap-2">
                     <button type="button"
                             @click="close()"
                             class="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
                         {{ __('messages.onboard_later') }}
                     </button>
+
                     @if($profileComplete)
-                        {{-- Continue button --}}
                         <button type="button"
                                 @click="step = 'verify'"
                                 class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition">
@@ -517,19 +520,15 @@
                             </svg>
                         </button>
                     @else
-                        {{-- Redirect sa profile page --}}
                         <a href="{{ route('profile.edit') }}"
-                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition">
                             {{ __('messages.onboard_complete_profile') }}
                         </a>
                     @endif
                 </div>
             </div>
 
-            {{-- VERIFY STEP (i-reuse ang update-id-form content) --}}
+            {{-- VERIFY STEP --}}
             <div x-show="step === 'verify'"
                 x-cloak
                 x-transition.opacity

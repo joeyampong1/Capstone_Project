@@ -2647,4 +2647,9 @@ return [
     'otb_overdue'               => 'Overdue — scheduled :time',
     'otb_view_details'          => 'View visit details →',
 
+
+    // Onboarding profile completeness
+    'onboard_profile_incomplete_title' => 'Profile Incomplete',
+    'onboard_profile_incomplete_desc'  => 'Please complete your profile information (DOB, gender, contact, address) before verifying your ID.',
+    'onboard_complete_profile'         => 'Complete Profile First',
 ];
