@@ -25,7 +25,7 @@ return [
     'large'             => 'Grand',
     'extra_large'       => 'Très Grand',
 
-        // ========================================== //
+    // ========================================== //
     // ADMIN DASHBOARD                             //
     // ========================================== //
     'admin_dashboard_title'        => 'Tableau de Bord Administrateur',
@@ -264,7 +264,7 @@ return [
 
     'analytics_last_updated'     => 'Dernière Mise à Jour :',
     'analytics_auto_refresh'     => 'Rafraîchissement auto toutes les 5 minutes',
-    
+
         // ========================================== //
     // COMPLAINTS MANAGEMENT (Admin)               //
     // ========================================== //
@@ -495,7 +495,7 @@ return [
     'help_ticket_empty_desc'  => 'Soumettez votre premier ticket en utilisant le formulaire.',
     'help_ticket_response'    => 'Réponse du Support',
 
-        // ========================================== //
+    // ========================================== //
     // ID VERIFICATION (Admin)                     //
     // ========================================== //
     'idv_title'                => 'Vérification d\'ID',
@@ -569,7 +569,20 @@ return [
     'idv_guide_3'              => 'Vérifiez le résultat de l\'API.',
     'idv_guide_4'              => 'Rejeter uniquement si la vérification échoue ou les documents sont invalides.',
 
-        // ========================================== //
+    // Admin ID Verification — OCR
+    'idv_ocr_title'        => "Résultat d'Extraction OCR",
+    'idv_ocr_success'      => 'Extrait',
+    'idv_ocr_failed'       => 'Non Extrait',
+    'idv_ocr_name'         => 'Nom',
+    'idv_ocr_id_number'    => 'Numéro de Pièce',
+    'idv_ocr_dob'          => 'Date de Naissance',
+    'idv_ocr_compare'      => "Comparaison avec le Profil de l'Utilisateur",
+    'idv_ocr_match_yes'    => '✓ Nom Correspondant',
+    'idv_ocr_match_check'  => '⚠ Vérifier Manuellement',
+    'idv_ocr_match_hint'   => "Vérifiez le nom sur la pièce d'identité avec le profil de l'utilisateur",
+    'idv_ocr_failed_desc'  => "L'OCR n'a pas pu extraire les détails. Veuillez vérifier manuellement la photo de la pièce d'identité.",
+
+    // ========================================== //
     // SUPPORT INBOX (Admin)                       //
     // ========================================== //
     'inbox_title'              => 'Boîte de Support',
@@ -633,7 +646,7 @@ return [
     'msg_delete'               => 'Supprimer le Message',
     'msg_confirm_delete'       => 'Supprimer définitivement ce message ? Cette action est irréversible.',
 
-        // ========================================== //
+    // ==========================================//
     // REPORTS (Admin)                             //
     // ========================================== //
     'reports_title'              => 'Rapports',
@@ -1254,7 +1267,16 @@ return [
     'od_cta_desc'                 => '¡Únete a PetNanny hoy — es gratis!',
     'od_cta_explore'              => 'Explorar Cuidadores',
 
-        // ========================================== //
+    'onboard_title'         => 'Vérifiez Votre Compte',
+    'onboard_desc'          => 'Pour débloquer toutes les fonctionnalités et établir la confiance avec la communauté, veuillez vérifier votre identité.',
+    'onboard_item_1'        => 'Téléchargez une pièce d\'identité officielle valide',
+    'onboard_item_2'        => 'Prenez un selfie en tenant votre pièce d\'identité',
+    'onboard_item_3'        => 'Attendez la vérification de l\'administrateur (1-2 jours ouvrables)',
+    'onboard_later'         => 'Plus tard',
+    'onboard_continue'      => 'Continuer',
+    'onboard_verify_title'  => 'Vérifiez Votre Identité',
+
+    // ========================================== //
     // HELP & SUPPORT (Owner/Sitter)               //
     // ========================================== //
     'hs_title'                    => 'Aide et Support',

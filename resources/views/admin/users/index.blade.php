@@ -35,8 +35,8 @@
         </div>
     </x-slot>
 
-    <div class="py-4 sm:py-6 bg-white dark:bg-neutral-950 min-h-screen antialiased text-neutral-800 dark:text-neutral-200"
-         x-data="{ suspendModal: false, banModal: false, actionUserId: null, actionUserName: '', actionUrl: '' }">
+     <div class="py-4 sm:py-6 bg-white dark:bg-neutral-950 min-h-screen antialiased text-neutral-800 dark:text-neutral-200"
+            x-data="{ suspendModal: false, banModal: false, deleteModal: false, promoteModal: false, demoteModal: false, actionUserId: null, actionUserName: '', actionUrl: '' }">
         <div class="w-full sm:max-w-7xl mx-auto px-2 sm:px-16 lg:px-24">
 
             @if(session('status'))
@@ -309,6 +309,42 @@
                                                 </form>
                                             @endif
 
+                                            {{-- DELETE BUTTON (BAG-O) --}}
+                                            @if(! $user->isAdmin() && $user->id !== auth()->id())
+                                                <button type="button"
+                                                        @click="deleteModal = true; actionUserId = {{ $user->id }}; actionUserName = '{{ addslashes($fullName) }}'; actionUrl = '{{ route('admin.users.destroy', $user->id) }}'"
+                                                        class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-red-700"
+                                                        title="{{ __('messages.um_tooltip_delete') }}">
+                                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                </button>
+                                            @endif
+
+                                            {{-- PROMOTE TO ADMIN --}}
+                                            @if(! $user->isAdmin() && $user->status === 'active' && $user->id !== auth()->id())
+                                                <button type="button"
+                                                        @click="promoteModal = true; actionUserId = {{ $user->id }}; actionUserName = '{{ addslashes($fullName) }}'; actionUrl = '{{ route('admin.users.promote', $user->id) }}'"
+                                                        class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-purple-600"
+                                                        title="{{ __('messages.um_tooltip_promote') }}">
+                                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                                    </svg>
+                                                </button>
+                                            @endif
+
+                                            {{-- DEMOTE FROM ADMIN --}}
+                                            @if($user->isAdmin() && $user->id !== auth()->id() && \App\Models\User::where('role', 'admin')->count() > 1)
+                                                <button type="button"
+                                                        @click="demoteModal = true; actionUserId = {{ $user->id }}; actionUserName = '{{ addslashes($fullName) }}'; actionUrl = '{{ route('admin.users.demote', $user->id) }}'"
+                                                        class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-orange-600"
+                                                        title="{{ __('messages.um_tooltip_demote') }}">
+                                                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                                    </svg>
+                                                </button>
+                                            @endif
+
                                         </div>
                                     </td>
                                 </tr>
@@ -439,6 +475,143 @@
                         <button type="submit"
                                 class="flex-1 px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition shadow-md hover:shadow-lg">
                             {{ __('messages.um_yes_ban') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- DELETE MODAL (BAG-O) --}}
+        <div x-show="deleteModal" x-cloak x-transition.opacity
+             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+             @click.away="deleteModal = false">
+
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-md w-full p-5 sm:p-6"
+                 @click.stop>
+
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-700 dark:text-red-400 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base font-black text-[#1B3B36] dark:text-white">{{ __('messages.um_delete_title') }}</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            <strong x-text="actionUserName"></strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 mb-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                    <p class="text-[11px] text-red-700 dark:text-red-400 font-bold">
+                        ⚠️ {{ __('messages.um_delete_warning') }}
+                    </p>
+                </div>
+
+                <form method="POST" :action="actionUrl"
+                      @submit="if (!confirm('{{ __('messages.um_delete_confirm_js') }}')) $event.preventDefault()">
+                    @csrf
+                    @method('DELETE')
+
+                    <div class="flex gap-2 mt-4">
+                        <button type="button" @click="deleteModal = false"
+                                class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            {{ __('messages.um_cancel') }}
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 rounded-xl bg-red-700 hover:bg-red-800 text-white font-bold text-xs transition shadow-md hover:shadow-lg">
+                            {{ __('messages.um_yes_delete') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- PROMOTE MODAL --}}
+        <div x-show="promoteModal" x-cloak x-transition.opacity
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            @click.away="promoteModal = false">
+
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-md w-full p-5 sm:p-6"
+                @click.stop>
+
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base font-black text-[#1B3B36] dark:text-white">{{ __('messages.um_promote_title') }}</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            <strong x-text="actionUserName"></strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 mb-4 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800">
+                    <p class="text-[11px] text-purple-700 dark:text-purple-400 font-bold">
+                        ⚠️ {{ __('messages.um_promote_warning') }}
+                    </p>
+                </div>
+
+                <form method="POST" :action="actionUrl">
+                    @csrf
+
+                    <div class="flex gap-2 mt-4">
+                        <button type="button" @click="promoteModal = false"
+                                class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            {{ __('messages.um_cancel') }}
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs transition shadow-md hover:shadow-lg">
+                            {{ __('messages.um_yes_promote') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {{-- DEMOTE MODAL --}}
+        <div x-show="demoteModal" x-cloak x-transition.opacity
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            @click.away="demoteModal = false">
+
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-md w-full p-5 sm:p-6"
+                @click.stop>
+
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-11 h-11 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="text-base font-black text-[#1B3B36] dark:text-white">{{ __('messages.um_demote_title') }}</h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            <strong x-text="actionUserName"></strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-3 mb-4 rounded-xl bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800">
+                    <p class="text-[11px] text-orange-700 dark:text-orange-400 font-bold">
+                        ⚠️ {{ __('messages.um_demote_warning') }}
+                    </p>
+                </div>
+
+                <form method="POST" :action="actionUrl">
+                    @csrf
+
+                    <div class="flex gap-2 mt-4">
+                        <button type="button" @click="demoteModal = false"
+                                class="flex-1 px-4 py-2.5 rounded-xl border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-xs hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            {{ __('messages.um_cancel') }}
+                        </button>
+                        <button type="submit"
+                                class="flex-1 px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs transition shadow-md hover:shadow-lg">
+                            {{ __('messages.um_yes_demote') }}
                         </button>
                     </div>
                 </form>

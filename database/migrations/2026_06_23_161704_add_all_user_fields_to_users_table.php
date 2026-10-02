@@ -60,7 +60,7 @@ return new class extends Migration
             $table->string('gov_id_path')->nullable()->after('profile_photo');
             
             // ID validation status
-            $table->enum('id_validation_status', ['pending', 'verified', 'rejected'])->default('pending')->after('gov_id_path');
+            $table->enum('id_validation_status', ['unverified', 'pending', 'verified', 'rejected'])->default('unverified')->after('gov_id_path');
             
             // ========================================== //
             // PET OWNER FIELDS                          //

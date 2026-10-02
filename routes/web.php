@@ -67,7 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
     Route::patch('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location');
     Route::post('/profile/id', [ProfileController::class, 'updateId'])->name('profile.id');
-    
+
     Route::patch('/settings/sitter-mode', [ProfileController::class, 'toggleSitterMode'])
         ->name('settings.sitter-mode');
 
@@ -103,6 +103,14 @@ Route::middleware(['auth'])->group(function () {
 
     Route::delete('/notifications', [NotificationController::class, 'clearAll'])
         ->name('notifications.clearAll');
+
+    // ============================================================
+    // ONBOARDING (All authenticated users)
+    // ============================================================
+    Route::post('/onboarding/dismiss', function () {
+        auth()->user()->update(['onboarding_dismissed' => true]);
+        return response()->json(['ok' => true]);
+    })->name('onboarding.dismiss');
 
     // ============================================================
     // BADGE COUNTS (Live polling for navbar)
@@ -177,12 +185,17 @@ Route::middleware(['auth'])->group(function () {
 
         // User Management
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
-        Route::get('/users/export', [AdminUserController::class, 'export'])->name('users.export'); 
+        Route::get('/users/export', [AdminUserController::class, 'export'])->name('users.export');
         Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
         Route::post('/users/{user}/suspend', [AdminUserController::class, 'suspend'])->name('users.suspend');
         Route::post('/users/{user}/activate', [AdminUserController::class, 'activate'])->name('users.activate');
         Route::post('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
         Route::post('/users/{user}/restore', [AdminUserController::class, 'restore'])->name('users.restore');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/users/{user}/restore-deleted', [AdminUserController::class, 'restoreDeleted'])->name('users.restoreDeleted');
+        Route::post('/users/{user}/force-delete', [AdminUserController::class, 'forceDelete'])->name('users.forceDelete');
+        Route::post('/users/{user}/promote', [AdminUserController::class, 'promote'])->name('users.promote');
+        Route::post('/users/{user}/demote', [AdminUserController::class, 'demote'])->name('users.demote');
 
         // Verification — ID
         Route::get('/verification/id', [IdVerificationController::class, 'index'])

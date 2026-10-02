@@ -22,6 +22,7 @@ class User extends Authenticatable
         // ========================================== //
         // PROFILE INFORMATION FIELDS                 //
         // ========================================== //
+        'name',
         'f_name',         
         'm_name',          
         'l_name',   
@@ -64,6 +65,9 @@ class User extends Authenticatable
         'id_reviewed_by',
         'id_reviewed_at',
         'face_match_score',
+        'ocr_result',
+        'face_detected_on_id',
+        'face_detected_on_selfie',
         'document_authenticity',
         'liveness_detection',
         'id_expired',
@@ -108,6 +112,9 @@ class User extends Authenticatable
             'id_reviewed_at'    => 'datetime',
             'id_expired'        => 'boolean',
             'face_match_score'  => 'float',
+            'ocr_result' => 'array',
+            'face_detected_on_id' => 'boolean',
+            'face_detected_on_selfie' => 'boolean',
         ];
     }
 

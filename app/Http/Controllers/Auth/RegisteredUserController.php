@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;              
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -33,7 +32,7 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'f_name' => $request->f_name,
             'l_name' => $request->l_name,
-            'm_name' => $request->m_name, 
+            'm_name' => $request->m_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => 'owner',
@@ -41,12 +40,9 @@ class RegisteredUserController extends Controller
             'is_sitter' => false,
             'sitter_level' => 1,
             'sitter_status' => 'pending',
-            'id_validation_status' => 'pending',
+            'id_validation_status' => 'unverified',
             'pet_count' => 0,
         ]);
-
-      
-        Setting::create(['user_id' => $user->id]);
 
         event(new Registered($user));
 

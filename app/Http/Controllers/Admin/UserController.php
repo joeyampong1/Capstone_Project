@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -206,7 +207,153 @@ class UserController extends Controller
         return back()->with('status', "{$user->f_name}'s account has been restored.");
     }
 
-        /**
+    // ==========================================
+    // SOFT DELETE — Hide user (reversible)
+    // ==========================================
+    public function destroy(User $user)
+    {
+        // Safety: cannot delete self
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'You cannot delete your own account.');
+        }
+
+        // Safety: cannot delete admins
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Cannot delete admin accounts.');
+        }
+
+        // Safety: cannot delete with active bookings
+        $hasActiveBookings = $user->bookingsAsOwner()
+                ->whereIn('status', ['pending', 'accepted'])
+                ->exists()
+            || $user->bookingsAsSitter()
+                ->whereIn('status', ['pending', 'accepted'])
+                ->exists();
+
+        if ($hasActiveBookings) {
+            return back()->with('error', 'Cannot delete user with active bookings. Cancel or complete them first.');
+        }
+
+        $name = $user->full_name ?: $user->email;
+        $user->delete(); // soft delete (deleted_at timestamp)
+
+        Log::info('User soft-deleted by admin', [
+            'admin_id' => Auth::id(),
+            'user_id'  => $user->id,
+            'email'    => $user->email,
+        ]);
+
+        return back()->with('status', "User {$name} has been deleted. Can be restored within 30 days.");
+    }
+
+    // ==========================================
+    // RESTORE DELETED — Recover soft-deleted user
+    // ==========================================
+    public function restoreDeleted($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        Log::info('User soft-deleted by admin', [
+            'admin_id' => Auth::id(),
+            'user_id'  => $user->id,
+        ]);
+
+        return back()->with('status', "User {$user->full_name} has been restored.");
+    }
+
+    // ==========================================
+    // FORCE DELETE — Permanently remove user
+    // ==========================================
+    public function forceDelete($id)
+    {
+        $user = User::withTrashed()->findOrFail($id);
+
+        // Safety
+        if ($user->id === Auth::id() || $user->isAdmin()) {
+            return back()->with('error', 'Not allowed.');
+        }
+
+        $name = $user->full_name ?: $user->email;
+        $user->forceDelete(); // permanent — DILI ma-restore
+
+        Log::info('User soft-deleted by admin', [
+            'admin_id' => Auth::id(),
+            'user_id'  => $id,
+            'email'    => $user->email,
+        ]);
+
+        return back()->with('status', "User {$name} has been permanently deleted.");
+    }
+
+    // ==========================================
+    // PROMOTE — User → Admin
+    // ==========================================
+    public function promote(User $user)
+    {
+        // Safety: cannot promote self
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'You are already an admin.');
+        }
+
+        // Safety: cannot promote suspended/banned users
+        if ($user->status !== 'active') {
+            return back()->with('error', 'Cannot promote suspended or banned users. Activate them first.');
+        }
+
+        // Safety: already admin
+        if ($user->isAdmin()) {
+            return back()->with('error', 'User is already an admin.');
+        }
+
+        $user->update([
+            'role' => 'admin',
+        ]);
+
+        Log::warning('User PROMOTED to admin', [
+            'admin_id' => Auth::id(),
+            'user_id'  => $user->id,
+            'email'    => $user->email,
+        ]);
+
+        return back()->with('status', "{$user->full_name} has been promoted to Administrator.");
+    }
+
+    // ==========================================
+    // DEMOTE — Admin → Owner
+    // ==========================================
+    public function demote(User $user)
+    {
+        // Safety: cannot demote self
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'You cannot demote yourself.');
+        }
+
+        // Safety: cannot demote if only admin left
+        if (User::where('role', 'admin')->count() <= 1) {
+            return back()->with('error', 'Cannot demote the only remaining admin.');
+        }
+
+        // Safety: not admin
+        if (! $user->isAdmin()) {
+            return back()->with('error', 'User is not an admin.');
+        }
+
+        $user->update([
+            'role'      => 'owner',
+            'is_sitter' => false,   // Tangtangon ang sitter privileges
+        ]);
+
+        Log::warning('Admin DEMOTED to owner', [
+            'admin_id' => Auth::id(),
+            'user_id'  => $user->id,
+            'email'    => $user->email,
+        ]);
+
+        return back()->with('status', "{$user->full_name} has been demoted to Pet Owner.");
+    }
+
+    /**
      * Export users as CSV (Excel-compatible).
      * Respects the same filters as the index page.
      */

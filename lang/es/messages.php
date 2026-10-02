@@ -25,7 +25,7 @@ return [
     'large'             => 'Grande',
     'extra_large'       => 'Extra Grande',
 
-        // ========================================== //
+    // ========================================== //
     // ADMIN DASHBOARD                             //
     // ========================================== //
     'admin_dashboard_title'        => 'Panel de Administrador',
@@ -495,7 +495,7 @@ return [
     'help_ticket_empty_desc'  => 'Envía tu primer ticket usando el formulario.',
     'help_ticket_response'    => 'Respuesta de Soporte',
 
-        // ========================================== //
+    // ========================================== //
     // ID VERIFICATION (Admin)                     //
     // ========================================== //
     'idv_title'                => 'Verificación de ID',
@@ -569,7 +569,20 @@ return [
     'idv_guide_3'              => 'Verifica el resultado de la API.',
     'idv_guide_4'              => 'Rechaza solo si la verificación falla o los documentos son inválidos.',
 
-        // ========================================== //
+    // Admin ID Verification — OCR
+    'idv_ocr_title'        => 'Resultado de Extracción OCR',
+    'idv_ocr_success'      => 'Extraído',
+    'idv_ocr_failed'       => 'No Extraído',
+    'idv_ocr_name'         => 'Nombre',
+    'idv_ocr_id_number'    => 'Número de ID',
+    'idv_ocr_dob'          => 'Fecha de Nacimiento',
+    'idv_ocr_compare'      => 'Comparación con el Perfil del Usuario',
+    'idv_ocr_match_yes'    => '✓ Coincide el Nombre',
+    'idv_ocr_match_check'  => '⚠ Verificar Manualmente',
+    'idv_ocr_match_hint'   => 'Verificar el nombre del ID con el perfil del usuario',
+    'idv_ocr_failed_desc'  => 'El OCR no pudo extraer los detalles. Por favor revise la foto del ID manualmente.',
+
+    // ========================================== //
     // SUPPORT INBOX (Admin)                       //
     // ========================================== //
     'inbox_title'              => 'Bandeja de Soporte',
@@ -852,7 +865,7 @@ return [
     'sv_reject_note'           => 'El motivo se enviará por notificación y correo electrónico al solicitante.',
     'sv_yes_reject'            => 'Sí, Rechazar',
 
-        // ========================================== //
+    // ========================================== //
     // USER MANAGEMENT (Admin)                     //
     // ========================================== //
     'um_title'                 => 'Gestión de Usuarios',
@@ -918,6 +931,26 @@ return [
     'um_ban_ph'                => 'ej., Múltiples quejas verificadas de mala conducta.',
     'um_yes_ban'               => 'Sí, Banear Usuario',
 
+    'um_tooltip_delete'   => 'Eliminar Usuario',
+    'um_delete_title'     => '¿Eliminar Cuenta de Usuario?',
+    'um_delete_warning'   => 'La cuenta se ocultará de usuarios activos. Puedes restaurarla dentro de 30 días.',
+    'um_delete_confirm_js'=> '¿Estás completamente seguro de que quieres eliminar este usuario? Esta acción puede ser deshecha por el admin.',
+    'um_yes_delete'       => 'Sí, Eliminar',
+
+    // Promote / Demote
+    'um_tooltip_promote'   => 'Promover a Admin',
+    'um_tooltip_demote'    => 'Degradar de Admin',
+    'um_confirm_promote'   => '¿Promover a :name a Administrador?',
+    'um_confirm_demote'    => '¿Degradar a :name de Administrador a Propietario?',
+
+    // Promote / Demote modals
+    'um_promote_title'    => '¿Promover a Admin?',
+    'um_promote_warning'  => 'Este usuario obtendrá todos los privilegios de administrador y acceso a todas las funciones.',
+    'um_yes_promote'      => 'Sí, Promover',
+    'um_demote_title'     => '¿Degradar de Admin?',
+    'um_demote_warning'   => 'Este usuario perderá todos los privilegios de administrador y se convertirá en Propietario.',
+    'um_yes_demote'       => 'Sí, Degradar',
+
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -962,7 +995,7 @@ return [
 
     'ud_back_btn'              => '← Atrás',
 
-        // ========================================== //
+    // ========================================== //
     // ADMIN HOME (Creative Homepage)              //
     // ========================================== //
     'ah_title'                 => 'Inicio del Admin',
@@ -1254,7 +1287,21 @@ return [
     'od_cta_desc'                 => '¡Únete a PetNanny hoy — es gratis!',
     'od_cta_explore'              => 'Explorar Cuidadores',
 
-        // ========================================== //
+    'onboard_title'         => 'Verifica Tu Cuenta',
+    'onboard_desc'          => 'Para desbloquear todas las funciones y generar confianza con la comunidad, por favor verifica tu identidad.',
+    'onboard_item_1'        => 'Sube una identificación oficial válida',
+    'onboard_item_2'        => 'Tómate una selfie sosteniendo tu identificación',
+    'onboard_item_3'        => 'Espera la verificación del administrador (1-2 días hábiles)',
+    'onboard_later'         => 'Más tarde',
+    'onboard_continue'      => 'Continuar',
+    'onboard_verify_title'  => 'Verifica Tu Identidad',
+
+    // Profile completeness
+    'onboard_profile_incomplete_title' => 'Perfil incompleto',
+    'onboard_profile_incomplete_desc'  => 'Complete la información de su perfil (fecha de nacimiento, género, contacto, dirección) antes de verificar su identificación.',
+    'onboard_complete_profile'         => 'Completar perfil',
+
+    // ========================================== //
     // HELP & SUPPORT (Owner/Sitter)               //
     // ========================================== //
     'hs_title'                    => 'Ayuda y Soporte',
@@ -1926,7 +1973,33 @@ return [
     'pf_password'              => 'Contraseña',
     'pf_cancel'                => 'Cancelar',
 
-        'ss_title'                 => 'Ajustes del Sistema',
+    'pf_open_camera'         => 'Abrir cámara',
+    'pf_choose_gallery'      => 'Elegir de la galería',
+    'pf_retry_camera'        => 'Volver a tomar',
+    'pf_retry_gallery'       => 'Elegir otra',
+    'pf_camera_denied'       => 'Acceso a cámara denegado. Permita el acceso o use la galería.',
+    'pf_camera_title'        => 'Tomar foto',
+    'pf_id_camera_title'     => 'Captura tu identificación',
+    'pf_selfie_camera_title' => 'Selfie con identificación',
+    'pf_capture_photo'       => 'Capturar',
+    'pf_cancel'              => 'Cancelar',
+
+    // ID Extraction Result
+    'pf_ocr_success_title'     => 'Identificación leída con éxito',
+    'pf_ocr_success_desc'      => 'Leímos correctamente los detalles de su identificación.',
+    'pf_ocr_failed_title'      => 'No se pudo leer su identificación',
+    'pf_ocr_failed_desc'       => 'Inténtelo de nuevo con una foto más clara. Asegúrese de que todo el texto sea legible y la iluminación sea buena.',
+    'pf_ocr_label_name'        => 'Nombre',
+    'pf_ocr_label_id'          => 'Número de identificación',
+
+    // Profile Incomplete Warning (Step 3)
+    'pf_profile_incomplete_title' => 'Complete su perfil',
+    'pf_profile_incomplete_desc'  => 'Antes de enviar para la verificación de identidad, complete la información de su perfil.',
+    'pf_complete_profile_btn'     => 'Completar perfil',
+    'pf_missing_field'            => 'Faltante',
+
+
+    'ss_title'                 => 'Ajustes del Sistema',
     'ss_subtitle'              => 'Gestiona tus preferencias de cuenta y configuraciones del sistema',
 
     'ss_sitter_mode'           => 'Modo Cuidador',

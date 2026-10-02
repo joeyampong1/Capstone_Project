@@ -50,6 +50,10 @@
      | Modal payload
      |------------------------------------------------------------------*/
     $modalRows = $verifications->map(function ($u) use ($initials, $statusLabel, $roleLabel) {
+        // Extract OCR data
+        $ocr = $u->ocr_result ?? [];
+        $ocrSuccess = $ocr['success'] ?? false;
+
         return [
             'id'         => $u->id,
             'status'     => $u->id_validation_status,
@@ -61,8 +65,17 @@
             'role'       => $u->id_role,
             'role_label' => $roleLabel($u->id_role),
             'registered' => optional($u->created_at)->format('F j, Y') ?? '—',
-            'id_type'    => $u->id_type ?? '—',
-            'id_number'  => '—',
+            'id_type'    => match($u->id_type) {
+                'passport'        => __('messages.pf_id_passport'),
+                'drivers_license' => __('messages.pf_id_drivers_license'),
+                'umid'            => __('messages.pf_id_umid'),
+                'postal_id'       => __('messages.pf_id_postal'),
+                'voters_id'       => __('messages.pf_id_voters'),
+                'national_id'     => __('messages.pf_id_national'),
+                'other'           => __('messages.pf_id_other'),
+                default           => $u->id_type ?? '—',
+            },
+            'id_number'  => $ocr['id_number'] ?? '—',
             'id_front'   => $u->gov_id_url,
             'selfie'     => $u->selfie_url,
             'api' => [
@@ -73,6 +86,17 @@
                 'name_match'      => $u->name_match,
                 'birthdate_match' => $u->birthdate_match,
             ],
+
+            // OCR RESULT
+            'ocr' => [
+                'success'    => $ocrSuccess,
+                'name'       => $ocr['name']      ?? null,
+                'id_number'  => $ocr['id_number'] ?? null,
+                'dob'        => $ocr['dob']       ?? null,
+                'raw_text'   => $ocr['raw_text']  ?? null,
+                'error'      => $ocr['error']     ?? null,
+            ],
+
             'notes' => $u->admin_notes ?? '',
         ];
     })->values();
@@ -396,234 +420,333 @@
                 </div>
             </div>
 
-        </div>
-    </div>
+            {{-- ④ VERIFICATION DETAILS MODAL — gi-move SA SULOD sa x-data --}}
+            <div x-show="showDetail"
+                 x-cloak
+                 class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:px-4 sm:py-8 bg-black/50 backdrop-blur-sm overflow-y-auto"
+                 @click.away="showDetail = false"
+                 @keydown.escape.window="showDetail = false">
 
-    <!-- ④ VERIFICATION DETAILS MODAL -->
-    <div x-show="showDetail"
-         x-cloak
-         class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:px-4 sm:py-8 bg-black/50 backdrop-blur-sm overflow-y-auto"
-         @click.away="showDetail = false"
-         @keydown.escape.window="showDetail = false">
+                <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-5xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-8">
 
-        <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-5xl w-full max-h-[92vh] overflow-y-auto p-4 sm:p-8">
-
-            <div class="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 class="text-lg sm:text-xl font-black text-[#1B3B36] dark:text-white">{{ __('messages.idv_modal_title') }}</h2>
-                <button type="button" @click="showDetail = false"
-                        class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
-                    <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6" x-show="selected">
-
-                <!-- LEFT: USER INFORMATION -->
-                <div class="lg:col-span-1 space-y-4">
-
-                    <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
-                        <div class="flex items-center gap-3 sm:gap-4 mb-4">
-                            <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg sm:text-xl shrink-0"
-                                 x-text="selected?.initials"></div>
-                            <div class="min-w-0">
-                                <p class="font-black text-[#1B3B36] dark:text-white text-base sm:text-lg truncate" x-text="selected?.name"></p>
-                                <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400" x-text="selected?.role_label"></p>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 text-sm">
-                            <div>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_email') }}</p>
-                                <p class="font-bold text-[#1B3B36] dark:text-white break-all" x-text="selected?.email"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_phone') }}</p>
-                                <p class="font-bold text-[#1B3B36] dark:text-white" x-text="selected?.phone"></p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_registered') }}</p>
-                                <p class="font-bold text-[#1B3B36] dark:text-white" x-text="selected?.registered"></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.idv_status') }}</p>
-                        <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold"
-                              :class="{
-                                  'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': selected?.status === 'pending',
-                                  'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': selected?.status === 'verified',
-                                  'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': selected?.status === 'rejected',
-                              }"
-                              x-text="selected?.status_label"></span>
-                    </div>
-
-                </div>
-
-                <!-- CENTER: ID + SELFIE -->
-                <div class="lg:col-span-1 space-y-4">
-
-                    <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_submitted_id') }}</p>
-                        <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 p-3 sm:p-4 text-center">
-                            <div class="aspect-[4/3] bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden">
-                                <template x-if="selected?.id_front">
-                                    <img :src="selected.id_front" alt="{{ __('messages.idv_submitted_id') }}" class="w-full h-full object-cover rounded-lg">
-                                </template>
-                                <template x-if="!selected?.id_front">
-                                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"/>
-                                    </svg>
-                                </template>
-                            </div>
-                            <div class="mt-3 text-left text-xs sm:text-sm">
-                                <p><span class="text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_type') }}</span> <span class="font-bold" x-text="selected?.id_type"></span></p>
-                                <p><span class="text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_id_number') }}</span> <span class="font-bold" x-text="selected?.id_number"></span></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_selfie') }}</p>
-                        <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 p-3 sm:p-4 text-center">
-                            <div class="aspect-[4/3] bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden">
-                                <template x-if="selected?.selfie">
-                                    <img :src="selected.selfie" alt="{{ __('messages.idv_selfie') }}" class="w-full h-full object-cover rounded-lg">
-                                </template>
-                                <template x-if="!selected?.selfie">
-                                    <svg class="w-12 h-12 sm:w-16 sm:h-16 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                    </svg>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- RIGHT: API RESULTS + ACTIONS -->
-                <div class="lg:col-span-1 space-y-4">
-
-                    <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_api_title') }}</p>
-                        <div class="space-y-3 text-sm">
-
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_face_match') }}</span>
-                                <span class="font-bold shrink-0"
-                                      :class="parseFloat(selected?.api?.face_match ?? 0) >= 80 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
-                                      x-text="selected?.api?.face_match != null ? (parseFloat(selected.api.face_match) + '%') : '—'"></span>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_doc_auth') }}</span>
-                                <span class="font-bold shrink-0"
-                                      :class="['passed','pass','yes','true','matched'].includes(String(selected?.api?.doc_auth ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : (String(selected?.api?.doc_auth ?? '').toLowerCase() === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-neutral-500')"
-                                      x-text="selected?.api?.doc_auth ? String(selected.api.doc_auth).charAt(0).toUpperCase() + String(selected.api.doc_auth).slice(1) : '—'"></span>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_liveness') }}</span>
-                                <span class="font-bold shrink-0"
-                                      :class="['passed','pass','yes','true'].includes(String(selected?.api?.liveness ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : (String(selected?.api?.liveness ?? '').toLowerCase() === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-neutral-500')"
-                                      x-text="selected?.api?.liveness ? String(selected.api.liveness).charAt(0).toUpperCase() + String(selected.api.liveness).slice(1) : '—'"></span>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_id_expired') }}</span>
-                                <span class="font-bold shrink-0"
-                                      :class="['yes','true','1'].includes(String(selected?.api?.id_expired ?? '').toLowerCase()) ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'"
-                                      x-text="selected?.api?.id_expired == null ? '—' : (['yes','true','1'].includes(String(selected.api.id_expired).toLowerCase()) ? '{{ __('messages.idv_yes') }}' : '{{ __('messages.idv_no') }}')"></span>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_name_match') }}</span>
-                                <span class="font-bold shrink-0"
-                                      :class="['passed','pass','yes','true','matched','match'].includes(String(selected?.api?.name_match ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-                                      x-text="selected?.api?.name_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.name_match).toLowerCase()) ? '{{ __('messages.idv_matched') }}' : '{{ __('messages.idv_not_matched') }}') : '—'"></span>
-                            </div>
-
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_birthdate_match') }}</span>
-                                <span class="font-bold shrink-0"
-                                      :class="['passed','pass','yes','true','matched','match'].includes(String(selected?.api?.birthdate_match ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-                                      x-text="selected?.api?.birthdate_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.birthdate_match).toLowerCase()) ? '{{ __('messages.idv_matched') }}' : '{{ __('messages.idv_not_matched') }}') : '—'"></span>
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.idv_admin_notes') }}</p>
-                        <textarea rows="3"
-                                  x-model="selected.notes"
-                                  placeholder="{{ __('messages.idv_admin_notes_ph') }}"
-                                  class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium resize-none"></textarea>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="flex flex-col gap-2">
-
-                            {{-- Approve --}}
-                            <form method="POST" :action="approveUrl()" x-show="selected?.status !== 'verified'">
-                                @csrf
-                                <input type="hidden" name="admin_notes" :value="selected?.notes ?? ''">
-                                <button type="submit"
-                                        class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    {{ __('messages.idv_approve') }}
-                                </button>
-                            </form>
-
-                            {{-- Reject --}}
-                            <form method="POST" :action="rejectUrl()" x-show="selected?.status !== 'rejected'"
-                                  @submit="if (!confirm('{{ __('messages.idv_confirm_reject') }}')) $event.preventDefault()">
-                                @csrf
-                                <input type="hidden" name="admin_notes" :value="selected?.notes ?? ''">
-                                <button type="submit"
-                                        class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-sm rounded-xl transition">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                    </svg>
-                                    {{ __('messages.idv_reject') }}
-                                </button>
-                            </form>
-
-                        </div>
-
-                        {{-- Download --}}
-                        <a :href="downloadUrl()"
-                           class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-sm rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    <div class="flex items-center justify-between mb-4 sm:mb-6">
+                        <h2 class="text-lg sm:text-xl font-black text-[#1B3B36] dark:text-white">{{ __('messages.idv_modal_title') }}</h2>
+                        <button type="button" @click="showDetail = false"
+                                class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                             </svg>
-                            {{ __('messages.idv_download') }}
-                        </a>
+                        </button>
                     </div>
 
-                </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6" x-show="selected">
 
-            </div>
+                        <!-- LEFT: USER INFORMATION -->
+                        <div class="lg:col-span-1 space-y-4">
 
-            <!-- GUIDELINES -->
-            <div class="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-950/20 rounded-2xl border border-blue-200 dark:border-blue-800/50">
-                <div class="flex items-start gap-3">
-                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <div class="min-w-0">
-                        <h3 class="font-bold text-sm text-[#1B3B36] dark:text-white">{{ __('messages.idv_guidelines') }}</h3>
-                        <ul class="mt-1 space-y-1 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
-                            <li>• {{ __('messages.idv_guide_1') }}</li>
-                            <li>• {{ __('messages.idv_guide_2') }}</li>
-                            <li>• {{ __('messages.idv_guide_3') }}</li>
-                            <li>• {{ __('messages.idv_guide_4') }}</li>
-                        </ul>
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <div class="flex items-center gap-3 sm:gap-4 mb-4">
+                                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-lg sm:text-xl shrink-0"
+                                         x-text="selected?.initials"></div>
+                                    <div class="min-w-0">
+                                        <p class="font-black text-[#1B3B36] dark:text-white text-base sm:text-lg truncate" x-text="selected?.name"></p>
+                                        <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400" x-text="selected?.role_label"></p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2 text-sm">
+                                    <div>
+                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_email') }}</p>
+                                        <p class="font-bold text-[#1B3B36] dark:text-white break-all" x-text="selected?.email"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_phone') }}</p>
+                                        <p class="font-bold text-[#1B3B36] dark:text-white" x-text="selected?.phone"></p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_registered') }}</p>
+                                        <p class="font-bold text-[#1B3B36] dark:text-white" x-text="selected?.registered"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.idv_status') }}</p>
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold"
+                                      :class="{
+                                          'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': selected?.status === 'pending',
+                                          'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': selected?.status === 'verified',
+                                          'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': selected?.status === 'rejected',
+                                      }"
+                                      x-text="selected?.status_label"></span>
+                            </div>
+
+                        </div>
+
+                        <!-- CENTER: ID + SELFIE -->
+                        <div class="lg:col-span-1 space-y-4">
+
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_submitted_id') }}</p>
+                                <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 p-3 sm:p-4 text-center">
+                                    <div class="aspect-[4/3] bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden">
+                                        <template x-if="selected?.id_front">
+                                            <div class="relative group w-full h-full">
+                                                <img :src="selected.id_front"
+                                                    alt="{{ __('messages.idv_submitted_id') }}"
+                                                    class="w-full h-full object-cover rounded-lg cursor-pointer transition group-hover:opacity-80"
+                                                    @click="window.open(selected.id_front, '_blank')">
+
+                                                {{-- Hover overlay with icons --}}
+                                                <div class="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition bg-black/40 rounded-lg pointer-events-none">
+                                                    {{-- View icon --}}
+                                                    <button type="button"
+                                                            @click.stop="window.open(selected.id_front, '_blank')"
+                                                            class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
+                                                            title="View Full Size">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                                        </svg>
+                                                    </button>
+
+                                                    {{-- Download icon --}}
+                                                    <a :href="selected.id_front"
+                                                    download="id_front.jpg"
+                                                    @click.stop
+                                                    class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
+                                                    title="Download">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <div class="mt-3 text-left text-xs sm:text-sm">
+                                        <p><span class="text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_type') }}</span> <span class="font-bold" x-text="selected?.id_type"></span></p>
+                                        <p><span class="text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_id_number') }}</span> <span class="font-bold" x-text="selected?.id_number"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_selfie') }}</p>
+                                <div class="bg-white dark:bg-neutral-900 rounded-xl border border-gray-200 dark:border-neutral-700 p-3 sm:p-4 text-center">
+                                    <div class="aspect-[4/3] bg-neutral-100 dark:bg-neutral-800 rounded-lg flex items-center justify-center overflow-hidden">
+                                        <template x-if="selected?.selfie">
+                                            <div class="relative group w-full h-full">
+                                                <img :src="selected.selfie"
+                                                    alt="{{ __('messages.idv_selfie') }}"
+                                                    class="w-full h-full object-cover rounded-lg cursor-pointer transition group-hover:opacity-80"
+                                                    @click="window.open(selected.selfie, '_blank')">
+
+                                                {{-- Hover overlay with icons --}}
+                                                <div class="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition bg-black/40 rounded-lg pointer-events-none">
+                                                    {{-- View icon --}}
+                                                    <button type="button"
+                                                            @click.stop="window.open(selected.selfie, '_blank')"
+                                                            class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
+                                                            title="View Full Size">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                                        </svg>
+                                                    </button>
+
+                                                    {{-- Download icon --}}
+                                                    <a :href="selected.selfie"
+                                                    download="selfie.jpg"
+                                                    @click.stop
+                                                    class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
+                                                    title="Download">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                                        </svg>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT: API RESULTS + ACTIONS -->
+                        <div class="lg:col-span-1 space-y-4">
+
+                            <!-- OCR EXTRACTION RESULT -->
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <div class="flex items-center justify-between mb-3">
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.idv_ocr_title') }}</p>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold"
+                                        :class="selected?.ocr?.success ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'"
+                                        x-text="selected?.ocr?.success ? '{{ __('messages.idv_ocr_success') }}' : '{{ __('messages.idv_ocr_failed') }}'"></span>
+                                </div>
+
+                                <template x-if="selected?.ocr?.success">
+                                    <div class="space-y-2 text-sm">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_ocr_name') }}</span>
+                                            <span class="font-bold text-[#1B3B36] dark:text-white text-right break-words" x-text="selected?.ocr?.name || '—'"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_ocr_id_number') }}</span>
+                                            <span class="font-bold text-[#1B3B36] dark:text-white text-right break-words" x-text="selected?.ocr?.id_number || '—'"></span>
+                                        </div>
+                                        <div class="flex items-center justify-between gap-2">
+                                            <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_ocr_dob') }}</span>
+                                            <span class="font-bold text-[#1B3B36] dark:text-white text-right break-words" x-text="selected?.ocr?.dob || '—'"></span>
+                                        </div>
+
+                                        {{-- Comparison: OCR name vs user's registered name --}}
+                                        <div class="mt-3 pt-3 border-t border-gray-200 dark:border-neutral-700">
+                                            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">{{ __('messages.idv_ocr_compare') }}</p>
+                                            <div class="flex items-center gap-2 text-xs">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full font-bold"
+                                                    :class="selected?.ocr?.name && selected?.name && selected.ocr.name.toLowerCase().includes(selected.name.toLowerCase().split(' ')[0])
+                                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'"
+                                                    x-text="selected?.ocr?.name && selected?.name && selected.ocr.name.toLowerCase().includes(selected.name.toLowerCase().split(' ')[0])
+                                                        ? '{{ __('messages.idv_ocr_match_yes') }}'
+                                                        : '{{ __('messages.idv_ocr_match_check') }}'"></span>
+                                                <span class="text-neutral-500 dark:text-neutral-400 text-[10px]">{{ __('messages.idv_ocr_match_hint') }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <template x-if="!selected?.ocr?.success">
+                                    <div class="text-xs text-amber-600 dark:text-amber-400">
+                                        <p>{{ __('messages.idv_ocr_failed_desc') }}</p>
+                                        <template x-if="selected?.ocr?.error">
+                                            <p class="mt-1 text-[10px] text-neutral-500 break-all" x-text="'Error: ' + selected.ocr.error"></p>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_api_title') }}</p>
+                                <div class="space-y-3 text-sm">
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_face_match') }}</span>
+                                        <span class="font-bold shrink-0"
+                                              :class="parseFloat(selected?.api?.face_match ?? 0) >= 80 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
+                                              x-text="selected?.api?.face_match != null ? (parseFloat(selected.api.face_match) + '%') : '—'"></span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_doc_auth') }}</span>
+                                        <span class="font-bold shrink-0"
+                                              :class="['passed','pass','yes','true','matched'].includes(String(selected?.api?.doc_auth ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : (String(selected?.api?.doc_auth ?? '').toLowerCase() === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-neutral-500')"
+                                              x-text="selected?.api?.doc_auth ? String(selected.api.doc_auth).charAt(0).toUpperCase() + String(selected.api.doc_auth).slice(1) : '—'"></span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_liveness') }}</span>
+                                        <span class="font-bold shrink-0"
+                                              :class="['passed','pass','yes','true'].includes(String(selected?.api?.liveness ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : (String(selected?.api?.liveness ?? '').toLowerCase() === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-neutral-500')"
+                                              x-text="selected?.api?.liveness ? String(selected.api.liveness).charAt(0).toUpperCase() + String(selected.api.liveness).slice(1) : '—'"></span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_id_expired') }}</span>
+                                        <span class="font-bold shrink-0"
+                                              :class="['yes','true','1'].includes(String(selected?.api?.id_expired ?? '').toLowerCase()) ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'"
+                                              x-text="selected?.api?.id_expired == null ? '—' : (['yes','true','1'].includes(String(selected.api.id_expired).toLowerCase()) ? '{{ __('messages.idv_yes') }}' : '{{ __('messages.idv_no') }}')"></span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_name_match') }}</span>
+                                        <span class="font-bold shrink-0"
+                                              :class="['passed','pass','yes','true','matched','match'].includes(String(selected?.api?.name_match ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                              x-text="selected?.api?.name_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.name_match).toLowerCase()) ? '{{ __('messages.idv_matched') }}' : '{{ __('messages.idv_not_matched') }}') : '—'"></span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_birthdate_match') }}</span>
+                                        <span class="font-bold shrink-0"
+                                              :class="['passed','pass','yes','true','matched','match'].includes(String(selected?.api?.birthdate_match ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                              x-text="selected?.api?.birthdate_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.birthdate_match).toLowerCase()) ? '{{ __('messages.idv_matched') }}' : '{{ __('messages.idv_not_matched') }}') : '—'"></span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.idv_admin_notes') }}</p>
+                                <textarea rows="3"
+                                          x-model="selected.notes"
+                                          placeholder="{{ __('messages.idv_admin_notes_ph') }}"
+                                          class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium resize-none"></textarea>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex flex-col gap-2">
+
+                                    {{-- Approve --}}
+                                    <form method="POST" :action="approveUrl()" x-show="selected?.status !== 'verified'">
+                                        @csrf
+                                        <input type="hidden" name="admin_notes" :value="selected?.notes ?? ''">
+                                        <button type="submit"
+                                                class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            {{ __('messages.idv_approve') }}
+                                        </button>
+                                    </form>
+
+                                    {{-- Reject --}}
+                                    <form method="POST" :action="rejectUrl()" x-show="selected?.status !== 'rejected'"
+                                          @submit="if (!confirm('{{ __('messages.idv_confirm_reject') }}')) $event.preventDefault()">
+                                        @csrf
+                                        <input type="hidden" name="admin_notes" :value="selected?.notes ?? ''">
+                                        <button type="submit"
+                                                class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 font-bold text-sm rounded-xl transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                            </svg>
+                                            {{ __('messages.idv_reject') }}
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                                {{-- Download --}}
+                                <a :href="downloadUrl()"
+                                   class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-sm rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    {{ __('messages.idv_download') }}
+                                </a>
+                            </div>
+
+                        </div>
+
                     </div>
+
+                    <!-- GUIDELINES -->
+                    <div class="mt-4 sm:mt-6 p-3 sm:p-4 bg-blue-50 dark:bg-blue-950/20 rounded-2xl border border-blue-200 dark:border-blue-800/50">
+                        <div class="flex items-start gap-3">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-sm text-[#1B3B36] dark:text-white">{{ __('messages.idv_guidelines') }}</h3>
+                                <ul class="mt-1 space-y-1 text-xs sm:text-sm text-neutral-600 dark:text-neutral-300">
+                                    <li>• {{ __('messages.idv_guide_1') }}</li>
+                                    <li>• {{ __('messages.idv_guide_2') }}</li>
+                                    <li>• {{ __('messages.idv_guide_3') }}</li>
+                                    <li>• {{ __('messages.idv_guide_4') }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

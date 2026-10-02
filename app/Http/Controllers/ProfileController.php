@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\OcrService;
+use App\Services\FaceMatchService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,13 +28,28 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if (! empty($validated['name']) && (empty($validated['f_name']) || empty($validated['l_name']))) {
+            $parts = preg_split('/\s+/', trim($validated['name']), 2);
+            $validated['f_name'] = $validated['f_name'] ?? ($parts[0] ?? '');
+            $validated['l_name'] = $validated['l_name'] ?? ($parts[1] ?? '');
         }
 
-        $request->user()->save();
+        if (! empty($validated['f_name']) || ! empty($validated['l_name'])) {
+            $validated['name'] = trim(($validated['f_name'] ?? '') . ' ' . ($validated['l_name'] ?? ''));
+        } elseif (! empty($validated['name'])) {
+            $validated['name'] = trim($validated['name']);
+        }
+
+        $user->fill($validated);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -100,12 +116,14 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit')->with('status', 'location-updated');
     }
 
-    public function updateId(Request $request)
+    public function updateId(Request $request, OcrService $ocr, FaceMatchService $faceMatch)
     {
         $user   = $request->user();
         $action = $request->input('action');
 
+        // ==========================================
         // Step 1: Save ID type
+        // ==========================================
         if ($action === 'save_id_type') {
             $request->validate(['id_type' => 'required|string|max:50']);
             $user->id_type = $request->id_type;
@@ -113,30 +131,295 @@ class ProfileController extends Controller
             return redirect()->route('profile.edit')->with('status', 'id_type_saved');
         }
 
-        // Step 2: Upload ID image
+        // ==========================================
+        // Step 2: Upload ID image + Run OCR
+        // ==========================================
         if ($action === 'upload_id') {
-            $request->validate(['gov_id_path' => 'required|file|mimes:jpg,jpeg,png|max:5120']);
-            if ($user->gov_id_path) Storage::disk('public')->delete($user->gov_id_path);
-            $path = $request->file('gov_id_path')->store('ids', 'public');
+            // ------------------------------------------------------------
+            // REQUEST DEBUG
+            // ------------------------------------------------------------
+            \Log::info('=== upload_id START ===', [
+                'user_id'   => $user->id,
+                'has_file'  => $request->hasFile('gov_id_path'),
+                'files'     => array_keys($request->allFiles()),
+                'input'     => array_keys($request->all()),
+                'action'    => $request->input('action'),
+                'id_type'   => $request->input('id_type'),
+            ]);
+
+            // ------------------------------------------------------------
+            // VALIDATION
+            // ------------------------------------------------------------
+            $validator = \Validator::make($request->all(), [
+                'gov_id_path' => 'required|file|mimes:jpg,jpeg,png|max:5120',
+                'id_type'     => 'nullable|string|max:50',
+            ]);
+
+            if ($validator->fails()) {
+                \Log::error('=== VALIDATION FAILED ===', [
+                    'errors' => $validator->errors()->toArray(),
+                ]);
+
+                return back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+
+            \Log::info('Validation passed');
+
+            // ------------------------------------------------------------
+            // SAVE ID TYPE (kung gi-submit)
+            // ------------------------------------------------------------
+            if ($request->filled('id_type')) {
+                $user->id_type = $request->input('id_type');
+                \Log::info('ID type saved', ['id_type' => $user->id_type]);
+            }
+
+            // ------------------------------------------------------------
+            // DELETE OLD FILE
+            // ------------------------------------------------------------
+            if ($user->gov_id_path) {
+                \Log::info('Deleting old file', ['old_path' => $user->gov_id_path]);
+
+                if (Storage::disk('public')->exists($user->gov_id_path)) {
+                    Storage::disk('public')->delete($user->gov_id_path);
+                    \Log::info('Old file deleted');
+                } else {
+                    \Log::warning('Old file not found on disk', ['path' => $user->gov_id_path]);
+                }
+            }
+
+            // ------------------------------------------------------------
+            // STORE NEW FILE
+            // ------------------------------------------------------------
+            try {
+                $path = $request->file('gov_id_path')->store('ids', 'public');
+            } catch (\Exception $e) {
+                \Log::error('=== FILE STORE FAILED ===', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return back()->withErrors(['gov_id_path' => 'Failed to store file: ' . $e->getMessage()]);
+            }
+
             $user->gov_id_path = $path;
-            $user->save();
+
+            $absolutePath = storage_path("app/public/{$path}");
+
+            \Log::info('File stored', [
+                'path'         => $path,
+                'absolute'     => $absolutePath,
+                'exists'       => file_exists($absolutePath),
+                'size'         => file_exists($absolutePath) ? filesize($absolutePath) : 0,
+                'mime'         => file_exists($absolutePath) ? mime_content_type($absolutePath) : 'unknown',
+            ]);
+
+            // ------------------------------------------------------------
+            // RUN OCR
+            // ------------------------------------------------------------
+            \Log::info('Starting OCR...');
+
+            try {
+                $ocrResult = $ocr->extractIdDetails($path);
+
+                \Log::info('=== OCR COMPLETED ===', [
+                    'success'    => $ocrResult['success'] ?? false,
+                    'error'      => $ocrResult['error'] ?? null,
+                    'name'       => $ocrResult['name'] ?? null,
+                    'id_number'  => $ocrResult['id_number'] ?? null,
+                    'dob'        => $ocrResult['dob'] ?? null,
+                    'raw_length' => isset($ocrResult['raw_text']) ? strlen($ocrResult['raw_text']) : 0,
+                ]);
+
+                $user->ocr_result = $ocrResult;
+
+            } catch (\Exception $e) {
+                \Log::error('=== OCR EXCEPTION ===', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'trace'   => $e->getTraceAsString(),
+                ]);
+
+                $user->ocr_result = [
+                    'success' => false,
+                    'error'   => 'OCR service unavailable: ' . $e->getMessage(),
+                ];
+            } catch (\Throwable $e) {
+                \Log::error('=== OCR FATAL ERROR ===', [
+                    'message' => $e->getMessage(),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'trace'   => $e->getTraceAsString(),
+                ]);
+
+                $user->ocr_result = [
+                    'success' => false,
+                    'error'   => 'Fatal error: ' . $e->getMessage(),
+                ];
+            }
+
+            // ------------------------------------------------------------
+            // SAVE USER
+            // ------------------------------------------------------------
+            try {
+                $user->save();
+
+                \Log::info('=== USER SAVED ===', [
+                    'user_id'     => $user->id,
+                    'gov_id_path' => $user->gov_id_path,
+                    'id_type'     => $user->id_type,
+                    'ocr_success' => $user->ocr_result['success'] ?? false,
+                ]);
+
+            } catch (\Exception $e) {
+                \Log::error('=== USER SAVE FAILED ===', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return back()->withErrors(['error' => 'Failed to save user data.']);
+            }
+
+            \Log::info('=== upload_id END ===');
+
             return redirect()->route('profile.edit')->with('status', 'id-updated');
         }
 
+        // ==========================================
         // Step 3: Upload selfie
+        // ==========================================
         if ($action === 'upload_selfie') {
             $request->validate(['selfie_photo' => 'required|file|mimes:jpg,jpeg,png|max:5120']);
-            if ($user->selfie_photo) Storage::disk('public')->delete($user->selfie_photo);
+
+            if ($user->selfie_photo) {
+                Storage::disk('public')->delete($user->selfie_photo);
+            }
+
             $path = $request->file('selfie_photo')->store('selfies', 'public');
             $user->selfie_photo = $path;
-            $user->id_validation_status = 'pending'; // Set to pending
+            $user->id_validation_status = 'unverified';
             $user->save();
+
             return redirect()->route('profile.edit')->with('status', 'id-updated');
         }
 
-        // Step 4: Submit for verification
+        // ==========================================
+        // Step 4: Submit for verification (face match)
+        // ==========================================
         if ($action === 'submit_verification') {
-            // Already pending, just show the pending status
+            // CHECK PROFILE COMPLETENESS
+            $missingFields = [];
+
+            if (empty($user->f_name))         $missingFields[] = 'First Name';
+            if (empty($user->l_name))         $missingFields[] = 'Last Name';
+            if (empty($user->date_of_birth))  $missingFields[] = 'Date of Birth';
+            if (empty($user->gender))         $missingFields[] = 'Gender';
+            if (empty($user->contact_number)) $missingFields[] = 'Contact Number';
+            if (empty($user->address))        $missingFields[] = 'Address';
+
+            if (! empty($missingFields)) {
+                return back()->withErrors([
+                    'error' => 'Please complete your profile first: ' . implode(', ', $missingFields),
+                ]);
+            }
+
+            // ------------------------------------------------------------
+            // RUN FACE MATCH
+            // ------------------------------------------------------------
+            $result = $faceMatch->verify($user->selfie_photo);
+
+            if (! $result['success']) {
+                return back()->withErrors([
+                    'selfie_photo' => 'Face verification failed: ' . ($result['error'] ?? 'unknown error'),
+                ]);
+            }
+
+            // ------------------------------------------------------------
+            // STORE FACE MATCH RESULTS
+            // ------------------------------------------------------------
+            $user->face_match_score        = $result['confidence'];
+            $user->face_detected_on_id     = true;
+            $user->face_detected_on_selfie = true;
+            $user->id_expired              = false;
+
+            // ------------------------------------------------------------
+            // NAME MATCH — compare OCR name vs user profile name
+            // ------------------------------------------------------------
+            $ocrName   = strtoupper($user->ocr_result['name'] ?? '');
+            $userLast  = strtoupper($user->l_name ?? '');
+            $userFirst = strtoupper($user->f_name ?? '');
+
+            $nameMatch = false;
+            if ($ocrName && ($userLast || $userFirst)) {
+                // Check kung naa ang last name o first name sa OCR text
+                if ($userLast && str_contains($ocrName, $userLast)) {
+                    $nameMatch = true;
+                } elseif ($userFirst && str_contains($ocrName, $userFirst)) {
+                    $nameMatch = true;
+                }
+            }
+            $user->name_match = $nameMatch ? 'matched' : 'not_matched';
+
+            \Log::info('=== NAME MATCH ===', [
+                'ocr_name'   => $ocrName,
+                'user_last'  => $userLast,
+                'user_first' => $userFirst,
+                'result'     => $user->name_match,
+            ]);
+
+            // ------------------------------------------------------------
+            // BIRTHDATE MATCH — compare OCR DOB vs user date_of_birth
+            // ------------------------------------------------------------
+            $ocrDob  = $user->ocr_result['dob'] ?? null;
+            $userDob = $user->date_of_birth ? $user->date_of_birth->format('Y/m/d') : null;
+
+            $birthdateMatch = false;
+            if ($ocrDob && $userDob) {
+                // Normalize format
+                $ocrDobNorm  = str_replace(['-', '.'], '/', $ocrDob);
+                $userDobNorm = str_replace(['-', '.'], '/', $userDob);
+                $birthdateMatch = ($ocrDobNorm === $userDobNorm);
+            }
+            $user->birthdate_match = ($ocrDob && $userDob) ? ($birthdateMatch ? 'matched' : 'not_matched') : null;
+
+            \Log::info('=== BIRTHDATE MATCH ===', [
+                'ocr_dob'  => $ocrDob,
+                'user_dob' => $userDob,
+                'result'   => $user->birthdate_match,
+            ]);
+
+            // ------------------------------------------------------------
+            // Placeholder for future features
+            // ------------------------------------------------------------
+            $user->document_authenticity = null;
+            $user->liveness_detection    = null;
+
+            // ------------------------------------------------------------
+            // HANDLE MATCH / NO MATCH
+            // ------------------------------------------------------------
+            if (! $result['match']) {
+                $user->id_validation_status = 'rejected';
+                $user->save();
+
+                return back()->withErrors([
+                    'selfie_photo' => 'Face does not match the ID. Distance: ' . $result['distance'],
+                ]);
+            }
+
+            // Match! Queue for admin review
+            $user->id_validation_status = 'pending';
+            $user->save();
+
+            \Log::info('=== SUBMIT VERIFICATION ===', [
+                'user_id'        => $user->id,
+                'face_score'     => $user->face_match_score,
+                'name_match'     => $user->name_match,
+                'birthdate_match'=> $user->birthdate_match,
+                'status'         => $user->id_validation_status,
+            ]);
+
             return redirect()->route('profile.edit')->with('status', 'submitted');
         }
 
@@ -207,9 +490,6 @@ class ProfileController extends Controller
     /**
      * Update user's preferred language.
      */
-/**
- * Update user's preferred language.
- */
     public function updateLanguage(Request $request)
     {
         $request->validate([
@@ -232,5 +512,4 @@ class ProfileController extends Controller
             'message' => 'Language updated successfully.',
         ]);
     }
-
 }

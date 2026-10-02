@@ -12,12 +12,14 @@ return new class extends Migration
         // ================================================================
         // 1. Fix the enum — add 'unverified' and make it the default
         // ================================================================
-        DB::statement("
-            ALTER TABLE users
-            MODIFY COLUMN id_validation_status
-            ENUM('unverified', 'pending', 'verified', 'rejected')
-            NOT NULL DEFAULT 'unverified'
-        ");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("
+                ALTER TABLE users
+                MODIFY COLUMN id_validation_status
+                ENUM('unverified', 'pending', 'verified', 'rejected')
+                NOT NULL DEFAULT 'unverified'
+            ");
+        }
 
         // Reset existing rows that were never submitted but are 'pending'
         DB::table('users')
@@ -75,11 +77,13 @@ return new class extends Migration
             ]);
         });
 
-        DB::statement("
-            ALTER TABLE users
-            MODIFY COLUMN id_validation_status
-            ENUM('pending', 'verified', 'rejected')
-            NOT NULL DEFAULT 'pending'
-        ");
+        if (DB::getDriverName() !== 'sqlite') {
+            DB::statement("
+                ALTER TABLE users
+                MODIFY COLUMN id_validation_status
+                ENUM('pending', 'verified', 'rejected')
+                NOT NULL DEFAULT 'pending'
+            ");
+        }
     }
 };

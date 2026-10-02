@@ -403,4 +403,165 @@
 
         </div>
     </div>
+
+    {{-- ============================================================ --}}
+    {{-- ONBOARDING VERIFICATION MODAL                                --}}
+    {{-- ============================================================ --}}
+    @php
+        $user = auth()->user();
+
+        // Check kung kompleto ang profile
+        $profileComplete = $user->f_name
+            && $user->l_name
+            && $user->date_of_birth
+            && $user->gender
+            && $user->contact_number
+            && $user->address;
+
+        // Initial step
+        $initialStep = $user->gov_id_path ? 'verify' : 'intro';
+    @endphp
+
+    @if(auth()->user()->id_validation_status === 'unverified' && !auth()->user()->onboarding_dismissed)
+        <div x-data="{
+                step: '{{ $initialStep }}',
+                close() {
+                    fetch('{{ route('onboarding.dismiss') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                        },
+                    });
+                    this.$root.remove();
+                }
+            }"
+            x-cloak
+            class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+
+            {{-- INTRO STEP --}}
+            <div x-show="step === 'intro'"
+                x-transition.opacity
+                class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-md w-full p-6 sm:p-8 my-8">
+
+                <div class="text-center space-y-4">
+                    <div class="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h2 class="text-2xl font-black text-[#1B3B36] dark:text-white tracking-tight">
+                            {{ __('messages.onboard_title') }}
+                        </h2>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                            {{ __('messages.onboard_desc') }}
+                        </p>
+                    </div>
+
+                    <ul class="text-left space-y-2 py-4 text-sm text-neutral-600 dark:text-neutral-300">
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            {{ __('messages.onboard_item_1') }}
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            {{ __('messages.onboard_item_2') }}
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            {{ __('messages.onboard_item_3') }}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                    @if(!$profileComplete)
+                        <div class="w-full mb-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <p class="text-xs font-bold text-amber-700 dark:text-amber-400">
+                                        {{ __('messages.onboard_profile_incomplete_title') }}
+                                    </p>
+                                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                        {{ __('messages.onboard_profile_incomplete_desc') }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    <button type="button"
+                            @click="close()"
+                            class="flex-1 px-4 py-3 rounded-xl border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                        {{ __('messages.onboard_later') }}
+                    </button>
+                    @if($profileComplete)
+                        {{-- Continue button --}}
+                        <button type="button"
+                                @click="step = 'verify'"
+                                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition">
+                            {{ __('messages.onboard_continue') }}
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </button>
+                    @else
+                        {{-- Redirect sa profile page --}}
+                        <a href="{{ route('profile.edit') }}"
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                            {{ __('messages.onboard_complete_profile') }}
+                        </a>
+                    @endif
+                </div>
+            </div>
+
+            {{-- VERIFY STEP (i-reuse ang update-id-form content) --}}
+            <div x-show="step === 'verify'"
+                x-cloak
+                x-transition.opacity
+                class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200 dark:border-neutral-800 max-w-2xl w-full max-h-[92vh] overflow-y-auto my-8">
+
+                <div class="sticky top-0 bg-white dark:bg-neutral-900 border-b border-gray-100 dark:border-neutral-800 px-6 py-4 flex items-center justify-between z-10">
+                    <div class="flex items-center gap-2">
+                        <button type="button"
+                                @click="step = 'intro'"
+                                class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                            <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                        </button>
+                        <h2 class="text-lg font-black text-[#1B3B36] dark:text-white">
+                            {{ __('messages.onboard_verify_title') }}
+                        </h2>
+                    </div>
+                    <button type="button"
+                            @click="close()"
+                            class="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                        <svg class="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="p-6 sm:p-8">
+                    @include('profile.partials.update-id-form')
+                </div>
+            </div>
+        </div>
+    @endif
+
 </x-app-layout>

@@ -25,7 +25,7 @@ return [
     'large'             => 'Large',
     'extra_large'       => 'Extra Large',
 
-        // ========================================== //
+    // ========================================== //
     // ADMIN DASHBOARD                             //
     // ========================================== //
     'admin_dashboard_title'        => 'Administrator Dashboard',
@@ -114,7 +114,7 @@ return [
     'status_accepted'                    => 'Accepted',
     'status_under_review_activity'       => 'Under Review',
 
-        // ========================================== //
+    // ========================================== //
     // BOOKING MANAGEMENT (Admin)                  //
     // ========================================== //
     'booking_title'              => 'Booking Management',
@@ -206,7 +206,7 @@ return [
 
     'booking_visit_label'        => 'Visit :n',
 
-        // ========================================== //
+    // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
     'analytics_title'            => 'Analytics Dashboard',
@@ -360,7 +360,7 @@ return [
     'role_owner'                  => 'Owner',
     'role_sitter'                 => 'Pet Sitter',
 
-        // ========================================== //
+    // ========================================== //
     // HELP & SUPPORT (Admin)                      //
     // ========================================== //
     'help_title'              => 'Help & Support',
@@ -509,7 +509,7 @@ return [
     'help_ticket_empty_desc'  => 'Submit your first ticket using the form.',
     'help_ticket_response'    => 'Support Response',
 
-        // ========================================== //
+    // ========================================== //
     // ID VERIFICATION (Admin)                     //
     // ========================================== //
     'idv_title'                => 'ID Verification',
@@ -583,7 +583,20 @@ return [
     'idv_guide_3'              => 'Check the verification result from the API.',
     'idv_guide_4'              => 'Reject only if verification fails or documents are invalid.',
 
-        // ========================================== //
+    // Admin ID Verification — OCR
+    'idv_ocr_title'        => 'OCR Extraction Result',
+    'idv_ocr_success'      => 'Extracted',
+    'idv_ocr_failed'       => 'Not Extracted',
+    'idv_ocr_name'         => 'Name',
+    'idv_ocr_id_number'    => 'ID Number',
+    'idv_ocr_dob'          => 'Date of Birth',
+    'idv_ocr_compare'      => 'Comparison with User Profile',
+    'idv_ocr_match_yes'    => '✓ Name Match',
+    'idv_ocr_match_check'  => '⚠ Check Manually',
+    'idv_ocr_match_hint'   => 'Cross-check ID name with user profile',
+    'idv_ocr_failed_desc'  => 'OCR could not extract details. Please review the ID photo manually.',
+
+    // ========================================== //
     // SUPPORT INBOX (Admin)                       //
     // ========================================== //
     'inbox_title'              => 'Support Inbox',
@@ -647,7 +660,7 @@ return [
     'msg_delete'               => 'Delete Message',
     'msg_confirm_delete'       => 'Delete this message permanently? This action cannot be undone.',
 
-        // ========================================== //
+    // ========================================== //
     // REPORTS (Admin)                             //
     // ========================================== //
     'reports_title'              => 'Reports',
@@ -760,8 +773,8 @@ return [
     'report_pdf_no'              => 'No',
     'report_pdf_empty'           => 'No records found for the selected filters.',
     'report_pdf_footer'          => 'PetNanny Admin System · Report generated on :date',
-    
-        // ========================================== //
+
+    // ========================================== //
     // SITTER VERIFICATION (Admin)                 //
     // ========================================== //
     'sv_title'                 => 'Pet Sitter Verification',
@@ -868,7 +881,7 @@ return [
     'sv_reject_note'           => 'The reason will be sent via notification and email to the applicant.',
     'sv_yes_reject'            => 'Yes, Reject',
 
-        // ========================================== //
+    // ========================================== //
     // USER MANAGEMENT (Admin)                     //
     // ========================================== //
     'um_title'                 => 'User Management',
@@ -936,6 +949,26 @@ return [
     'um_ban_ph'                => 'e.g., Multiple verified complaints of misconduct.',
     'um_yes_ban'               => 'Yes, Ban User',
 
+    'um_tooltip_delete'   => 'Delete User',
+    'um_delete_title'     => 'Delete User Account?',
+    'um_delete_warning'   => 'The account will be hidden from active users. You can restore it within 30 days.',
+    'um_delete_confirm_js'=> 'Are you absolutely sure you want to delete this user? This action can be undone by admin.',
+    'um_yes_delete'       => 'Yes, Delete',
+
+    // Promote / Demote
+    'um_tooltip_promote'   => 'Promote to Admin',
+    'um_tooltip_demote'    => 'Demote from Admin',
+    'um_confirm_promote'   => 'Promote :name to Administrator?',
+    'um_confirm_demote'    => 'Demote :name from Administrator to Pet Owner?',
+
+    // Promote / Demote modals
+    'um_promote_title'    => 'Promote to Admin?',
+    'um_promote_warning'  => 'This user will gain full administrator privileges and access to all admin features.',
+    'um_yes_promote'      => 'Yes, Promote',
+    'um_demote_title'     => 'Demote from Admin?',
+    'um_demote_warning'   => 'This user will lose all administrator privileges and become a Pet Owner.',
+    'um_yes_demote'       => 'Yes, Demote',
+
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -979,9 +1012,10 @@ return [
     'ud_yrs'                   => 'yrs',
 
     'ud_back_btn'              => '← Back',
+    'ud_delete_btn'          => 'Delete User',
 
-        // ========================================== //
-    // ADMIN HOME (Creative Homepage)              //
+    // ========================================== //
+    // ADMIN HOME (Creative Homepage)             //
     // ========================================== //
     'ah_title'                 => 'Admin Home',
     'ah_subtitle'              => 'Welcome to your PetNanny admin workspace',
@@ -1046,7 +1080,7 @@ return [
     'ah_action'             => 'Action',
     'ah_all_clear'          => 'All clear',
 
-        // ========================================== //
+    // ========================================== //
     // NAVIGATION                                  //
     // ========================================== //
     'nav_search_placeholder'         => 'Search users, bookings...',
@@ -1104,7 +1138,7 @@ return [
     'sb_task_monitor'          => 'Task Monitor',
     'sb_settings'              => 'Settings',
 
-        // ========================================== //
+    // ========================================== //
     // COMPLAINTS (Owner/Sitter)                   //
     // ========================================== //
     // Create page
@@ -1212,7 +1246,7 @@ return [
     'cp_role_owner'                => 'Owner',
     'cp_role_sitter'               => 'Sitter',
 
-        // ========================================== //
+    // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
     // ========================================== //
     'od_title'                    => 'Home',
@@ -1273,7 +1307,17 @@ return [
     'od_cta_desc'                 => "Join PetNanny today — it's free!",
     'od_cta_explore'              => 'Explore Sitters',
 
-        // ========================================== //
+    // Onboarding Modal
+    'onboard_title'         => 'Verify Your Account',
+    'onboard_desc'          => 'To unlock all features and build trust with the community, please verify your identity.',
+    'onboard_item_1'        => 'Upload a valid government-issued ID',
+    'onboard_item_2'        => 'Take a selfie holding your ID',
+    'onboard_item_3'        => 'Wait for admin verification (1-2 business days)',
+    'onboard_later'         => 'Later',
+    'onboard_continue'      => 'Continue',
+    'onboard_verify_title'  => 'Verify Your Identity',
+
+    // ========================================== //
     // HELP & SUPPORT (Owner/Sitter)               //
     // ========================================== //
     'hs_title'                    => 'Help & Support',
@@ -1478,7 +1522,7 @@ return [
     'mi_empty_archived_desc'      => 'Archived conversations will appear here.',
     'mi_find_sitter'              => 'Find a Sitter',
 
-        // ========================================== //
+    // ========================================== //
     // BOOKING CARD (Partial)                      //
     // ========================================== //
     'bc_location_not_set'         => 'Location not set',
@@ -1651,7 +1695,7 @@ return [
     'sb_keep_booking'             => 'Keep Booking',
     'sb_yes_cancel'               => 'Yes, Cancel',
 
-        // ========================================== //
+    // ========================================== //
     // MYPETS                                       //
     // ========================================== //
     'mp_add_title'         => 'Add Pet',
@@ -1757,7 +1801,7 @@ return [
     'notif_close'             => 'Close',
     'notif_view_details_full' => 'View Details',
 
-        // ========================================== //
+    // ========================================== //
     // FIND SITTER                                  //
     // ========================================== //
     'fs_title'                => 'Find a Sitter',
@@ -1978,13 +2022,32 @@ return [
     'pf_id_fallback'           => 'ID',
     'pf_id_doc'                => 'Government-issued ID',
 
+    // OCR Result
+    'pf_ocr_success_title'     => 'OCR Extraction Successful',
+    'pf_ocr_success_desc'      => 'We successfully read the details on your ID.',
+    'pf_ocr_failed_title'      => 'OCR Extraction Failed',
+    'pf_ocr_failed_desc'       => 'We could not read the text on your ID. Please try again with a clearer photo.',
+    'pf_ocr_label_name'        => 'Name',
+    'pf_ocr_label_id'          => 'ID Number',
+
     // Delete account
     'pf_delete_account'        => 'Delete Account',
-    'pf_delete_account_desc'   => 'Once your account is deleted, all data will be permanently removed. Please download any data you wish to keep before proceeding.',
+    'pf_delete_account_desc'   => 'Once your account is deleted, all data will be permanently removed.      Please download any data you wish to keep before proceeding.',
     'pf_delete_confirm_title'  => 'Are you sure you want to delete your account?',
     'pf_delete_confirm_desc'   => 'This action is irreversible. Please enter your password to confirm.',
     'pf_password'              => 'Password',
     'pf_cancel'                => 'Cancel',
+
+    // Camera / Gallery options
+    'pf_open_camera'         => 'Open Camera',
+    'pf_choose_gallery'      => 'Choose from Gallery',
+    'pf_retry_camera'        => 'Retake',
+    'pf_retry_gallery'       => 'Choose Different',
+    'pf_camera_denied'       => 'Camera access denied. Please allow camera permissions or use the gallery instead.',
+    'pf_camera_title'        => 'Capture Photo',
+    'pf_id_camera_title'     => 'Capture Your ID',
+    'pf_selfie_camera_title' => 'Take a Selfie with ID',
+    'pf_capture_photo'       => 'Capture',
 
     // ========================================== //
     // SYSTEM SETTINGS                              //

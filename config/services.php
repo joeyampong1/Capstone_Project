@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    // ID Verification
+    'ocr_space' => [
+        'key' => env('OCR_SPACE_API_KEY'),
+    ],
+
 ];
