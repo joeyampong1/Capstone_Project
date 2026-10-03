@@ -1,11 +1,11 @@
 <?php
 
 return [
-
     'dashboard'         => 'Dashboard',
     'settings'          => 'Mga Setting',
     'profile'           => 'Profile',
     'logout'            => 'Mag-logout',
+
     'system_settings'   => 'Mga Setting ng System',
     'system_settings_desc' => 'Pamahalaan ang iyong mga kagustuhan at configuration',
     'preferences'       => 'Mga Kagustuhan',
@@ -22,12 +22,19 @@ return [
     'email_notifications_desc' => 'Makatanggap ng updates via email',
     'sms_notifications' => 'SMS Notifications',
     'sms_notifications_desc' => 'Makatanggap ng SMS updates para sa bookings',
+
     'small'             => 'Maliit',
     'default'           => 'Default',
     'large'             => 'Malaki',
-    'extra_large'       => 'Sobrang Laki',        // ========================================== //    // ADMIN DASHBOARD                             //    // ========================================== //    'admin_dashboard_title'        => 'Dashboard ng Administrator',
+    'extra_large'       => 'Sobrang Laki',
+
+        // ========================================== //
+    // ADMIN DASHBOARD                             //
+    // ========================================== //
+    'admin_dashboard_title'        => 'Dashboard ng Administrator',
     'admin_dashboard_subtitle'     => 'Subaybayan ang pangkalahatang performance ng PetNanny platform',
     'admin_filter_label'           => 'Filter:',
+
     'admin_total_users'            => 'Kabuuang Users',
     'admin_all_accounts'           => 'Lahat ng accounts',
     'admin_pet_owners'             => 'Mga Pet Owner',
@@ -48,12 +55,15 @@ return [
     'admin_completed'              => 'Natapos',
     'admin_new_sitters'            => 'Bagong Sitters',
     'admin_this_month'             => 'Ngayong buwan',
+
     'admin_booking_trend'          => 'Trend ng Bookings',
     'admin_last_7_months'          => 'Nakaraang 7 buwan',
     'admin_status_distribution'    => 'Distribusyon ng Status ng Booking',
+
     'admin_recent_activities'      => 'Mga Kamakailang Aktibidad',
     'admin_view_all'               => 'Tingnan Lahat',
     'admin_no_recent_activities'   => 'Walang kamakailang aktibidad',
+
     'admin_recent_booking_requests'=> 'Mga Kamakailang Booking Request',
     'admin_col_id'                 => 'ID',
     'admin_col_pet_owner'          => 'Pet Owner',
@@ -61,18 +71,24 @@ return [
     'admin_col_action'             => 'Aksyon',
     'admin_view'                   => 'Tingnan',
     'admin_no_bookings_yet'        => 'Wala pang bookings',
+
     'admin_pending_verification'   => 'Naghihintay na Beripikasyon',
     'admin_government_id'          => 'Government ID',
     'admin_approve'                => 'Aprubahan',
     'admin_reject'                 => 'Tanggihan',
     'admin_no_pending_verifications'=> 'Walang pending na beripikasyon',
+
     'admin_recent_complaints'      => 'Mga Kamakailang Reklamo',
     'admin_review'                 => 'I-review',
     'admin_no_recent_complaints'   => 'Walang kamakailang reklamo',
+
     'admin_quick_actions'          => 'Mabilis na Aksyon',
     'admin_verify_sitter'          => 'I-verify ang Sitter',
     'admin_users'                  => 'Mga User',
-    'admin_reports'                => 'Mga Ulat',    // Status labels    'status_pending'               => 'Naghihintay',
+    'admin_reports'                => 'Mga Ulat',
+
+    // Status labels
+    'status_pending'               => 'Naghihintay',
     'status_confirmed'             => 'Kumpirmado',
     'status_completed'             => 'Natapos',
     'status_cancelled'             => 'Kinansela',
@@ -80,20 +96,31 @@ return [
     'status_in_progress'           => 'Isinasagawa',
     'status_under_review'          => 'Sinusuri',
     'status_resolved'              => 'Naayos na',
-    'status_dismissed'             => 'Binunyagan',    // Complaint types    'complaint_missed_visit'       => 'Hindi Nasipotan',
+    'status_dismissed'             => 'Binunyagan',
+
+    // Complaint types
+    'complaint_missed_visit'       => 'Hindi Nasipotan',
     'complaint_poor_service'       => 'Mahinang Serbisyo',
     'complaint_no_proof'           => 'Walang Patunay',
     'complaint_rude_behavior'      => 'Bastos na Ugali',
     'complaint_others'             => 'Iba pa',
+
     'activity_submitted_id'              => ':name nagsumite ng ID Verification',
     'activity_filed_complaint'           => ':name nagreklamo laban kay :target',
     'activity_booking_created'           => 'Booking :ref ni :name',
     'activity_user_registered'           => ':name nagrehistro',
     'activity_sitter_approved'           => ':name naaprubahan bilang sitter',
+
     'status_verified'                    => 'Beripikado',
     'status_accepted'                    => 'Tinanggap',
-    'status_under_review_activity'       => 'Sinusuri',        // ========================================== //    // BOOKING MANAGEMENT (Admin)                  //    // ========================================== //    'booking_title'              => 'Pamamahala ng Booking',
+    'status_under_review_activity'       => 'Sinusuri',
+
+        // ========================================== //
+    // BOOKING MANAGEMENT (Admin)                  //
+    // ========================================== //
+    'booking_title'              => 'Pamamahala ng Booking',
     'booking_subtitle'           => 'Subaybayan at pamahalaan ang lahat ng booking sa platform',
+
     'booking_total'              => 'Kabuuang Bookings',
     'booking_pending'            => 'Naghihintay',
     'booking_active'             => 'Aktibo',
@@ -103,11 +130,13 @@ return [
     'booking_awaiting'           => 'Naghihintay',
     'booking_ongoing'            => 'Kasalukuyan',
     'booking_finished'           => 'Tapos na',
+
     'booking_search_ph'          => 'Maghanap ng booking...',
     'booking_all_status'         => 'Lahat ng Status',
     'booking_all_owners'         => 'Lahat ng Owner',
     'booking_all_sitters'        => 'Lahat ng Sitter',
     'booking_reset'              => 'I-reset',
+
     'booking_col_id'             => 'Booking ID',
     'booking_col_owner'          => 'Owner',
     'booking_col_sitter'         => 'Pet Sitter',
@@ -117,38 +146,48 @@ return [
     'booking_col_status'         => 'Status',
     'booking_col_action'         => 'Aksyon',
     'booking_view'               => 'Tingnan',
+
     'booking_no_found'           => 'Walang booking na nahanap.',
     'booking_no_match'           => 'Walang tugma sa iyong filter sa pahinang ito.',
-    'booking_showing'            => 'Ipinapakita :fromÃ¢â‚¬â€œ:to ng :total bookings',
+
+    'booking_showing'            => 'Ipinapakita :from–:to ng :total bookings',
     'booking_previous'           => 'Nakaraan',
     'booking_next'               => 'Susunod',
+
     'booking_details'            => 'Detalye ng Booking',
     'booking_tab_details'        => 'Detalye',
     'booking_tab_visits'         => 'Talaan ng Bisita',
+
     'booking_info'               => 'Impormasyon ng Booking',
     'booking_date'               => 'Petsa ng Booking',
     'booking_visit_sched'        => 'Iskedyul ng Bisita',
+
     'booking_owner_info'         => 'Impormasyon ng Owner',
     'booking_verified'           => 'Beripikado',
     'booking_phone'              => 'Telepono:',
     'booking_email'              => 'Email:',
+
     'booking_sitter_info'        => 'Impormasyon ng Pet Sitter',
     'booking_verified_sitter'    => 'Beripikadong Sitter',
     'booking_rating'             => 'Rating',
     'booking_completed_jobs'     => 'Natapos na Trabaho',
+
     'booking_pet_info'           => 'Impormasyon ng Alagang Hayop',
     'booking_pet_name'           => 'Pangalan',
     'booking_pet_type'           => 'Uri',
     'booking_pet_breed'          => 'Lahi',
     'booking_pet_age'            => 'Edad',
     'booking_pet_weight'         => 'Timbang',
+
     'booking_services'           => 'Mga Serbisyo ng Booking',
     'booking_no_services'        => 'Walang nakatalang serbisyo.',
     'booking_no_visits'          => 'Walang naka-iskedyul na bisita.',
+
     'booking_summary'            => 'Buod',
     'booking_total_label'        => 'Kabuuang Booking',
     'booking_completed_visits'   => 'Natapos na Bisita',
     'booking_remaining_visits'   => 'Natitirang Bisita',
+
     'booking_admin_actions'      => 'Mga Aksyon ng Admin',
     'booking_view_owner'         => 'Tingnan ang Profile ng Owner',
     'booking_view_sitter'        => 'Tingnan ang Profile ng Sitter',
@@ -156,25 +195,35 @@ return [
     'booking_cancel'             => 'Kanselahin ang Booking',
     'booking_confirm_force'      => 'Pilitin tapusin ang booking na ito? Markahan ang lahat ng bisita bilang tapos na.',
     'booking_confirm_cancel'     => 'Kanselahin ang booking na ito? Aabisuhan ang owner at sitter.',
+
     'booking_no_visit_logs'      => 'Walang Talaan ng Bisita',
     'booking_visit_logs_hint'    => 'Ang mga talaan ng bisita ay ipapakita dito.',
+
     'booking_guidelines'         => 'Mga Alituntunin sa Booking',
     'booking_guide_1'            => 'Subaybayan ang lahat ng aktibidad ng booking.',
     'booking_guide_2'            => 'I-track ang natapos at hindi nasipotan na bisita.',
     'booking_guide_3'            => 'Imbestigahan ang mga reklamo kung kinakailangan.',
     'booking_guide_4'            => 'Kanselahin ang booking kung kinakailangan lamang.',
-    'booking_visit_label'        => 'Bisita :n',    // ========================================== //    // ANALYTICS DASHBOARD (Admin)                 //    // ========================================== //    'analytics_title'            => 'Dashboard ng Analytics',
+
+    'booking_visit_label'        => 'Bisita :n',
+
+    // ========================================== //
+    // ANALYTICS DASHBOARD (Admin)                 //
+    // ========================================== //
+    'analytics_title'            => 'Dashboard ng Analytics',
     'analytics_subtitle'         => 'Subaybayan ang performance, trend, at insight ng system',
     'analytics_range_today'      => 'Ngayon',
     'analytics_range_week'       => 'Linggo',
     'analytics_range_month'      => 'Buwan',
     'analytics_range_year'       => 'Taon',
     'analytics_refresh'          => 'I-refresh',
+
     'analytics_total_users'      => 'Kabuuang Users',
     'analytics_active_sitters'   => 'Aktibong Sitters',
     'analytics_verified_pct'     => ':pct% beripikado',
     'analytics_growth_this'      => 'ngayong :range',
     'analytics_complaints_pending'=> ':n naghihintay',
+
     'analytics_booking_trend'    => 'Trend ng Booking',
     'analytics_last_n_months'    => 'Nakaraang :n buwan',
     'analytics_booking_status'   => 'Status ng Booking',
@@ -185,6 +234,7 @@ return [
     'analytics_complaint_dist'   => 'Distribusyon ng Reklamo',
     'analytics_complaint_status' => 'Status ng Reklamo',
     'analytics_no_complaint_data'=> 'Wala pang data ng reklamo.',
+
     'analytics_label_owners'     => 'Mga Owner',
     'analytics_label_sitters'    => 'Mga Pet Sitter',
     'analytics_label_admins'     => 'Mga Admin',
@@ -197,6 +247,7 @@ return [
     'analytics_label_evening'    => 'Gabi',
     'analytics_label_resolved'   => 'Naayos na',
     'analytics_label_dismissed'  => 'Binunyagan',
+
     'analytics_top_sitters'      => 'Mga Pinakamahusay na Pet Sitter',
     'analytics_most_active_owners'=> 'Mga Pinakaaktibong Pet Owner',
     'analytics_col_rank'         => 'Ranggo',
@@ -208,13 +259,21 @@ return [
     'analytics_col_rate'         => 'Rate',
     'analytics_no_sitter_data'   => 'Wala pang data ng sitter.',
     'analytics_no_owner_data'    => 'Wala pang data ng owner.',
+
     'analytics_recent_activities'=> 'Mga Kamakailang Aktibidad',
     'analytics_no_recent_acts'   => 'Walang kamakailang aktibidad.',
     'analytics_platform_health'  => 'Kalusugan ng Platform',
     'analytics_platform_insights'=> 'Mga Insight ng Platform',
+
     'analytics_last_updated'     => 'Huling Na-update:',
-    'analytics_auto_refresh'     => 'Awtomatikong nagre-refresh tuwing 5 minuto',        // ========================================== //    // COMPLAINTS MANAGEMENT (Admin)               //    // ========================================== //    'complaint_title'             => 'Pamamahala ng Reklamo',
+    'analytics_auto_refresh'     => 'Awtomatikong nagre-refresh tuwing 5 minuto',
+
+        // ========================================== //
+    // COMPLAINTS MANAGEMENT (Admin)               //
+    // ========================================== //
+    'complaint_title'             => 'Pamamahala ng Reklamo',
     'complaint_subtitle'          => 'Suriin, imbestigahan, at lutasin ang mga reklamo ng user',
+
     'complaint_stat_total'        => 'Kabuuan',
     'complaint_stat_pending'      => 'Naghihintay',
     'complaint_stat_under_review' => 'Sinusuri',
@@ -224,9 +283,11 @@ return [
     'complaint_label_awaiting'    => 'Naghihintay',
     'complaint_label_investigating'=> 'Iniimbestigahan',
     'complaint_label_completed'   => 'Natapos',
+
     'complaint_search_ph'         => 'Maghanap ng reklamo...',
     'complaint_all_status'        => 'Lahat ng Status',
     'complaint_all_types'         => 'Lahat ng Uri',
+
     'complaint_col_id'            => 'Complaint ID',
     'complaint_col_booking'       => 'Booking',
     'complaint_col_complainant'   => 'Nagreklamo',
@@ -235,14 +296,18 @@ return [
     'complaint_col_status'        => 'Status',
     'complaint_col_submitted'     => 'Isinumite',
     'complaint_col_action'        => 'Aksyon',
+
     'complaint_review'            => 'I-review',
     'complaint_view'              => 'Tingnan',
     'complaint_no_found'          => 'Walang reklamong nahanap.',
     'complaint_no_match'          => 'Walang tugma sa iyong filter.',
-    'complaint_showing'           => 'Ipinapakita :fromÃ¢â‚¬â€œ:to ng :total reklamo',
+
+    'complaint_showing'           => 'Ipinapakita :from–:to ng :total reklamo',
+
     'complaint_details_title'     => 'Detalye ng Reklamo',
     'complaint_tab_details'       => 'Detalye',
     'complaint_tab_activity'      => 'Aktibidad',
+
     'complaint_info'              => 'Impormasyon ng Reklamo',
     'complaint_users_involved'    => 'Mga User na Kabilang',
     'complaint_view_profiles'     => 'Tingnan ang mga Profile',
@@ -254,16 +319,19 @@ return [
     'complaint_no_description'    => 'Walang ibinigay na paglalarawan.',
     'complaint_evidence'          => 'Ebidensya',
     'complaint_no_evidence'       => 'Walang naka-attach na ebidensya.',
+
     'complaint_admin_notes'       => 'Mga Tala ng Admin',
     'complaint_notes_ph'          => 'Magdagdag ng tala sa imbestigasyon...',
     'complaint_resolution'        => 'Resolusyon',
     'complaint_resolution_ph'     => 'Ilagay ang detalye ng resolusyon...',
     'complaint_actions'           => 'Mga Aksyon',
+
     'complaint_mark_review'       => 'Markahan Bilang Sinusuri',
     'complaint_resolve'           => 'Lutasin ang Reklamo',
     'complaint_dismiss'           => 'Balewalain ang Reklamo',
     'complaint_confirm_dismiss'   => 'Balewalain ang reklamong ito? Hindi na maibabalik.',
     'complaint_need_resolution'   => 'Pakilagay ang detalye ng resolusyon bago lutasin.',
+
     'complaint_timeline'          => 'Timeline ng Reklamo',
     'complaint_tl_submitted'      => 'Isinumite',
     'complaint_tl_under_review'   => 'Sinusuri',
@@ -272,22 +340,33 @@ return [
     'complaint_tl_pending'        => 'Naghihintay',
     'complaint_tl_resolved'       => 'Naayos na',
     'complaint_tl_dismissed'      => 'Binunyagan',
+
     'complaint_activity_log'      => 'Talaan ng Aktibidad',
     'complaint_activity_hint'     => 'Ang talaan ng aktibidad ay ipapakita dito.',
+
     'complaint_guidelines'        => 'Mga Alituntunin sa Imbestigasyon ng Reklamo',
     'complaint_guide_1'           => 'Suriing mabuti ang lahat ng isinumiteng ebidensya.',
     'complaint_guide_2'           => 'I-verify ang detalye ng booking at mga rekord ng bisita.',
     'complaint_guide_3'           => 'Makipag-usap nang patas sa magkabilang panig.',
     'complaint_guide_4'           => 'Itala ang mga tala ng imbestigasyon.',
     'complaint_guide_5'           => 'Markahan ang reklamo bilang Naayos o Binunyagan pagkatapos ng imbestigasyon.',
+
     'role_owner'                  => 'Owner',
-    'role_sitter'                 => 'Pet Sitter',        // ========================================== //    // HELP & SUPPORT (Admin)                      //    // ========================================== //    'help_title'              => 'Tulong at Suporta',
+    'role_sitter'                 => 'Pet Sitter',
+
+        // ========================================== //
+    // HELP & SUPPORT (Admin)                      //
+    // ========================================== //
+    'help_title'              => 'Tulong at Suporta',
     'help_subtitle'           => 'Maghanap ng sagot, magbasa ng gabay, at kumuha ng teknikal na tulong',
+
     'help_tab_help'           => 'Tulong at Gabay',
     'help_tab_tickets'        => 'Aking mga Ticket',
+
     'help_search_title'       => 'Paano ka namin matutulungan?',
     'help_search_subtitle'    => 'Maghanap ng FAQ, gabay, o dokumentasyon ng system',
     'help_search_ph'          => 'Maghanap ng tulong...',
+
     'help_cat_faqs'           => 'Mga FAQ',
     'help_cat_faqs_desc'      => 'Karaniwang tanong at sagot',
     'help_cat_guide'          => 'Gabay sa User',
@@ -296,8 +375,10 @@ return [
     'help_cat_contact_desc'   => 'I-ulat ang teknikal na isyu',
     'help_cat_docs'           => 'Dokumentasyon',
     'help_cat_docs_desc'      => 'Impormasyon at patakaran',
+
     'help_faqs_header'        => 'Mga Madalas Itanong',
     'help_faqs_header_desc'   => 'Karaniwang tanong ng mga administrator',
+
     'help_faq_q1' => 'Paano ko i-verify ang isang pet sitter?',
     'help_faq_a1' => 'Pumunta sa Pet Sitter Verification mula sa sidebar. Suriin ang isinumiteng aplikasyon, tingnan ang mga dokumento, at i-click ang Aprubahan o Tanggihan. Awtomatikong maaabisuhan ang aplikante.',
     'help_faq_q2' => 'Paano ko i-verify ang government ID ng user?',
@@ -314,66 +395,81 @@ return [
     'help_faq_a7' => 'Buksan ang User Management, i-click ang user upang makita ang detalye, at gamitin ang Suspend User o Ban User na button. Ang mga suspendidong user ay maaaring i-reactivate; ang mga banned na user ay nangangailangan ng admin restore.',
     'help_faq_q8' => 'Ano ang pagkakaiba ng Help & Support at Complaints?',
     'help_faq_a8' => 'Ang Help & Support ay para sa mga admin na nangangailangan ng teknikal na tulong sa paggamit ng system. Ang Complaints ay para sa pamamahala ng mga ulat na isinumite ng mga pet owner o sitter laban sa ibang user.',
+
     'help_guide_header'       => 'Gabay sa Admin User',
     'help_guide_header_desc'  => 'Hakbang-hakbang na tagubilin para sa bawat module',
+
     'help_guide_user_title'   => 'Pamamahala ng User',
     'help_guide_user_s1'      => 'Buksan ang User Management mula sa sidebar.',
     'help_guide_user_s2'      => 'Gamitin ang search bar upang maghanap ng user sa pamamagitan ng pangalan o email.',
     'help_guide_user_s3'      => 'I-click ang user upang makita ang kanilang profile at detalye ng account.',
     'help_guide_user_s4'      => 'Gamitin ang Suspend, Ban, o Reactivate na button upang pamahalaan ang status ng account.',
+
     'help_guide_id_title'     => 'Beripikasyon ng ID',
     'help_guide_id_s1'        => 'Buksan ang ID Verification mula sa sidebar.',
     'help_guide_id_s2'        => 'Suriin ang isinumiteng government ID at selfie.',
     'help_guide_id_s3'        => 'Tingnan ang resulta ng API (face match, authenticity, liveness).',
     'help_guide_id_s4'        => 'Magdagdag ng admin notes, at i-click ang Aprubahan o Tanggihan.',
+
     'help_guide_sitter_title' => 'Beripikasyon ng Pet Sitter',
     'help_guide_sitter_s1'    => 'Buksan ang Pet Sitter Verification mula sa sidebar.',
     'help_guide_sitter_s2'    => 'I-filter ayon sa status (Naghihintay, Aprubado, Tinanggihan).',
     'help_guide_sitter_s3'    => 'Suriin ang profile, karanasan, at mga dokumento ng aplikante.',
     'help_guide_sitter_s4'    => 'Aprubahan o Tanggihan na may opsyonal na remarks.',
+
     'help_guide_booking_title'=> 'Pamamahala ng Booking',
     'help_guide_booking_s1'   => 'Buksan ang Bookings mula sa sidebar.',
     'help_guide_booking_s2'   => 'I-filter ayon sa status, owner, o sitter.',
     'help_guide_booking_s3'   => 'I-click ang Tingnan upang makita ang detalye, bisita, at status ng bayad.',
     'help_guide_booking_s4'   => 'Gamitin ang Force Complete o Cancel para sa admin override kung kinakailangan.',
+
     'help_guide_complaint_title'=> 'Mga Reklamo',
     'help_guide_complaint_s1' => 'Buksan ang Mga Reklamo sa ilalim ng Case Management.',
     'help_guide_complaint_s2' => 'I-click ang I-review upang buksan ang reklamo na may ebidensya at mga user na sangkot.',
     'help_guide_complaint_s3' => 'Markahan bilang Sinusuri habang nag-iimbestiga.',
     'help_guide_complaint_s4' => 'Itala ang resolusyon, at Lutasin o Balewalain.',
+
     'help_guide_reports_title'=> 'Mga Ulat at Analytics',
     'help_guide_reports_s1'   => 'Buksan ang Reports upang gumawa ng PDF o Excel summaries.',
     'help_guide_reports_s2'   => 'Piliin ang uri ng ulat at date range bago mag-export.',
     'help_guide_reports_s3'   => 'Buksan ang Analytics para sa live na KPI at chart.',
     'help_guide_reports_s4'   => 'I-filter ayon sa Ngayon, Linggo, Buwan, o Taon.',
+
     'help_docs_header'        => 'Dokumentasyon ng System',
     'help_docs_header_desc'   => 'Mahalagang impormasyon at patakaran ng system',
+
     'help_doc_verif_title'    => 'Pamantayan sa Beripikasyon',
     'help_doc_verif_1'        => 'Ang lahat ng ID ay dapat malinaw, balido, at hindi pa expired.',
     'help_doc_verif_2'        => 'Ang selfie ay dapat tumugma sa larawan ng ID.',
     'help_doc_verif_3'        => 'Ang face match score na 80% o mas mataas ay katanggap-tanggap.',
     'help_doc_verif_4'        => 'Tanggihan lamang kapag nabigo ang validation ng dokumento.',
+
     'help_doc_complaint_title'=> 'Patakaran sa Paghawak ng Reklamo',
     'help_doc_complaint_1'    => 'Suriin ang lahat ng ebidensya bago magpasya.',
     'help_doc_complaint_2'    => 'Makipag-usap nang patas sa magkabilang panig.',
     'help_doc_complaint_3'    => 'Itala ang admin notes para sa bawat aksyon.',
     'help_doc_complaint_4'    => 'I-escalate sa ban lamang para sa paulit-ulit na paglabag.',
+
     'help_doc_booking_title'  => 'Mga Patakaran sa Booking',
     'help_doc_booking_1'      => 'Kanselahin ang booking lamang sa kahilingan ng user o hindi pagkakasundo.',
     'help_doc_booking_2'      => 'Force complete lamang kung hindi makapag-check out ang sitter.',
     'help_doc_booking_3'      => 'Ang lahat ng aksyon ng admin ay naka-log na may timestamps.',
     'help_doc_booking_4'      => 'Aabisuhan ang owner at sitter sa mga pagbabago.',
+
     'help_doc_privacy_title'  => 'Data at Privacy',
     'help_doc_privacy_1'      => 'Ang mga ID dokumento ay naka-store nang secure at admin-only.',
     'help_doc_privacy_2'      => 'Huwag ibahagi ang data ng user sa labas ng platform.',
     'help_doc_privacy_3'      => 'Mag-logout pagkatapos ng bawat admin session.',
     'help_doc_privacy_4'      => 'I-ulat agad ang mga kahina-hinalang account.',
+
     'help_ticket_total'       => 'Kabuuan',
     'help_ticket_open'        => 'Bukas',
     'help_ticket_in_progress' => 'Isinasagawa',
     'help_ticket_resolved'    => 'Naayos na',
+
     'help_ticket_new'         => 'Bagong Ticket',
     'help_ticket_new_desc'    => 'Magsumite ng teknikal na alalahanin',
+
     'help_ticket_concern'     => 'Uri ng Alalahanin',
     'help_ticket_select'      => 'Pumili ng uri',
     'help_ticket_priority'    => 'Priyoridad',
@@ -382,6 +478,7 @@ return [
     'help_ticket_description' => 'Paglalarawan',
     'help_ticket_description_ph' => 'Ilarawan ang isyu. Isama ang ginagawa mo, ano ang nangyari, at anumang error message na nakita mo.',
     'help_ticket_submit'      => 'Isumite ang Ticket',
+
     'help_concern_login'      => 'Isyu sa Login / Access',
     'help_concern_id'         => 'Error sa Beripikasyon ng ID',
     'help_concern_booking'    => 'Error sa Booking System',
@@ -389,16 +486,24 @@ return [
     'help_concern_user'       => 'Isyu sa User Management',
     'help_concern_perf'       => 'Performance ng System',
     'help_concern_other'      => 'Iba pa',
+
     'help_priority_low'       => 'Mababa',
     'help_priority_normal'    => 'Normal',
     'help_priority_high'      => 'Mataas',
     'help_priority_critical'  => 'Kritikal',
+
     'help_ticket_history'     => 'Aking mga Isinumiteng Ticket',
     'help_ticket_history_desc'=> 'Subaybayan ang status ng iyong mga alalahanin',
     'help_ticket_empty'       => 'Wala pang ticket',
     'help_ticket_empty_desc'  => 'Isumite ang iyong unang ticket gamit ang form.',
-    'help_ticket_response'    => 'Tugon ng Suporta',        // ========================================== //    // ID VERIFICATION (Admin)                     //    // ========================================== //    'idv_title'                => 'Beripikasyon ng ID',
+    'help_ticket_response'    => 'Tugon ng Suporta',
+
+        // ========================================== //
+    // ID VERIFICATION (Admin)                     //
+    // ========================================== //
+    'idv_title'                => 'Beripikasyon ng ID',
     'idv_subtitle'             => 'Suriin at pamahalaan ang mga kahilingan sa beripikasyon ng pagkakakilanlan',
+
     'idv_stat_pending'         => 'Naghihintay',
     'idv_stat_verified'        => 'Beripikado',
     'idv_stat_rejected'        => 'Tinanggihan',
@@ -407,6 +512,7 @@ return [
     'idv_label_approved'       => 'Aprubado',
     'idv_label_resubmit'       => 'Isumite Muli',
     'idv_label_requests'       => 'Mga Kahilingan',
+
     'idv_search_ph'            => 'Maghanap ng user...',
     'idv_all_status'           => 'Lahat ng Status',
     'idv_all_result'           => 'Lahat ng Resulta',
@@ -415,26 +521,32 @@ return [
     'idv_result_failed'        => 'Bigo',
     'idv_result_partial'       => 'Bahagya',
     'idv_search_btn'           => 'Maghanap',
+
     'idv_col_user'             => 'User',
     'idv_col_role'             => 'Role',
     'idv_col_submitted'        => 'Isinumite',
     'idv_col_status'           => 'Status',
     'idv_col_action'           => 'Aksyon',
     'idv_view'                 => 'Tingnan',
+
     'idv_no_requests'          => 'Wala pang kahilingan sa beripikasyon.',
     'idv_no_match'             => 'Walang tugma sa iyong filter sa pahinang ito.',
-    'idv_showing'              => 'Ipinapakita :fromÃ¢â‚¬â€œ:to ng :total kahilingan sa beripikasyon',
+
+    'idv_showing'              => 'Ipinapakita :from–:to ng :total kahilingan sa beripikasyon',
+
     'idv_modal_title'          => 'Detalye ng Beripikasyon',
     'idv_email'                => 'Email',
     'idv_phone'                => 'Numero ng Telepono',
     'idv_registered'           => 'Nakarehistro',
     'idv_status'               => 'Status ng Beripikasyon',
+
     'idv_submitted_id'         => 'Isinumiteng Government ID',
     'idv_type'                 => 'Uri:',
     'idv_id_number'            => 'Numero ng ID:',
     'idv_selfie'               => 'Selfie',
     'idv_no_id_image'          => 'Walang larawan ng ID',
     'idv_no_selfie_image'      => 'Walang larawan ng selfie',
+
     'idv_api_title'            => 'Resulta ng API Verification',
     'idv_face_match'           => 'Face Match',
     'idv_doc_auth'             => 'Authenticity ng Dokumento',
@@ -446,24 +558,33 @@ return [
     'idv_no'                   => 'Hindi',
     'idv_matched'              => 'Tugma',
     'idv_not_matched'          => 'Hindi Tugma',
+
     'idv_admin_notes'          => 'Mga Tala ng Admin',
     'idv_admin_notes_ph'       => 'Magdagdag ng tala tungkol sa beripikasyong ito...',
     'idv_approve'              => 'Aprubahan',
     'idv_reject'               => 'Tanggihan',
     'idv_download'             => 'I-download ang mga Dokumento',
     'idv_confirm_reject'       => 'Tanggihan ang beripikasyong ito? Hihilingin sa user na magsumite muli.',
+
     'idv_guidelines'           => 'Mga Alituntunin sa Beripikasyon',
     'idv_guide_1'              => 'Suriing mabuti ang isinumiteng ID.',
     'idv_guide_2'              => 'Siguraduhing tumutugma ang selfie sa larawan ng ID.',
     'idv_guide_3'              => 'Tingnan ang resulta ng beripikasyon mula sa API.',
-    'idv_guide_4'              => 'Tanggihan lamang kung nabigo ang beripikasyon o hindi balido ang mga dokumento.',        // ========================================== //    // SUPPORT INBOX (Admin)                       //    // ========================================== //    'inbox_title'              => 'Inbox ng Suporta',
+    'idv_guide_4'              => 'Tanggihan lamang kung nabigo ang beripikasyon o hindi balido ang mga dokumento.',
+
+        // ========================================== //
+    // SUPPORT INBOX (Admin)                       //
+    // ========================================== //
+    'inbox_title'              => 'Inbox ng Suporta',
     'inbox_subtitle'           => 'Mga mensahe at ulat ng problema mula sa mga pet owner at sitter',
+
     'inbox_stat_total'         => 'Kabuuan',
     'inbox_stat_open'          => 'Bukas',
     'inbox_stat_in_progress'   => 'Isinasagawa',
     'inbox_stat_resolved'      => 'Naayos na',
     'inbox_stat_contacts'      => 'Mga Contact',
     'inbox_stat_reports'       => 'Mga Ulat',
+
     'inbox_search_ph'          => 'Maghanap sa code, paksa, sender...',
     'inbox_all_status'         => 'Lahat ng Status',
     'inbox_all_types'          => 'Lahat ng Uri',
@@ -471,6 +592,7 @@ return [
     'inbox_type_report'        => 'Mga Ulat ng Problema',
     'inbox_filter'             => 'I-filter',
     'inbox_reset'              => 'I-reset',
+
     'inbox_col_code'           => 'Code',
     'inbox_col_from'           => 'Mula kay',
     'inbox_col_type'           => 'Uri',
@@ -478,32 +600,48 @@ return [
     'inbox_col_status'         => 'Status',
     'inbox_col_date'           => 'Petsa',
     'inbox_col_action'         => 'Aksyon',
+
     'inbox_label_report'       => 'Ulat',
     'inbox_label_contact'      => 'Contact',
     'inbox_view'               => 'Tingnan',
-    'inbox_no_messages'        => 'Wala pang mensahe.',    // ========================================== //    // MESSAGE DETAILS (Admin)                     //    // ========================================== //    'msg_title'                => 'Detalye ng Mensahe',
+    'inbox_no_messages'        => 'Wala pang mensahe.',
+
+    // ========================================== //
+    // MESSAGE DETAILS (Admin)                     //
+    // ========================================== //
+    'msg_title'                => 'Detalye ng Mensahe',
     'msg_role_sitter'          => 'Pet Sitter',
     'msg_role_owner'           => 'Pet Owner',
     'msg_no_email'             => 'Walang email',
     'msg_label_report'         => 'Ulat ng Problema',
     'msg_label_contact'        => 'Contact Message',
+
     'msg_category'             => 'Kategorya',
     'msg_message'              => 'Mensahe',
     'msg_steps'                => 'Mga Hakbang para Maulit',
     'msg_device'               => 'Device / Browser',
+
     'msg_previous_reply'       => 'Nakaraang Tugon',
     'msg_admin_fallback'       => 'Admin',
+
     'msg_update_reply'         => 'I-update ang Tugon',
     'msg_send_reply'           => 'Ipadala ang Tugon',
     'msg_reply_ph'             => 'I-type ang iyong tugon sa user...',
     'msg_update_status'        => 'I-update ang Status',
-    'msg_status_in_progress'   => 'Isinasagawa Ã¢â‚¬â€ patuloy pang ginagawa',
-    'msg_status_resolved'      => 'Naayos na Ã¢â‚¬â€ isara ang ticket na ito',
+    'msg_status_in_progress'   => 'Isinasagawa — patuloy pang ginagawa',
+    'msg_status_resolved'      => 'Naayos na — isara ang ticket na ito',
+
     'msg_danger_zone'          => 'Mapanganib na Sona',
     'msg_danger_desc'          => 'Ang pag-delete ng mensaheng ito ay permanente at hindi na maibabalik.',
     'msg_delete'               => 'I-delete ang Mensahe',
-    'msg_confirm_delete'       => 'I-delete nang permanente ang mensaheng ito? Hindi na ito maibabalik.',        // ========================================== //    // REPORTS (Admin)                             //    // ========================================== //    'reports_title'              => 'Mga Ulat',
+    'msg_confirm_delete'       => 'I-delete nang permanente ang mensaheng ito? Hindi na ito maibabalik.',
+
+        // ========================================== //
+    // REPORTS (Admin)                             //
+    // ========================================== //
+    'reports_title'              => 'Mga Ulat',
     'reports_subtitle'           => 'Gumawa, tingnan, at i-export ang mga ulat ng system',
+
     'reports_total_users'        => 'Kabuuang Users',
     'reports_growth_this_month'  => 'ngayong buwan',
     'reports_total_bookings'     => 'Kabuuang Bookings',
@@ -511,6 +649,7 @@ return [
     'reports_completed'          => 'Natapos',
     'reports_complaints'         => 'Mga Reklamo',
     'reports_pending_count'      => ':count naghihintay',
+
     'reports_filter_type'        => 'Uri ng Ulat',
     'reports_all_reports'        => 'Lahat ng Ulat',
     'reports_booking_report'     => 'Ulat ng Booking',
@@ -525,13 +664,14 @@ return [
     'reports_reset_filters'      => 'I-reset ang filter',
     'reports_generate_pdf'       => 'Gumawa ng PDF',
     'reports_generate_excel'     => 'Gumawa ng Excel',
+
     'reports_categories'         => 'Mga Kategorya ng Ulat',
     'reports_label_booking'      => 'Ulat ng Booking',
     'reports_label_user'         => 'Ulat ng User',
     'reports_label_complaint'    => 'Ulat ng Reklamo',
     'reports_top'                => 'Nangunguna:',
     'reports_na'                 => 'N/A',
-    'reports_view_arrow'         => 'Tingnan Ã¢â€ â€™',
+    'reports_view_arrow'         => 'Tingnan →',
     'reports_total_short'        => 'Kabuuan:',
     'reports_done_short'         => 'Tapos:',
     'reports_cancel_short'       => 'Kansel:',
@@ -544,6 +684,7 @@ return [
     'reports_resolved_short'     => 'Naayos:',
     'reports_dismissed_short'    => 'Binunyagan:',
     'reports_common'             => 'Karaniwan:',
+
     'reports_analytics_overview' => 'Pangkalahatang Analytics',
     'reports_booking_trend'      => 'Trend ng Booking',
     'reports_last_n_months'      => 'Nakaraang :n buwan',
@@ -552,10 +693,12 @@ return [
     'reports_complaint_dist'     => 'Distribusyon ng Reklamo',
     'reports_by_type'            => 'Ayon sa uri',
     'reports_no_complaint_data'  => 'Wala pang data ng reklamo.',
+
     'reports_recent_generated'   => 'Mga Kamakailang Ulat',
     'reports_download'           => 'I-download',
     'reports_no_reports_yet'     => 'Wala pang ulat na nagawa.',
     'reports_generate_first'     => 'Gumawa ng Unang Ulat',
+
     'reports_history'            => 'Kasaysayan ng mga Ulat',
     'reports_col_id'             => 'Report ID',
     'reports_col_type'           => 'Uri ng Ulat',
@@ -564,16 +707,22 @@ return [
     'reports_col_format'         => 'Format',
     'reports_col_action'         => 'Aksyon',
     'reports_admin_fallback'     => 'Admin',
-    'reports_showing'            => 'Ipinapakita :fromÃ¢â‚¬â€œ:to ng :total ulat',
+    'reports_showing'            => 'Ipinapakita :from–:to ng :total ulat',
     'reports_no_history'         => 'Wala pang ulat na nagawa.',
+
     'reports_info_title'         => 'Impormasyon ng Ulat',
     'reports_info_1'             => 'Ang mga ulat ay maaaring gawin ayon sa date range.',
     'reports_info_2'             => 'Ang mga ulat ay naglalaman lamang ng mga finalized na rekord.',
     'reports_info_3'             => 'Mga format ng export: PDF, Excel (CSV).',
-    'reports_info_4'             => 'Ang mga ginawang ulat ay nakaimbak sa kasaysayan ng system.',    // ========================================== //    // PDF EXPORT (Standalone HTML)                //    // ========================================== //    'report_pdf_page_title'      => 'Ulat ng PetNanny Ã¢â‚¬â€ :type',
-    'report_pdf_back'            => 'Ã¢â€ Â Bumalik',
-    'report_pdf_print'           => 'Ã°Å¸â€“Â¨ I-print / I-save bilang PDF',
-    'report_pdf_heading'         => 'PetNanny Ã¢â‚¬â€ Ulat ng :type',
+    'reports_info_4'             => 'Ang mga ginawang ulat ay nakaimbak sa kasaysayan ng system.',
+
+    // ========================================== //
+    // PDF EXPORT (Standalone HTML)                //
+    // ========================================== //
+    'report_pdf_page_title'      => 'Ulat ng PetNanny — :type',
+    'report_pdf_back'            => '← Bumalik',
+    'report_pdf_print'           => '🖨 I-print / I-save bilang PDF',
+    'report_pdf_heading'         => 'PetNanny — Ulat ng :type',
     'report_pdf_full_system'     => 'Buong Ulat ng System',
     'report_pdf_type_report'     => 'Ulat ng :type',
     'report_pdf_from'            => 'Mula:',
@@ -599,8 +748,14 @@ return [
     'report_pdf_yes'             => 'Oo',
     'report_pdf_no'              => 'Hindi',
     'report_pdf_empty'           => 'Walang rekord na nahanap para sa napiling filter.',
-    'report_pdf_footer'          => 'PetNanny Admin System Ã‚Â· Ulat na nagawa noong :date',        // ========================================== //    // SITTER VERIFICATION (Admin)                 //    // ========================================== //    'sv_title'                 => 'Beripikasyon ng Pet Sitter',
+    'report_pdf_footer'          => 'PetNanny Admin System · Ulat na nagawa noong :date',
+
+        // ========================================== //
+    // SITTER VERIFICATION (Admin)                 //
+    // ========================================== //
+    'sv_title'                 => 'Beripikasyon ng Pet Sitter',
     'sv_subtitle'              => 'Suriin at aprubahan ang mga aplikasyon ng pet sitter',
+
     'sv_stat_pending'          => 'Naghihintay',
     'sv_stat_approved'         => 'Aprubado',
     'sv_stat_rejected'         => 'Tinanggihan',
@@ -609,6 +764,7 @@ return [
     'sv_label_verified'        => 'Beripikado',
     'sv_label_resubmit'        => 'Isumite Muli',
     'sv_label_applications'    => 'Mga Aplikasyon',
+
     'sv_search_ph'             => 'Maghanap ng aplikante...',
     'sv_all_status'            => 'Lahat ng Status',
     'sv_latest'                => 'Pinakabago',
@@ -619,24 +775,34 @@ return [
     'sv_exp_less1'             => 'Mas mababa sa 1 Taon',
     'sv_exp_none'              => 'Walang Karanasan',
     'sv_apply'                 => 'I-apply',
+
     'sv_col_applicant'         => 'Aplikante',
     'sv_col_experience'        => 'Karanasan',
     'sv_col_submitted'         => 'Isinumite',
     'sv_col_status'            => 'Status',
     'sv_col_action'            => 'Aksyon',
+
     'sv_year'                  => 'Taon',
     'sv_years'                 => 'Taon',
     'sv_review'                => 'I-review',
     'sv_view'                  => 'Tingnan',
     'sv_no_applications'       => 'Walang aplikasyong nahanap.',
-    'sv_showing'               => 'Ipinapakita :fromÃ¢â‚¬â€œ:to ng :total aplikasyon',    // ========================================== //    // SITTER APPLICATION MODAL                    //    // ========================================== //    'sv_modal_title'           => 'I-review ang Aplikasyon',
+
+    'sv_showing'               => 'Ipinapakita :from–:to ng :total aplikasyon',
+
+    // ========================================== //
+    // SITTER APPLICATION MODAL                    //
+    // ========================================== //
+    'sv_modal_title'           => 'I-review ang Aplikasyon',
     'sv_role_applicant'        => 'Aplikante para sa Pet Sitter',
     'sv_email'                 => 'Email',
     'sv_phone'                 => 'Telepono',
     'sv_location'              => 'Lokasyon',
     'sv_registered_since'      => 'Nakarehistro Mula Noon',
+
     'sv_experience'            => 'Karanasan',
     'sv_no_bio'                => 'Walang ibinigay na bio.',
+
     'sv_perf_summary'          => 'Buod ng Performance',
     'sv_avg_rating'            => 'Average na Rating',
     'sv_completed_bookings'    => 'Natapos na Bookings',
@@ -644,43 +810,61 @@ return [
     'sv_cancelled'             => 'Kinansela',
     'sv_missed_visits'         => 'Hindi Nasipotan',
     'sv_complaints'            => 'Mga Reklamo',
+
     'sv_services_offered'      => 'Mga Serbisyong Inaalok',
     'sv_no_services'           => 'Walang nakatalang serbisyo.',
+
     'sv_pets_accepted'         => 'Mga Tumatanggap na Alagang Hayop',
     'sv_no_pets'               => 'Walang nakatalang alagang hayop.',
+
     'sv_supporting_docs'       => 'Mga Sumusuportang Dokumento',
     'sv_doc_view'              => 'Tingnan',
     'sv_no_docs'               => 'Walang isinumiteng dokumento.',
     'sv_doc_count'             => 'Bilang ng Dokumento',
     'sv_files_submitted'       => 'Mga File na Isinumite',
+
     'sv_app_summary'           => 'Buod ng Aplikasyon',
     'sv_app_date'              => 'Petsa ng Aplikasyon',
     'sv_status'                => 'Status',
     'sv_base_rate'             => 'Base Rate',
     'sv_per_visit'             => '/ bisita',
+
     'sv_approve_btn'           => 'Aprubahan ang Aplikasyon',
     'sv_reject_btn'            => 'Tanggihan ang Aplikasyon',
     'sv_download_all'          => 'I-download ang Lahat ng Dokumento',
+
     'sv_guidelines'            => 'Mga Alituntunin sa Beripikasyon ng Pet Sitter',
     'sv_guide_1'               => 'Suriin ang lahat ng isinumiteng sumusuportang dokumento.',
     'sv_guide_2'               => 'Siguraduhing malinaw at balido ang mga dokumento.',
     'sv_guide_3'               => 'I-verify ang mga kwalipikasyon ng aplikante.',
     'sv_guide_4'               => 'Aprubahan lamang kung natutugunan ang mga kinakailangan.',
-    'sv_guide_5'               => 'Tanggihan kung hindi kumpleto o hindi balido ang mga dokumento.',    // Approve confirmation    'sv_approve_confirm_title' => 'Aprubahan ang Aplikasyon?',
+    'sv_guide_5'               => 'Tanggihan kung hindi kumpleto o hindi balido ang mga dokumento.',
+
+    // Approve confirmation
+    'sv_approve_confirm_title' => 'Aprubahan ang Aplikasyon?',
     'sv_approve_confirm_desc'  => 'Ang aplikanteng ito ay magiging beripikadong pet sitter.',
     'sv_admin_remarks'         => 'Mga Tala ng Admin',
     'sv_optional'              => '(opsyonal)',
     'sv_approve_ph'            => 'hal., Lahat ng dokumento ay na-verify at balido.',
     'sv_cancel'                => 'Kanselahin',
-    'sv_yes_approve'           => 'Oo, Aprubahan',    // Reject confirmation    'sv_reject_confirm_title'  => 'Tanggihan ang Aplikasyon?',
-    'sv_reject_confirm_desc'   => 'Mangyaring magbigay ng dahilan Ã¢â‚¬â€ ito ay ipapakita sa aplikante.',
+    'sv_yes_approve'           => 'Oo, Aprubahan',
+
+    // Reject confirmation
+    'sv_reject_confirm_title'  => 'Tanggihan ang Aplikasyon?',
+    'sv_reject_confirm_desc'   => 'Mangyaring magbigay ng dahilan — ito ay ipapakita sa aplikante.',
     'sv_reject_reason'         => 'Dahilan ng Pagtanggi',
     'sv_reject_ph'             => 'hal., Hindi kumpleto o hindi malinaw ang mga dokumento. Mangyaring mag-upload muli ng malinaw na kopya ng iyong NBI Clearance.',
     'sv_reject_note'           => 'Ang dahilan ay ipapadala sa pamamagitan ng notification at email sa aplikante.',
-    'sv_yes_reject'            => 'Oo, Tanggihan',        // ========================================== //    // USER MANAGEMENT (Admin)                     //    // ========================================== //    'um_title'                 => 'Pamamahala ng User',
+    'sv_yes_reject'            => 'Oo, Tanggihan',
+
+        // ========================================== //
+    // USER MANAGEMENT (Admin)                     //
+    // ========================================== //
+    'um_title'                 => 'Pamamahala ng User',
     'um_subtitle'              => 'Pamahalaan ang lahat ng rehistradong user, pet owner, at pet sitter',
     'um_add_admin'             => 'Magdagdag ng Admin',
     'um_export_users'          => 'I-export ang mga User',
+
     'um_stat_total'            => 'Kabuuang Users',
     'um_stat_owners'           => 'Mga Pet Owner',
     'um_stat_sitters'          => 'Mga Pet Sitter',
@@ -689,6 +873,7 @@ return [
     'um_label_registered'      => 'Nakarehistro',
     'um_label_applicants'      => 'Mga Aplikante',
     'um_label_suspended_banned'=> 'Suspinde/Banned',
+
     'um_search_ph'             => 'Maghanap ng user...',
     'um_all_roles'             => 'Lahat ng Role',
     'um_role_admin'            => 'Admin',
@@ -707,6 +892,7 @@ return [
     'um_sort_name_asc'         => 'Pangalan (A-Z)',
     'um_sort_name_desc'        => 'Pangalan (Z-A)',
     'um_apply'                 => 'I-apply',
+
     'um_col_user'              => 'User',
     'um_col_email'             => 'Email',
     'um_col_role'              => 'Role',
@@ -714,38 +900,50 @@ return [
     'um_col_status'            => 'Status',
     'um_col_joined'            => 'Sumali',
     'um_col_actions'           => 'Mga Aksyon',
+
     'um_no_users'              => 'Walang user na nahanap',
     'um_no_users_desc'         => 'Subukang baguhin ang iyong search o filter.',
-    'um_showing'               => 'Ipinapakita :fromÃ¢â‚¬â€œ:to ng :total user',
+    'um_showing'               => 'Ipinapakita :from–:to ng :total user',
+
     'um_tooltip_view'          => 'Tingnan',
     'um_tooltip_suspend'       => 'I-suspend',
     'um_tooltip_ban'           => 'I-ban',
     'um_tooltip_restore'       => 'I-restore',
     'um_confirm_restore'       => 'I-restore ang account ni :name?',
+
     'um_suspend_title'         => 'I-suspend ang User?',
     'um_suspend_reason'        => 'Dahilan ng Pag-suspend',
     'um_suspend_ph'            => 'hal., Maraming natanggap na reklamo. Iniimbestigahan.',
     'um_cancel'                => 'Kanselahin',
     'um_yes_suspend'           => 'Oo, I-suspend',
+
     'um_ban_title'             => 'I-ban ang User?',
     'um_ban_warning'           => 'Permanenteng i-ban ang account at kakanselahin ang lahat ng aktibong booking.',
     'um_ban_reason'            => 'Dahilan ng Pag-ban',
     'um_ban_ph'                => 'hal., Maraming beripikadong reklamo ng maling pag-uugali.',
-    'um_yes_ban'               => 'Oo, I-ban ang User',    // ========================================== //    // USER DETAILS (Admin)                        //    // ========================================== //    'ud_title'                 => 'Detalye ng User',
+    'um_yes_ban'               => 'Oo, I-ban ang User',
+
+    // ========================================== //
+    // USER DETAILS (Admin)                        //
+    // ========================================== //
+    'ud_title'                 => 'Detalye ng User',
     'ud_user_id'               => 'User ID',
     'ud_joined'                => 'Sumali',
     'ud_sitter_level'          => 'Antas ng Sitter',
     'ud_location'              => 'Lokasyon',
     'ud_not_set'               => 'Hindi nakatakda',
     'ud_na'                    => 'N/A',
+
     'ud_suspend_btn'           => 'I-suspend ang User',
     'ud_ban_btn'               => 'I-ban ang User',
     'ud_restore_btn'           => 'I-restore ang Account',
     'ud_confirm_restore'       => 'I-restore ang account ni :name?',
+
     'ud_stat_complaints_filed' => 'Mga Reklamong Isinumite',
     'ud_stat_complaints_against'=> 'Mga Reklamo Laban',
     'ud_stat_pets'             => 'Mga Alagang Hayop',
     'ud_stat_role'             => 'Role',
+
     'ud_personal_info'         => 'Personal na Impormasyon',
     'ud_full_name'             => 'Buong Pangalan',
     'ud_email'                 => 'Email',
@@ -754,6 +952,7 @@ return [
     'ud_dob'                   => 'Petsa ng Kapanganakan',
     'ud_address'               => 'Address',
     'ud_bio'                   => 'Bio',
+
     'ud_sitter_profile'        => 'Profile ng Sitter',
     'ud_base_rate'             => 'Base Rate',
     'ud_experience'            => 'Karanasan',
@@ -761,20 +960,29 @@ return [
     'ud_food_preference'       => 'Kagustuhan sa Pagkain',
     'ud_rating'                => 'Rating',
     'ud_no_sitter_profile'     => 'Wala pang profile ng sitter.',
+
     'ud_pets_count'            => 'Mga Alagang Hayop (:count)',
     'ud_unknown_type'          => 'Hindi Alam',
     'ud_yrs'                   => 'taon',
-    'ud_back_btn'              => 'Ã¢â€ Â Bumalik',        // ========================================== //    // ADMIN HOME (Creative Homepage)              //    // ========================================== //    'ah_title'                 => 'Home ng Admin',
+
+    'ud_back_btn'              => '← Bumalik',
+
+        // ========================================== //
+    // ADMIN HOME (Creative Homepage)              //
+    // ========================================== //
+    'ah_title'                 => 'Home ng Admin',
     'ah_subtitle'              => 'Maligayang pagdating sa iyong PetNanny admin workspace',
     'ah_good_morning'          => 'Magandang umaga',
     'ah_good_afternoon'        => 'Magandang hapon',
     'ah_good_evening'          => 'Magandang gabi',
     'ah_system_online'         => 'Online ang System',
-    'ah_welcome_desc'          => 'Narito ang overview ng iyong platform. Pamahalaan ang users, bookings, verifications, at complaints Ã¢â‚¬â€ sa isang lugar.',
+    'ah_welcome_desc'          => 'Narito ang overview ng iyong platform. Pamahalaan ang users, bookings, verifications, at complaints — sa isang lugar.',
+
     'ah_qa_verify_sitter'      => 'I-verify ang Sitter',
     'ah_qa_verify_id'          => 'I-verify ang ID',
     'ah_qa_complaints'         => 'Mga Reklamo',
     'ah_qa_messages'           => 'Mga Mensahe',
+
     'ah_kpi_users'             => 'Kabuuang Users',
     'ah_kpi_bookings'          => 'Kabuuang Bookings',
     'ah_kpi_pending_verify'    => 'Naghihintay na Beripikasyon',
@@ -784,9 +992,11 @@ return [
     'ah_active'                => 'aktibo',
     'ah_needs_review'          => 'Kailangan ng review',
     'ah_attention'             => 'Kailangan ng pansin',
+
     'ah_recent_activity'       => 'Kamakailang Aktibidad',
     'ah_view_all'              => 'Tingnan Lahat',
     'ah_no_activity'           => 'Wala pang aktibidad.',
+
     'ah_pending_tasks'         => 'Mga Nakabinbing Gawain',
     'ah_task_sitter_apps'      => 'Mga Aplikasyon ng Sitter',
     'ah_task_id_verif'         => 'Beripikasyon ng ID',
@@ -795,6 +1005,7 @@ return [
     'ah_task_review'           => 'Kailangan ng review',
     'ah_task_attention'        => 'Kailangan ng pansin',
     'ah_task_respond'          => 'Naghihintay ng sagot',
+
     'ah_quick_access'          => 'Mabilis na Access',
     'ah_users'                 => 'Mga User',
     'ah_manage_accounts'       => 'Pamahalaan ang account',
@@ -812,13 +1023,20 @@ return [
     'ah_edit_profile'          => 'I-edit ang profile',
     'ah_admin_dashboard'       => 'Admin Dashboard',
     'ah_full_dashboard'        => 'Buong dashboard',
+
     'ah_system_healthy'        => 'Maayos ang lahat ng system',
     'ah_last_login'            => 'Nagsimula ang session:',
+
     'ah_home_command_desc'  => 'Ang iyong personal command center. Ano ang nangangailangan ng pansin ngayon?',
     'ah_needs_attention'    => 'Nangangailangan ng Pansin',
     'ah_action_required'    => 'Kailangan ng Aksyon',
     'ah_action'             => 'Aksyon',
-    'ah_all_clear'          => 'Malinis',        // ========================================== //    // NAVIGATION                                  //    // ========================================== //    'nav_search_placeholder'         => 'Maghanap ng users, bookings...',
+    'ah_all_clear'          => 'Malinis',
+
+        // ========================================== //
+    // NAVIGATION                                  //
+    // ========================================== //
+    'nav_search_placeholder'         => 'Maghanap ng users, bookings...',
     'nav_search_placeholder_mobile'  => 'Maghanap ng users, bookings, payments...',
     'nav_home'                       => 'Home',
     'nav_find_sitters'               => 'Maghanap ng Sitter',
@@ -834,6 +1052,7 @@ return [
     'nav_logout'                     => 'Mag-logout',
     'nav_log_out'                    => 'Mag-logout',
     'nav_profile'                    => 'Profile',
+
     'nav_notif_demo_1'               => 'Nagsumite ng ID Verification si Maria Santos',
     'nav_notif_demo_2'               => 'Nagreklamo si Juan',
     'nav_notif_demo_3'               => 'Bagong Protection Claim na Isinumite',
@@ -842,7 +1061,12 @@ return [
     'nav_time_2h'                    => '2 oras ang nakalipas',
     'nav_time_5h'                    => '5 oras ang nakalipas',
     'nav_time_1d'                    => '1 araw ang nakalipas',
-    'nav_time_2d'                    => '2 araw ang nakalipas',    // ========================================== //    // SIDEBAR                                     //    // ========================================== //    'sb_petnanny_admin'        => 'PetNanny Admin',
+    'nav_time_2d'                    => '2 araw ang nakalipas',
+
+    // ========================================== //
+    // SIDEBAR                                     //
+    // ========================================== //
+    'sb_petnanny_admin'        => 'PetNanny Admin',
     'sb_main'                  => 'Pangunahin',
     'sb_dashboard'             => 'Dashboard',
     'sb_user_management'       => 'Pamamahala ng User',
@@ -864,25 +1088,37 @@ return [
     'sb_my_tasks'              => 'Aking mga Gawain',
     'sb_availability'          => 'Availability',
     'sb_task_monitor'          => 'Monitor ng Gawain',
-    'sb_settings'              => 'Mga Setting',        // ========================================== //    // COMPLAINTS (Owner/Sitter)                   //    // ========================================== //    // Create page    'cp_create_title'              => 'Mag-file ng Reklamo',
+    'sb_settings'              => 'Mga Setting',
+
+        // ========================================== //
+    // COMPLAINTS (Owner/Sitter)                   //
+    // ========================================== //
+    // Create page
+    'cp_create_title'              => 'Mag-file ng Reklamo',
     'cp_create_subtitle_sitter'    => 'Magsumite ng reklamo para sa booking na iyong serbisyo',
     'cp_create_subtitle_owner'     => 'Magsumite ng reklamo para sa booking na iyong ginawa',
     'cp_errors_intro'              => 'Mangyaring ayusin ang sumusunod:',
     'cp_details_header'            => 'Detalye ng Reklamo',
+
     'cp_no_bookings_title'         => 'Walang booking para sa reklamo',
     'cp_no_bookings_sitter'        => 'Wala kang accepted o completed bookings na iyong serbisyo.',
     'cp_no_bookings_owner'         => 'Wala kang accepted o completed bookings.',
     'cp_view_my_bookings'          => 'Tingnan ang aking bookings',
+
     'cp_booking_label'             => 'Booking',
     'cp_select_booking'            => 'Pumili ng Booking',
     'cp_booking_hint'              => 'Piliin ang booking na may kaugnayan sa reklamong ito',
+
     'cp_respondent_label'          => 'Inirereklamo',
     'cp_respondent_ph'             => 'Awtomatikong pinupunan mula sa napiling booking',
     'cp_respondent_hint'           => 'Awtomatikong pinupunan mula sa napiling booking',
+
     'cp_type_label'                => 'Uri ng Reklamo',
     'cp_select_type'               => 'Pumili ng Uri ng Reklamo',
+
     'cp_desc_label'                => 'Paglalarawan',
     'cp_desc_ph'                   => 'Ilarawan nang detalyado ang iyong reklamo...',
+
     'cp_evidence_label'            => 'Ebidensya (Opsyonal)',
     'cp_evidence_photos'           => 'Mga Larawan',
     'cp_evidence_videos'           => 'Mga Video',
@@ -890,12 +1126,17 @@ return [
     'cp_files_selected'            => ':count file ang napili',
     'cp_clear_all'                 => 'Burahin lahat',
     'cp_evidence_hint'             => 'Mag-upload ng mga larawan, video, o dokumento bilang ebidensya (max 10 files, 10MB bawat isa)',
+
     'cp_cancel'                    => 'Kanselahin',
-    'cp_submit'                    => 'Isumite ang Reklamo',    // Index page    'cp_index_title'               => 'Mga Reklamo',
+    'cp_submit'                    => 'Isumite ang Reklamo',
+
+    // Index page
+    'cp_index_title'               => 'Mga Reklamo',
     'cp_index_subtitle'            => 'Magsumite at pamahalaan ang mga reklamo na may kaugnayan sa iyong bookings',
     'cp_file_card_title'           => 'Mag-file ng Reklamo',
     'cp_file_card_desc'            => 'Magsumite ng reklamo para sa tapos o aktibong booking',
     'cp_file_btn'                  => 'Mag-file ng Reklamo',
+
     'cp_stat_total'                => 'Kabuuan',
     'cp_stat_total_desc'           => 'Lahat ng reklamo',
     'cp_stat_pending'              => 'Naghihintay',
@@ -904,16 +1145,19 @@ return [
     'cp_stat_under_review_desc'    => 'Iniimbestigahan',
     'cp_stat_resolved'             => 'Naayos na',
     'cp_stat_resolved_desc'        => 'Natapos',
+
     'cp_info_header'               => 'Impormasyon ng Reklamo',
     'cp_info_1'                    => 'Ang mga reklamo ay maaaring i-file lamang para sa tapos o aktibong bookings.',
     'cp_info_2'                    => 'Magbigay ng tumpak na detalye kapag nagsumite ng reklamo.',
     'cp_info_3'                    => 'Maaaring mag-attach ng sumusuportang ebidensya.',
     'cp_info_4'                    => 'Susuriin ng aming mga administrator ang bawat reklamo bago magpasya.',
+
     'cp_filter_all'                => 'Lahat',
     'cp_filter_pending'            => 'Naghihintay',
     'cp_filter_under_review'       => 'Sinusuri',
     'cp_filter_resolved'           => 'Naayos na',
     'cp_filter_dismissed'          => 'Binunyagan',
+
     'cp_card_complaint_id'         => 'Complaint ID',
     'cp_card_filed_on'             => 'Isinumite noong :date',
     'cp_card_type'                 => 'Uri ng Reklamo',
@@ -923,9 +1167,13 @@ return [
     'cp_card_you'                  => 'Ikaw',
     'cp_view_resolution'           => 'Tingnan ang Resolusyon',
     'cp_view_details'              => 'Tingnan ang Detalye',
+
     'cp_empty_title'               => 'Wala pang reklamo',
     'cp_empty_desc'                => 'Wala ka pang na-file na reklamo.',
-    'cp_empty_btn'                 => 'I-file ang Iyong Unang Reklamo',    // Show page    'cp_show_title'                => 'Detalye ng Reklamo',
+    'cp_empty_btn'                 => 'I-file ang Iyong Unang Reklamo',
+
+    // Show page
+    'cp_show_title'                => 'Detalye ng Reklamo',
     'cp_parties_header'            => 'Mga Kabilang Partido',
     'cp_label_complainant'         => 'Nagreklamo',
     'cp_label_respondent'          => 'Inirereklamo',
@@ -940,23 +1188,32 @@ return [
     'cp_admin_notes'               => 'Mga Tala ng Admin',
     'cp_resolution'                => 'Resolusyon',
     'cp_resolved_on'               => 'Naayos noong :date',
+
     'cp_status_pending_title'      => 'Naghihintay ng Review ng Admin',
     'cp_status_pending_desc'       => 'Naisumite na ang iyong reklamo. Susuriin ito ng aming admin team sa lalong madaling panahon. Makakatanggap ka ng notification kapag may desisyon na.',
     'cp_status_review_title'       => 'Iniimbestigahan',
     'cp_status_review_desc'        => 'Kasalukuyang sinusuri ng aming admin team ang reklamong ito. Aabisuhan ka namin kapag may desisyon na.',
-    'cp_back_to_complaints'        => 'Ã¢â€ Â Bumalik sa Mga Reklamo',
+
+    'cp_back_to_complaints'        => '← Bumalik sa Mga Reklamo',
     'cp_role_owner'                => 'Owner',
-    'cp_role_sitter'               => 'Sitter',        // ========================================== //    // OWNER / SITTER DASHBOARD                    //    // ========================================== //    'od_title'                    => 'Home',
+    'cp_role_sitter'               => 'Sitter',
+
+        // ========================================== //
+    // OWNER / SITTER DASHBOARD                    //
+    // ========================================== //
+    'od_title'                    => 'Home',
     'od_subtitle'                 => 'Tinitingnan ang pangunahing landing workspace presentation flow.',
     'od_mode_owner'               => 'Pet Owner',
     'od_mode_sitter'              => 'Pet Sitter',
-    'od_change_mode'              => 'Palitan ang mode sa Settings Ã¢â€ â€™',
+    'od_change_mode'              => 'Palitan ang mode sa Settings →',
+
     'od_tag_home_based'           => 'Pangangalaga sa bahay',
     'od_hero_title'               => 'Isang Nanny para sa Iyong Furry Family',
     'od_hero_desc'                => 'Kumonekta sa mga pinagkakatiwalaang pet sitter na nag-aalaga sa iyong mga alagang hayop sa bahay. Drop-in visits, photo updates, at kumpletong peace of mind.',
     'od_find_sitter'              => 'Maghanap ng Sitter',
     'od_become_sitter'            => 'Maging Sitter',
     'od_sitter_dashboard'         => 'Dashboard ng Sitter',
+
     'od_why_title'                => 'Bakit PetNanny?',
     'od_why_subtitle'             => 'Lahat ng kailangan ng iyong alagang hayop, sa bahay mismo.',
     'od_why_1_title'              => 'Maghanap ng Pinagkakatiwalaang Sitter',
@@ -967,6 +1224,7 @@ return [
     'od_why_3_desc'               => 'Beripikasyon ng ID, photo proof bawat bisita, at protection fund.',
     'od_why_4_title'              => 'Pangangalaga sa Bahay',
     'od_why_4_desc'               => 'Ang iyong alagang hayop ay inaalagaan sa kaginhawahan ng kanilang sariling tahanan.',
+
     'od_bookings_title'           => 'Aking mga Booking',
     'od_bookings_sitter_desc'     => 'Pamahalaan ang mga papasok na kahilingan sa booking',
     'od_bookings_owner_desc'      => 'Tingnan ang status ng iyong mga booking',
@@ -984,9 +1242,10 @@ return [
     'od_accept'                   => 'Tanggapin',
     'od_decline'                  => 'Tanggihan',
     'od_confirm_decline'          => 'Tanggihan ang booking na ito?',
-    'od_view_tasks'               => 'Tingnan ang Gawain Ã¢â€ â€™',
+    'od_view_tasks'               => 'Tingnan ang Gawain →',
     'od_tasks_count'              => ':count gawain',
     'od_view_all_bookings'        => 'Tingnan lahat ng bookings',
+
     'od_how_title'                => 'Paano Gumagana ang PetNanny',
     'od_how_subtitle'             => 'Tatlong simpleng hakbang para sa masasayang alagang hayop.',
     'od_step_1_title'             => 'Gumawa ng Iyong Profile',
@@ -995,19 +1254,29 @@ return [
     'od_step_2_desc'              => 'Mag-browse ng mga sitter, tingnan ang ratings, at maghanap ng perpektong tugma.',
     'od_step_3_title'             => 'Mag-book at Mag-relax',
     'od_step_3_desc'              => 'Kumpirmahin ang iyong booking, makakuha ng updates sa bisita na may mga larawan.',
+
     'od_cta_title'                => 'Handa Ka Na Bang Magsimula?',
-    'od_cta_desc'                 => 'Sumali sa PetNanny ngayon Ã¢â‚¬â€ libre ito!',
-    'od_cta_explore'              => 'I-explore ang mga Sitter',        // ========================================== //    // HELP & SUPPORT (Owner/Sitter)               //    // ========================================== //    'hs_title'                    => 'Tulong at Suporta',
+    'od_cta_desc'                 => 'Sumali sa PetNanny ngayon — libre ito!',
+    'od_cta_explore'              => 'I-explore ang mga Sitter',
+
+        // ========================================== //
+    // HELP & SUPPORT (Owner/Sitter)               //
+    // ========================================== //
+    'hs_title'                    => 'Tulong at Suporta',
     'hs_subtitle'                 => 'Maghanap ng sagot sa mga karaniwang tanong o kontakin ang aming support team',
+
     'hs_faq_card_title'           => 'Mga Madalas Itanong',
     'hs_faq_card_desc'            => 'Tingnan ang mga sagot sa karaniwang tanong',
-    'hs_faq_card_btn'             => 'Tingnan ang FAQs Ã¢â€ â€™',
+    'hs_faq_card_btn'             => 'Tingnan ang FAQs →',
+
     'hs_contact_card_title'       => 'Kontakin ang Suporta',
     'hs_contact_card_desc'        => 'Kailangan ng tulong? Magpadala ng mensahe sa aming support team',
-    'hs_contact_card_btn'         => 'Kontakin ang Suporta Ã¢â€ â€™',
+    'hs_contact_card_btn'         => 'Kontakin ang Suporta →',
+
     'hs_report_card_title'        => 'Mag-ulat ng Problema',
     'hs_report_card_desc'         => 'I-ulat ang mga bug o teknikal na isyu',
-    'hs_report_card_btn'          => 'I-ulat ang Isyu Ã¢â€ â€™',
+    'hs_report_card_btn'          => 'I-ulat ang Isyu →',
+
     'hs_my_messages'              => 'Aking mga Mensahe sa Suporta',
     'hs_msg_pending'              => 'Naghihintay',
     'hs_msg_in_progress'          => 'Isinasagawa',
@@ -1015,7 +1284,9 @@ return [
     'hs_msg_type_report'          => 'Ulat',
     'hs_msg_type_contact'         => 'Contact',
     'hs_support_reply'            => 'Tugon ng Suporta',
+
     'hs_faq_header'               => 'Mga Madalas Itanong',
+
     'hs_faq_q1' => 'Paano ako mag-book ng pet sitter?',
     'hs_faq_a1' => 'Upang mag-book ng pet sitter, pumunta sa "Maghanap ng Sitter" na pahina, mag-browse ng mga available na sitter, piliin ang iyong gustong sitter, at i-click ang "Mag-book Ngayon". Sundin ang mga prompt upang makumpleto ang iyong booking.',
     'hs_faq_q2' => 'Paano gumagana ang mga bayad?',
@@ -1030,17 +1301,20 @@ return [
     'hs_faq_a6' => 'Upang magsumite ng protection claim, pumunta sa "Claims" na pahina at i-click ang "Isumite ang Claim". Piliin ang booking, ilagay ang detalye ng insidente, mag-upload ng ebidensya, at isumite para sa review.',
     'hs_faq_q7' => 'Gaano katagal ang imbestigasyon ng claim?',
     'hs_faq_a7' => 'Ang mga imbestigasyon ng claim ay karaniwang tumatagal ng 3-5 business days. Susuriin ng aming team ang ebidensya at ipapaalam ang desisyon sa pamamagitan ng platform. Aabisuhan ka sa resulta.',
+
     'hs_safety_header'            => 'Kaligtasan at Komunidad',
     'hs_safety_1'                 => 'Magkita sa ligtas na lugar bago ang unang serbisyo.',
     'hs_safety_2'                 => 'Panatilihin ang komunikasyon sa loob ng platform.',
     'hs_safety_3'                 => 'Mag-upload ng tumpak na impormasyon ng booking.',
     'hs_safety_4'                 => 'Igalang ang ibang user.',
     'hs_safety_5'                 => 'I-ulat agad ang mga kahina-hinalang aktibidad.',
+
     'hs_contact_info_header'      => 'Impormasyon ng Contact',
     'hs_label_email'              => 'Email',
     'hs_label_phone'              => 'Telepono',
     'hs_label_hours'              => 'Oras ng Suporta',
     'hs_hours_value'              => 'Lunes - Biyernes|8:00 AM - 5:00 PM',
+
     'hs_resources_header'         => 'Mga Kapaki-pakinabang na Resource',
     'hs_resource_privacy_title'   => 'Patakaran sa Privacy',
     'hs_resource_privacy_desc'    => 'Paano namin pinangangasiwaan ang iyong data',
@@ -1050,14 +1324,23 @@ return [
     'hs_resource_community_desc'  => 'Ligtas at magalang na pakikipag-ugnayan',
     'hs_resource_protection_title'=> 'Patakaran sa Proteksyon',
     'hs_resource_protection_desc' => 'Paano hinahawakan ang mga claim',
+
     'hs_app_version'              => 'Bersyon 1.0',
     'hs_app_description'          => 'Web-based na Responsive System para sa On-Demand Pet Sitting na may Matching Algorithm',
-    'hs_app_copyright'            => 'Ã‚Â© 2026 PetNanny. Lahat ng karapatan ay nakareserba.',
-    'hs_back'                     => 'Bumalik',    // ========================================== //    // REPORT ISSUE PAGE                           //    // ========================================== //    'ri_title'                    => 'Mag-ulat ng Problema',
+    'hs_app_copyright'            => '© 2026 PetNanny. Lahat ng karapatan ay nakareserba.',
+
+    'hs_back'                     => 'Bumalik',
+
+    // ========================================== //
+    // REPORT ISSUE PAGE                           //
+    // ========================================== //
+    'ri_title'                    => 'Mag-ulat ng Problema',
     'ri_subtitle'                 => 'I-ulat ang mga bug o teknikal na isyu',
     'ri_header'                   => 'Detalye ng Isyu',
+
     'ri_issue_title'              => 'Pamagat ng Isyu',
     'ri_issue_title_ph'           => 'Maikling pamagat ng isyu',
+
     'ri_issue_category'           => 'Kategorya ng Isyu',
     'ri_select_category'          => 'Pumili ng kategorya',
     'ri_cat_bug'                  => 'Bug / Teknikal na Error',
@@ -1066,28 +1349,41 @@ return [
     'ri_cat_payment'              => 'Error sa Bayad',
     'ri_cat_feature'              => 'Hindi Gumagana ang Feature',
     'ri_cat_other'                => 'Iba pa',
+
     'ri_description'              => 'Paglalarawan',
     'ri_description_ph'           => 'Ilarawan nang detalyado ang isyu...',
+
     'ri_steps'                    => 'Mga Hakbang para Maulit',
     'ri_steps_ph'                 => '1. Pumunta sa...\n2. I-click ang...\n3. Tingnan ang error...',
     'ri_steps_hint'               => 'Magbigay ng step-by-step na tagubilin upang matulungan kaming maulit ang isyu',
+
     'ri_screenshot'               => 'Screenshot (Opsyonal)',
     'ri_screenshot_click'         => 'I-click upang mag-upload ng screenshot',
     'ri_screenshot_hint'          => 'JPG, PNG, JPEG (max 5MB)',
+
     'ri_device'                   => 'Impormasyon ng Browser / Device (Opsyonal)',
     'ri_device_ph'                => 'hal. Chrome 120.0, Windows 11',
     'ri_device_hint'              => 'Nakakatulong sa amin na matukoy ang platform-specific na mga isyu',
+
     'ri_guidelines'               => 'Mga Alituntunin sa Pag-ulat',
     'ri_guide_1'                  => 'Magbigay ng mas maraming detalye hangga\'t maaari tungkol sa isyu',
     'ri_guide_2'                  => 'Isama ang mga hakbang para maulit para sa mas mabilis na solusyon',
     'ri_guide_3'                  => 'Ang mga screenshot ay tumutulong sa aming team na mabilis na matukoy ang problema',
     'ri_guide_4'                  => 'Ang aming team ay tutugon sa loob ng 24-48 oras',
+
     'ri_cancel'                   => 'Kanselahin',
-    'ri_submit'                   => 'Isumite ang Ulat',    // ========================================== //    // CONTACT SUPPORT PAGE                        //    // ========================================== //    'cs_title'                    => 'Kontakin ang Suporta',
+    'ri_submit'                   => 'Isumite ang Ulat',
+
+    // ========================================== //
+    // CONTACT SUPPORT PAGE                        //
+    // ========================================== //
+    'cs_title'                    => 'Kontakin ang Suporta',
     'cs_subtitle'                 => 'Magpadala ng mensahe sa aming support team',
     'cs_header'                   => 'Detalye ng Mensahe',
+
     'cs_subject'                  => 'Paksa',
     'cs_subject_ph'               => 'Maikling buod ng iyong alalahanin',
+
     'cs_category'                 => 'Kategorya',
     'cs_select_category'          => 'Pumili ng kategorya',
     'cs_cat_booking'              => 'Mga Isyu sa Booking',
@@ -1096,23 +1392,28 @@ return [
     'cs_cat_technical'            => 'Teknikal na Suporta',
     'cs_cat_feedback'             => 'Feedback at Suhestiyon',
     'cs_cat_other'                => 'Iba pa',
+
     'cs_message'                  => 'Mensahe',
     'cs_message_ph'               => 'Ilarawan nang detalyado ang iyong alalahanin o tanong...',
+
     'cs_attachment'               => 'Attachment (Opsyonal)',
     'cs_attachment_click'         => 'I-click upang mag-attach ng file',
     'cs_attachment_hint'          => 'JPG, PNG, PDF, DOC, DOCX (max 5MB)',
+
     'cs_info_header'              => 'Impormasyon ng Suporta',
     'cs_info_1'                   => 'Oras ng pagtugon: 24-48 oras sa mga business day',
     'cs_info_2'                   => 'Para sa mga urgent na isyu, tumawag sa: (+63) 912 345 6789',
     'cs_info_3'                   => 'Oras ng suporta: Lunes - Biyernes, 8:00 AM - 5:00 PM',
+
     'cs_cancel'                   => 'Kanselahin',
     'cs_send'                     => 'Ipadala ang Mensahe',
+
     'msg_index_title'             => 'Mga Mensahe',
     'msg_chat_with'               => 'Kausapin si :name',
-    'msg_online_status'           => 'Online Ã¢â‚¬Â¢ Karaniwang tumutugon sa ilang minuto',
+    'msg_online_status'           => 'Online • Karaniwang tumutugon sa ilang minuto',
     'msg_typing'                  => 'nagta-type...',
     'msg_no_messages'             => 'Wala pang mensahe',
-    'msg_say_hi'                  => 'Kumustahin upang simulan ang usapan Ã°Å¸â€˜â€¹',
+    'msg_say_hi'                  => 'Kumustahin upang simulan ang usapan 👋',
     'msg_view_document'           => 'Tingnan ang Dokumento',
     'msg_reply'                   => 'Tumugon',
     'msg_react'                   => 'Mag-react',
@@ -1127,11 +1428,12 @@ return [
     'msg_sending'                 => 'Ipinapadala...',
     'msg_send'                    => 'Ipadala',
     'msg_press'                   => 'Pindutin ang',
-    'msg_to_send'                 => 'upang ipadala Ã¢â‚¬Â¢',
+    'msg_to_send'                 => 'upang ipadala •',
     'msg_for_newline'             => 'para sa bagong linya',
     'msg_file_too_large'          => 'Masyadong malaki ang file. Maximum na laki ay 20MB.',
     'msg_send_failed_status'      => 'Bigo (:status). Pakisubukan muli.',
     'msg_send_failed_error'       => 'Bigo: :error',
+
     'mi_title'                    => 'Mga Mensahe',
     'mi_subtitle'                 => 'Ang iyong mga usapan sa mga sitter at owner',
     'mi_search_ph'                => 'Maghanap ng usapan...',
@@ -1148,19 +1450,20 @@ return [
     'mi_delete_chat'              => 'I-delete ang chat',
     'mi_report'                   => 'I-ulat',
     'mi_confirm_delete'           => 'Sigurado ka bang gusto mong i-delete ang usapang ito?',
-    'mi_feature_coming_soon'      => ':feature Ã¢â‚¬â€œ paparating na ang feature!',
+    'mi_feature_coming_soon'      => ':feature – paparating na ang feature!',
     'mi_empty_active_title'       => 'Walang aktibong usapan',
     'mi_empty_archived_title'     => 'Walang naka-archive na usapan',
     'mi_empty_active_desc'        => 'Magsimula ng usapan sa pamamagitan ng pagkontak sa sitter o owner.',
     'mi_empty_archived_desc'      => 'Ang mga naka-archive na usapan ay lalabas dito.',
     'mi_find_sitter'              => 'Maghanap ng Sitter',
-    'bc_location_not_set'         => 'Hindi nakatakda ang lokasyon',
+
+        'bc_location_not_set'         => 'Hindi nakatakda ang lokasyon',
     'bc_user_fallback'            => 'User',
     'bc_ref_prefix'               => 'Ref:',
     'bc_visit_per_day'            => ':count bisita/araw',
     'bc_total_visits'             => ':count kabuuang bisita',
     'bc_notes_label'              => 'Mga Tala:',
-    'bc_food_sitter_provides'     => 'Sitter ang magbibigay ng pagkain (+Ã¢â€šÂ±:amount)',
+    'bc_food_sitter_provides'     => 'Sitter ang magbibigay ng pagkain (+₱:amount)',
     'bc_food_owner_provides'      => 'Owner ang magbibigay ng pagkain',
     'bc_accept'                   => 'Tanggapin',
     'bc_decline'                  => 'Tanggihan',
@@ -1178,6 +1481,7 @@ return [
     'bc_decline_ph'               => 'hal., Hindi ako available sa mga petsang iyon...',
     'bc_decline_btn'              => 'Tanggihan ang Booking',
     'status_declined'             => 'Tinanggihan',
+
     'cb_title'                    => 'Mag-book ng Sitter',
     'cb_subtitle'                 => 'Kumpletuhin ang detalye ng iyong booking',
     'cb_errors_intro'             => 'Mangyaring ayusin ang sumusunod:',
@@ -1201,25 +1505,25 @@ return [
     'cb_visits_2'                 => '2 bisita kada araw',
     'cb_visits_3'                 => '3 bisita kada araw',
     'cb_visits_4'                 => '4 bisita kada araw',
-    'cb_visits_custom'            => 'Custom na numeroÃ¢â‚¬Â¦',
+    'cb_visits_custom'            => 'Custom na numero…',
     'cb_visits_custom_ph'         => 'Ilagay ang numero (1-20)',
     'cb_visits_custom_hint'       => 'Minimum 1, maximum 20 bisita kada araw.',
     'cb_rate_label'               => 'Rate ng Sitter kada Bisita',
     'cb_step5_title'              => '5. Iskedyul ng Oras',
     'cb_step5_desc'               => 'Ang parehong iskedyul ay maa-apply sa lahat ng araw sa iyong piniling saklaw ng petsa.',
     'cb_visit_n'                  => 'Bisita :n',
-    'cb_morning'                  => 'Ã°Å¸Å’â€¦ Umaga',
-    'cb_midday'                   => 'Ã¢Ëœâ‚¬Ã¯Â¸Â Tanghali',
-    'cb_afternoon'                => 'Ã°Å¸Å’Â¤Ã¯Â¸Â Hapon',
-    'cb_evening'                  => 'Ã°Å¸Å’â€  Gabi',
-    'cb_night'                    => 'Ã°Å¸Å’â„¢ Madaling Araw',
+    'cb_morning'                  => '🌅 Umaga',
+    'cb_midday'                   => '☀️ Tanghali',
+    'cb_afternoon'                => '🌤️ Hapon',
+    'cb_evening'                  => '🌆 Gabi',
+    'cb_night'                    => '🌙 Madaling Araw',
     'cb_step6_title'              => '6. Kaayusan ng Pagkain',
     'cb_step6_desc'               => 'Sino ang magbibigay ng pagkain para sa iyong alagang hayop habang nag-booking?',
     'cb_food_provider'            => 'Magbibigay ng Pagkain',
     'cb_food_owner'               => 'Owner ang magbibigay ng pagkain',
     'cb_food_sitter'              => 'Sitter ang magbibigay ng pagkain',
     'cb_food_flexible'            => 'Flexible / Pag-uusapan',
-    'cb_food_budget_label'        => 'Budget sa Pagkain kada Bisita (Ã¢â€šÂ±)',
+    'cb_food_budget_label'        => 'Budget sa Pagkain kada Bisita (₱)',
     'cb_not_applicable'           => '(hindi naaangkop)',
     'cb_food_budget_ph'           => 'hal., 50',
     'cb_food_owner_note'          => 'Ikaw ang magbibigay ng pagkain. Ang sitter ay magpapakain lamang.',
@@ -1233,20 +1537,21 @@ return [
     'cb_step8_title'              => '8. Espesyal na Tagubilin',
     'cb_special_ph'               => 'Anumang espesyal na tagubilin para sa sitter...',
     'cb_payment_summary'          => 'Buod ng Bayad',
-    'cb_sitter_rate_label'        => 'Rate ng Sitter (Ã¢â€šÂ±:rate Ãƒ- :visits bisita)',
-    'cb_food_cost_label'          => 'Pagkain (Ã¢â€šÂ±:budget Ãƒ- :visits bisita)',
+    'cb_sitter_rate_label'        => 'Rate ng Sitter (₱:rate × :visits bisita)',
+    'cb_food_cost_label'          => 'Pagkain (₱:budget × :visits bisita)',
     'cb_total_pay'                => 'Kabuuang Bayad sa Sitter',
-    'cb_breakdown'                => ':days araw Ãƒ- :visits bisita/araw = :total kabuuang bisita',
+    'cb_breakdown'                => ':days araw × :visits bisita/araw = :total kabuuang bisita',
     'cb_payment_notice_title'     => 'Direktang pagbabayad.',
     'cb_payment_notice_desc'      => 'Bayaran ang sitter nang direkta pagkatapos ng serbisyo.',
     'cb_cancel'                   => 'Kanselahin',
     'cb_confirm'                  => 'Kumpirmahin ang Booking',
+
     'mbi_title'                   => 'Aking mga Booking',
     'mbi_subtitle'                => 'Pamahalaan ang lahat ng iyong booking sa isang lugar',
     'mbi_mode_tooltip'            => 'Ang mode ay kinokontrol mula sa Settings',
     'mbi_mode_owner'              => 'Pet Owner',
     'mbi_mode_sitter'             => 'Pet Sitter',
-    'mbi_change_mode'             => 'Palitan ang mode sa Settings Ã¢â€ â€™',
+    'mbi_change_mode'             => 'Palitan ang mode sa Settings →',
     'mbi_tab_all'                 => 'Lahat',
     'mbi_tab_pending'             => 'Naghihintay',
     'mbi_tab_accepted'            => 'Tinanggap',
@@ -1265,6 +1570,7 @@ return [
     'mbi_cancel_note'             => 'Ang dahilan ay ibabahagi sa sitter.',
     'mbi_keep_booking'            => 'Panatilihin ang Booking',
     'mbi_yes_cancel'              => 'Oo, Kanselahin',
+
     'sb_title'                    => 'Detalye ng Booking',
     'sb_booking_ref'              => 'Ref ng Booking',
     'sb_pet'                      => 'Alagang Hayop',
@@ -1276,15 +1582,15 @@ return [
     'sb_contact'                  => 'Kontakin',
     'sb_schedule_title'           => 'Iskedyul',
     'sb_date_range'               => 'Saklaw ng Petsa',
-    'sb_days_visits_per_day'      => ':days araw Ã¢â‚¬Â¢ :per_day bisita/araw',
+    'sb_days_visits_per_day'      => ':days araw • :per_day bisita/araw',
     'sb_total_visits_label'       => 'Kabuuang Bisita',
     'sb_visits_count'             => ':count bisita',
     'sb_time_schedule_label'      => 'Iskedyul ng Oras (parehas kada araw)',
     'sb_visit_progress'           => 'Progreso ng Bisita',
     'sb_progress_count'           => ':completed / :total natapos',
     'sb_payment_details'          => 'Detalye ng Bayad',
-    'sb_sitter_rate_label'        => 'Rate ng Sitter (Ã¢â€šÂ±:rate Ãƒ- :visits bisita)',
-    'sb_food_cost_label'          => 'Pagkain (Ã¢â€šÂ±:budget Ãƒ- :visits bisita)',
+    'sb_sitter_rate_label'        => 'Rate ng Sitter (₱:rate × :visits bisita)',
+    'sb_food_cost_label'          => 'Pagkain (₱:budget × :visits bisita)',
     'sb_total'                    => 'Kabuuan',
     'sb_tasks_instructions'       => 'Mga Gawain at Tagubilin',
     'sb_tasks_every_visit'        => 'Mga Gawain (kada bisita)',
@@ -1301,7 +1607,7 @@ return [
     'sb_rejection_reason'         => 'Dahilan ng Pagtanggi',
     'sb_cancellation_reason'      => 'Dahilan ng Pagkansela',
     'sb_by'                       => 'Ni:',
-    'sb_back_to_bookings'         => 'Ã¢â€ Â Bumalik sa mga Booking',
+    'sb_back_to_bookings'         => '← Bumalik sa mga Booking',
     'sb_cancel_booking'           => 'Kanselahin ang Booking',
     'sb_cancel_modal_title'       => 'Kanselahin ang Booking?',
     'sb_cancel_modal_desc'        => 'Mangyaring magbigay ng dahilan kung bakit kinakansela mo ang booking na ito.',
@@ -1311,7 +1617,8 @@ return [
     'sb_cancel_note_owner'        => 'Ang dahilan ay lalabas sa notification at email sa owner.',
     'sb_keep_booking'             => 'Panatilihin ang Booking',
     'sb_yes_cancel'               => 'Oo, Kanselahin',
-    'mp_add_title'         => 'Magdagdag ng Alagang Hayop',
+
+        'mp_add_title'         => 'Magdagdag ng Alagang Hayop',
     'mp_add_subtitle'      => 'Gumawa ng bagong profile ng alagang hayop',
     'mp_edit_title'        => 'I-edit ang Alagang Hayop',
     'mp_edit_subtitle'     => 'I-update ang detalye ng alagang hayop',
@@ -1388,6 +1695,7 @@ return [
     'mp_delete_confirm'    => 'Sigurado ka bang gusto mong i-delete si',
     'mp_delete_warning'    => 'Hindi na ito maibabalik.',
     'mp_delete'            => 'I-delete',
+
     'notif_title'             => 'Mga Notification',
     'notif_subtitle'          => 'Manatiling updated sa iyong pinakabagong aktibidad',
     'notif_unread'            => 'hindi pa nabasa',
@@ -1395,9 +1703,9 @@ return [
     'notif_tab_unread'        => 'Hindi pa Nabasa',
     'notif_mark_all_read'     => 'Markahan lahat bilang nabasa',
     'notif_empty_title'       => 'Walang notification',
-    'notif_empty_unread'      => 'Nakabasa ka na lahat! Ã°Å¸Å½â€°',
+    'notif_empty_unread'      => 'Nakabasa ka na lahat! 🎉',
     'notif_empty_all'         => 'Wala pa rito.',
-    'notif_view_details'      => 'Tingnan ang detalye Ã¢â€ â€™',
+    'notif_view_details'      => 'Tingnan ang detalye →',
     'notif_menu_mark_read'    => 'Markahan bilang nabasa',
     'notif_menu_mark_unread'  => 'Markahan bilang hindi pa nabasa',
     'notif_menu_open'         => 'Buksan ang notification',
@@ -1408,7 +1716,12 @@ return [
     'notif_type'              => 'Uri',
     'notif_delete'            => 'I-delete',
     'notif_close'             => 'Isara',
-    'notif_view_details_full' => 'Tingnan ang Detalye',        // ========================================== //    // FIND SITTER                                  //    // ========================================== //    'fs_title'                => 'Maghanap ng Sitter',
+    'notif_view_details_full' => 'Tingnan ang Detalye',
+
+        // ========================================== //
+    // FIND SITTER                                  //
+    // ========================================== //
+    'fs_title'                => 'Maghanap ng Sitter',
     'fs_subtitle'             => 'Mag-browse ng mga pinagkakatiwalaang pet sitter sa iyong lugar.',
     'fs_hero_badge'           => 'Pinagkakatiwalaang pangangalaga sa bahay',
     'fs_hero_title_line1'     => 'Hanapin ang',
@@ -1423,6 +1736,7 @@ return [
     'fs_level_st2'            => 'ST2 - Para sa Malalaki at Agresibong Alaga',
     'fs_level_st3'            => 'ST3 - Para sa Exotic na Alaga',
     'fs_search_btn'           => 'Maghanap',
+
     'fs_badge_id_title'       => 'Beripikadong ID na Sitter',
     'fs_badge_id_desc'        => 'Beripikasyon ng Government ID',
     'fs_badge_rating_title'   => 'May Rating at Review',
@@ -1431,6 +1745,7 @@ return [
     'fs_badge_booking_desc'   => 'Tingnan ang availability agad',
     'fs_badge_food_title'     => 'Flexible na Pagkain',
     'fs_badge_food_desc'      => 'Iyong pagpipilian, iyong budget',
+
     'fs_recommended_title'    => 'Mga Inirerekomendang Sitter',
     'fs_recommended_desc'     => 'Niraranggo ng matching algorithm: lokasyon, kagustuhan sa pagkain, at rating',
     'fs_sitters_count'        => ':count sitter',
@@ -1443,12 +1758,17 @@ return [
     'fs_food_flexible_full'   => 'Flexible na opsyon sa pagkain',
     'fs_food_not_set'         => 'Walang nakatakdang kaayusan sa pagkain',
     'fs_no_sitters_title'     => 'Wala pang available na sitter',
-    'fs_no_sitters_desc'      => 'Bumalik ka mamaya para sa mga available na sitter sa iyong lugar.',    // ========================================== //    // SITTER PROFILE (Owner viewing)              //    // ========================================== //    'sp_back_to_sitters'      => 'Ã¢â€ Â Bumalik sa mga sitter',
+    'fs_no_sitters_desc'      => 'Bumalik ka mamaya para sa mga available na sitter sa iyong lugar.',
+
+    // ========================================== //
+    // SITTER PROFILE (Owner viewing)              //
+    // ========================================== //
+    'sp_back_to_sitters'      => '← Bumalik sa mga sitter',
     'sp_location_not_set'     => 'Walang nakatakdang lokasyon',
     'sp_id_verified'          => 'Beripikadong ID',
     'sp_reviews_count'        => ':count review',
     'sp_daily_rate'           => 'Arawang rate',
-    'sp_food_budget_note'     => '+Ã¢â€šÂ±:amount/araw kung sitter ang magbibigay ng pagkain',
+    'sp_food_budget_note'     => '+₱:amount/araw kung sitter ang magbibigay ng pagkain',
     'sp_no_bio'               => 'Wala pang bio ang sitter na ito.',
     'sp_food_arrangement'     => 'Kaayusan ng Pagkain',
     'sp_available_dates'      => 'Available na Petsa',
@@ -1461,14 +1781,14 @@ return [
     'sp_no_reviews'           => 'Wala pang review. Maging una na mag-book at mag-review!',
     'sp_community_chat'       => 'Chat ng Komunidad (:count)',
     'sp_comment_ph'           => 'Magtanong o mag-iwan ng komento...',
-    'sp_be_respectful'        => 'Maging magalang at mabait Ã°Å¸â€™Å¡',
+    'sp_be_respectful'        => 'Maging magalang at mabait 💚',
     'sp_post_comment'         => 'I-post ang Komento',
     'sp_post'                 => 'I-post',
-    'sp_reply'                => 'Ã¢â€ Â Tumugon',
-    'sp_cancel_reply'         => 'Ã¢â€ Â Kanselahin ang tugon',
+    'sp_reply'                => '← Tumugon',
+    'sp_cancel_reply'         => '← Kanselahin ang tugon',
     'sp_reply_ph'             => 'Magsulat ng tugon...',
     'sp_reply_btn'            => 'Tumugon',
-    'sp_no_comments'          => 'Wala pang komento. Maging una na magtanong! Ã°Å¸â€™Â¬',
+    'sp_no_comments'          => 'Wala pang komento. Maging una na magtanong! 💬',
     'sp_anonymous'            => 'Anonymous',
     'sp_food_owner'           => 'Owner ang magbibigay ng pagkain',
     'sp_food_sitter'          => 'Sitter ang magbibigay ng pagkain',
@@ -1476,8 +1796,9 @@ return [
     'sp_food_not_set_short'   => 'Hindi nakatakda',
     'sp_pets_not_specified'   => 'Hindi tinukoy',
     'sp_sitter_fallback'      => 'Sitter',
-    'pf_title'                 => 'Profile',
-    'pf_role_sitter_level'     => 'Pet Sitter Ã¢â‚¬Â¢ Level :level',
+
+        'pf_title'                 => 'Profile',
+    'pf_role_sitter_level'     => 'Pet Sitter • Level :level',
     'pf_role_owner'            => 'Pet Owner',
     'pf_location_not_set'      => 'Hindi nakatakda ang lokasyon',
     'pf_id_verified'           => 'Beripikadong ID',
@@ -1497,10 +1818,10 @@ return [
     'pf_pet_sizes_accepted'    => 'Mga Laki ng Alaga na Tumatanggap',
     'pf_food_arrangement'      => 'Kaayusan ng Pagkain',
     'pf_food_owner'            => 'Owner ang magbibigay ng pagkain',
-    'pf_food_sitter'           => 'Sitter ang magbibigay ng pagkain (+Ã¢â€šÂ±:amount)',
+    'pf_food_sitter'           => 'Sitter ang magbibigay ng pagkain (+₱:amount)',
     'pf_food_flexible'         => 'Flexible',
     'pf_pet_capacity'          => 'Kapasidad ng Alaga',
-    'pf_pets_range'            => ':min Ã¢â‚¬â€œ :max alaga',
+    'pf_pets_range'            => ':min – :max alaga',
     'pf_pets'                  => 'Mga Alagang Hayop',
     'pf_pets_count'            => ':count alaga',
     'pf_no_pets'               => 'Wala pang naidagdag na alagang hayop.',
@@ -1514,6 +1835,7 @@ return [
     'pf_contact'               => 'Kontakin',
     'pf_mixed'                 => 'Mixed',
     'pf_unknown'               => 'Hindi Alam',
+
     'pe_title'                 => 'Mga Setting ng Profile',
     'pe_subtitle'              => 'Pamahalaan ang detalye ng iyong account at beripikasyon',
     'pe_change_cover'          => 'Palitan ang Cover',
@@ -1526,6 +1848,7 @@ return [
     'pe_profile_information'   => 'Impormasyon ng Profile',
     'pe_location_contact'      => 'Lokasyon at Contact',
     'pe_update_password_title' => 'I-update ang Password',
+
     'pf_first_name'            => 'Pangalan',
     'pf_middle_name'           => 'Gitnang Pangalan',
     'pf_last_name'             => 'Apelyido',
@@ -1547,10 +1870,12 @@ return [
     'pf_resend_verification'   => 'I-click dito upang muling ipadala ang verification email.',
     'pf_verification_sent'     => 'Bagong verification link ang ipinadala.',
     'pf_contact_number_ph'     => '09xx xxx xxxx',
+
     'pf_current_password'      => 'Kasalukuyang Password',
     'pf_new_password'          => 'Bagong Password',
     'pf_confirm_password'      => 'Kumpirmahin ang Password',
     'pf_update_password_btn'   => 'I-update ang Password',
+
     'pf_city_municipality'     => 'Lungsod / Munisipalidad',
     'pf_city_ph'               => 'hal. Quezon City',
     'pf_city_hint'             => 'Nakakatulong ang iyong lungsod upang tumugma sa mga kalapit na sitter.',
@@ -1558,12 +1883,13 @@ return [
     'pf_latitude_ph'           => 'hal. 14.5995',
     'pf_longitude'             => 'Longitude',
     'pf_longitude_ph'          => 'hal. 120.9842',
-    'pf_optional_geo'          => 'Opsyonal Ã¢â‚¬â€œ awtomatikong pupunan kung gagamit ka ng "Detect Location".',
+    'pf_optional_geo'          => 'Opsyonal – awtomatikong pupunan kung gagamit ka ng "Detect Location".',
     'pf_detect_location'       => 'I-detect ang Aking Lokasyon',
     'pf_update_location'       => 'I-update ang Lokasyon',
     'pf_geo_not_supported'     => 'Hindi sinusuportahan ng iyong browser ang Geolocation.',
     'pf_geo_success'           => 'Na-detect ang lokasyon! Napunan ang latitude at longitude.',
     'pf_geo_error'             => 'Hindi makuha ang lokasyon: :error',
+
     'pf_step_upload_id'        => 'I-upload ang ID',
     'pf_step_selfie_id'        => 'Selfie kasama ang ID',
     'pf_step_status_verified'  => 'Beripikado',
@@ -1571,7 +1897,7 @@ return [
     'pf_step_status_submit'    => 'Isumite',
     'pf_upload_gov_id'         => 'I-upload ang Iyong Government ID',
     'pf_upload_gov_id_desc'    => 'Una, piliin ang uri ng iyong ID. Pagkatapos, mag-upload ng malinaw na larawan nito.',
-    'pf_select_id_type'        => 'Ã¢â‚¬â€ Pumili ng uri ng ID Ã¢â‚¬â€',
+    'pf_select_id_type'        => '— Pumili ng uri ng ID —',
     'pf_id_passport'           => 'Pasaporte',
     'pf_id_drivers_license'    => 'Driver\'s License',
     'pf_id_umid'               => 'UMID',
@@ -1580,36 +1906,43 @@ return [
     'pf_id_national'           => 'National ID',
     'pf_id_other'              => 'Iba pa',
     'pf_upload_id_hint'        => 'Mag-upload ng malinaw na larawan ng iyong :id.',
-    'pf_id_accepted'           => 'Tinatanggap: JPG, PNG Ã¢â‚¬Â¢ Max laki: 5MB',
-    'pf_select_id_btn'         => 'Pumili ng ID Ã¢â€ â€™',
-    'pf_upload_id_btn'         => 'I-upload ang ID Ã¢â€ â€™',
+    'pf_id_accepted'           => 'Tinatanggap: JPG, PNG • Max laki: 5MB',
+    'pf_select_id_btn'         => 'Pumili ng ID →',
+    'pf_upload_id_btn'         => 'I-upload ang ID →',
     'pf_take_selfie_id'        => 'Kumuha ng Selfie kasama ang ID',
     'pf_selfie_hint'           => 'Hawakan ang iyong :id sa tabi ng iyong mukha. Dapat malinaw na makita ang dalawa.',
-    'pf_select_selfie_btn'     => 'Pumili ng Selfie Ã¢â€ â€™',
-    'pf_next_btn'              => 'Susunod Ã¢â€ â€™',
+    'pf_select_selfie_btn'     => 'Pumili ng Selfie →',
+    'pf_next_btn'              => 'Susunod →',
     'pf_ready_submit'          => 'Handa nang Isumite',
     'pf_ready_submit_desc'     => 'Na-upload na ang iyong ID at selfie. Isumite ang mga ito para sa review.',
-    'pf_submit_verification'   => 'Isumite para sa Beripikasyon Ã¢â€ â€™',
+    'pf_submit_verification'   => 'Isumite para sa Beripikasyon →',
     'pf_verifying_progress'    => 'Kasalukuyang Nagbe-beripika',
-    'pf_verifying_desc'        => 'Sinusuri namin ang iyong isinumiteng dokumento. Karaniwang tumatagal ito ng 1Ã¢â‚¬â€œ2 business day.',
+    'pf_verifying_desc'        => 'Sinusuri namin ang iyong isinumiteng dokumento. Karaniwang tumatagal ito ng 1–2 business day.',
     'pf_verified_title'        => 'Beripikado na ang Iyong Pagkakakilanlan!',
     'pf_verified_desc'         => 'Matagumpay na nabe-beripika ang iyong pagkakakilanlan. Maaari ka nang:',
-    'pf_verified_item_1'       => 'Ã¢Å“â€œ Mag-post ng sitting requests',
-    'pf_verified_item_2'       => 'Ã¢Å“â€œ Mag-apply bilang sitter',
-    'pf_verified_item_3'       => 'Ã¢Å“â€œ Makakuha ng mas mataas na trust rating',
+    'pf_verified_item_1'       => '✓ Mag-post ng sitting requests',
+    'pf_verified_item_2'       => '✓ Mag-apply bilang sitter',
+    'pf_verified_item_3'       => '✓ Makakuha ng mas mataas na trust rating',
     'pf_failed_title'          => 'Bigo ang Beripikasyon',
     'pf_failed_desc'           => 'Tinanggihan ang iyong isinumite. Mangyaring mag-upload ng malinaw na selfie na may hawak na balidong ID at subukan muli.',
-    'pf_retry'                 => 'Subukan Muli ang Beripikasyon Ã¢â€ â€™',
-    'pf_photo_uploaded'        => 'Ã¢Å“â€¦ Matagumpay na na-upload ang larawan.',
+    'pf_retry'                 => 'Subukan Muli ang Beripikasyon →',
+    'pf_photo_uploaded'        => '✅ Matagumpay na na-upload ang larawan.',
     'pf_id_fallback'           => 'ID',
     'pf_id_doc'                => 'Government-issued ID',
+
     'pf_delete_account'        => 'I-delete ang Account',
     'pf_delete_account_desc'   => 'Sa sandaling ma-delete ang iyong account, permanenteng matatanggal ang lahat ng data. Mangyaring i-download ang anumang data na nais mong itago bago magpatuloy.',
     'pf_delete_confirm_title'  => 'Sigurado ka bang gusto mong i-delete ang iyong account?',
     'pf_delete_confirm_desc'   => 'Hindi na maibabalik ang aksyon na ito. Ilagay ang iyong password upang kumpirmahin.',
     'pf_password'              => 'Password',
-    'pf_cancel'                => 'Kanselahin',        // ========================================== //    // SYSTEM SETTINGS                              //    // ========================================== //    'ss_title'                 => 'Mga Setting ng System',
+    'pf_cancel'                => 'Kanselahin',
+
+        // ========================================== //
+    // SYSTEM SETTINGS                              //
+    // ========================================== //
+    'ss_title'                 => 'Mga Setting ng System',
     'ss_subtitle'              => 'Pamahalaan ang iyong mga kagustuhan sa account at configuration ng system',
+
     'ss_sitter_mode'           => 'Sitter Mode',
     'ss_sitter_switch'         => 'Lumipat sa pagitan ng :sitter at :owner views. Nagbabago ang sidebar base sa iyong kasalukuyang mode.',
     'ss_sitter_word'           => 'Sitter',
@@ -1621,12 +1954,14 @@ return [
     'ss_sitter_rejected'       => 'Ang iyong huling application ay :rejected. Maaari kang mag-apply muli upang maging pet sitter.',
     'ss_rejected_word'         => 'tinanggihan',
     'ss_sitter_become'         => 'Maging pet sitter upang tumanggap ng bookings at kumita. I-on ang Sitter Mode upang magsimula.',
+
     'ss_status_sitter_view'    => 'Kasalukuyan: Pet Sitter View',
     'ss_status_owner_view'     => 'Kasalukuyan: Pet Owner View',
     'ss_status_verify_id'      => 'I-verify Muna ang ID',
     'ss_status_app_pending'    => 'Naghihintay ang Application',
     'ss_status_app_rejected'   => 'Tinanggihan ang Application',
     'ss_status_not_sitter'     => 'Hindi Pa Sitter',
+
     'ss_modal_verify_id_title' => 'I-verify Muna ang Iyong ID',
     'ss_modal_pending_title'   => 'Sinusuri ang Application',
     'ss_modal_reapply_title'   => 'Mag-apply Muli bilang Pet Sitter?',
@@ -1635,19 +1970,23 @@ return [
     'ss_modal_pending_desc'    => 'Ang iyong sitter application ay sinusuri pa ng aming admin team. Aabisuhan ka kapag may desisyon na.',
     'ss_modal_reapply_desc'    => 'Ang iyong nakaraang application ay tinanggihan. Maaari kang magsumite ng bagong application na may updated na dokumento.',
     'ss_modal_become_desc'     => 'Upang i-enable ang Sitter Mode, kailangan mo munang mag-apply bilang pet sitter. Ito ay nagpapahintulot sa iyo na tumanggap ng bookings, pamahalaan ang mga bisita, at kumita mula sa mga pet owner.',
+
     'ss_you_need'              => 'Kailangan mo:',
     'ss_need_gov_id'           => 'Balidong government-issued ID',
     'ss_need_selfie'           => 'Malinaw na selfie na may hawak na ID',
     'ss_need_admin_review'     => 'Review ng admin (1-2 business day)',
+
     'ss_you_can'               => 'Bilang Pet Sitter, maaari mong:',
     'ss_can_accept'            => 'Tumanggap ng pet sitting bookings',
     'ss_can_set_rates'         => 'Itakda ang iyong sariling rate at availability',
     'ss_can_earn'              => 'Kumita mula sa mga natapos na bisita',
+
     'ss_cancel'                => 'Kanselahin',
-    'ss_verify_id_btn'         => 'I-verify ang ID Ã¢â€ â€™',
+    'ss_verify_id_btn'         => 'I-verify ang ID →',
     'ss_contact_support'       => 'Kontakin ang Suporta',
     'ss_continue_application'  => 'Ipagpatuloy ang Application',
-    'ss_reapply_btn'           => 'Mag-apply Muli Ã¢â€ â€™',
+    'ss_reapply_btn'           => 'Mag-apply Muli →',
+
     'ss_preferences'           => 'Mga Kagustuhan',
     'ss_push_notifications'    => 'Push Notifications',
     'ss_push_desc'             => 'Makatanggap ng notification sa iyong device',
@@ -1661,16 +2000,20 @@ return [
     'ss_language_desc'         => 'Piliin ang iyong gustong wika',
     'ss_font_size'             => 'Laki ng Text',
     'ss_font_desc'             => 'Ayusin ang laki ng text para sa mas malinaw na pagbasa',
+
     'ss_lang_en'               => 'English',
     'ss_lang_fil'              => 'Filipino',
     'ss_lang_es'               => 'Spanish',
     'ss_lang_fr'               => 'French',
+
     'ss_size_small'            => 'Maliit',
     'ss_size_default'          => 'Default',
     'ss_size_large'            => 'Malaki',
     'ss_size_xl'               => 'Sobrang Laki',
+
     'ss_change_lang_failed'    => 'Bigo ang pagpalit ng wika. Pakisubukan muli.',
     'ss_network_error'         => 'Network error. Pakisubukan muli.',
+
     'ss_privacy_security'      => 'Privacy at Seguridad',
     'ss_profile_visibility'    => 'Visibility ng Profile',
     'ss_profile_visibility_desc'=> 'Sino ang makakakita ng iyong profile',
@@ -1685,6 +2028,7 @@ return [
     'ss_active_sessions'       => 'Mga Aktibong Session',
     'ss_active_sessions_desc'  => 'Pamahalaan ang iyong mga aktibong session',
     'ss_view_all'              => 'Tingnan Lahat',
+
     'ss_account'               => 'Account',
     'ss_email_address'         => 'Email Address',
     'ss_password'              => 'Password',
@@ -1701,62 +2045,84 @@ return [
     'ss_delete_account'        => 'I-delete ang Account',
     'ss_delete_account_desc'   => 'Permanenteng i-delete ang iyong account at lahat ng data',
     'ss_delete'                => 'I-delete',
-    'ss_save_settings'         => 'I-save ang Settings',        // ========================================== //    // SITTER APPLICATION                           //    // ========================================== //    'sa_title'                 => 'Mag-apply Bilang Sitter',
+    'ss_save_settings'         => 'I-save ang Settings',
+
+        // ========================================== //
+    // SITTER APPLICATION                           //
+    // ========================================== //
+    'sa_title'                 => 'Mag-apply Bilang Sitter',
     'sa_subtitle'              => 'Kumpletuhin ang iyong sitter profile upang makapagsimula sa pagtanggap ng bookings',
     'sa_back_dashboard'        => 'Bumalik sa Dashboard',
     'sa_sitter_details'        => 'Mga Detalye ng Sitter',
+
     'sa_about_you'             => 'Tungkol sa Iyo',
     'sa_about_placeholder'     => 'Ikuwento sa mga pet owner kung bakit magaling kang sitter...',
     'sa_about_hint'            => 'Ibahagi ang iyong karanasan, availability, at pagmamahal sa mga alagang hayop.',
+
     'sa_years_exp'             => 'Taon ng Karanasan',
     'sa_years_placeholder'     => 'hal. 2',
     'sa_years_hint'            => 'Ilang taon ka nang nag-aalaga ng mga alagang hayop?',
+
     'sa_sitter_type'           => 'Uri ng Sitter',
     'sa_sitter_type_hint'      => 'Piliin ang pinakamataas na antas ng pangangalaga na kaya mong ibigay.',
-    'sa_st_small'              => 'Maliliit na Alagang Hayop - Pusa, maliliit na aso, kuneho, hamster',
-    'sa_st_large'              => 'Malalaking Alagang Hayop - Malalaking aso, kahit anong laki',
-    'sa_st_exotic'             => 'Exotic na Alagang Hayop - Ibon, reptilya, isda',
-    'sa_st_all'                => 'Lahat ng Alagang Hayop - Kahit anong laki, kahit anong uri',
-    'sa_rate_per_visit'        => 'Base Rate kada Bisita (Ã¢â€šÂ±)',
+    'sa_st1'                   => 'ST1 - Para sa Karaniwang Alagang Hayop',
+    'sa_st2'                   => 'ST2 - Para sa Malalaki at Agresibong Alagang Hayop',
+    'sa_st3'                   => 'ST3 - Para sa Exotic na Alagang Hayop',
+
+    'sa_rate_per_visit'        => 'Base Rate kada Bisita (₱)',
     'sa_rate_placeholder'      => 'hal. 250',
-    'sa_rate_hint'             => 'Inirerekomenda: Ã¢â€šÂ±150 Ã¢â‚¬â€œ Ã¢â€šÂ±500 kada bisita.',
+    'sa_rate_hint'             => 'Inirerekomenda: ₱150 – ₱500 kada bisita.',
+
     'sa_food_arrangement'      => 'Pag-aayos ng Pagkain',
     'sa_food_arrangement_hint' => 'Piliin ang gusto mong paraan ng pag-aayos ng pagkain para sa mga alagang hayop.',
     'sa_food_owner'            => 'Ang owner ang magbibigay ng pagkain',
-    'sa_food_sitter'           => 'Ang sitter ang magbibigay ng pagkain (+Ã¢â€šÂ±100/bisita)',
+    'sa_food_sitter'           => 'Ang sitter ang magbibigay ng pagkain (+₱100/bisita)',
     'sa_food_flexible'         => 'Flexible (parehong opsyon)',
-    'sa_food_budget'           => 'Badyet sa Pagkain kada Bisita (Ã¢â€šÂ±)',
+
+    'sa_food_budget'           => 'Badyet sa Pagkain kada Bisita (₱)',
     'sa_food_budget_placeholder' => 'hal. 100',
-    'sa_food_budget_hint'      => 'Magkano ang badyet mo sa pagkain kada bisita? (Default: Ã¢â€šÂ±100)',
+    'sa_food_budget_hint'      => 'Magkano ang badyet mo sa pagkain kada bisita? (Default: ₱100)',
+
     'sa_pet_types'             => 'Anong mga alagang hayop ang kaya mong alagaan?',
     'sa_pet_types_hint'        => 'Piliin ang lahat ng uri ng alagang hayop na komportable kang alagaan.',
+
     'sa_pet_sizes'             => 'Anong mga laki ang kaya mong alagaan?',
     'sa_pet_sizes_hint'        => 'Piliin ang mga laki ng alagang hayop na kaya mong alagaan.',
     'sa_size_small'            => 'Maliit',
     'sa_size_medium'           => 'Katamtaman',
     'sa_size_large'            => 'Malaki',
     'sa_size_giant'            => 'Sobrang Laki',
+
     'sa_pet_capacity'          => 'Ilang alagang hayop ang kaya mong alagaan nang sabay?',
     'sa_min'                   => 'Minimum',
     'sa_max'                   => 'Maximum',
     'sa_min_placeholder'       => 'hal. 1',
     'sa_max_placeholder'       => 'hal. 3',
     'sa_capacity_hint'         => 'Itakda ang min/max na bilang ng alagang hayop na kaya mong alagaan sa isang booking.',
+
     'sa_upload_certs'          => 'Mag-upload ng mga Sertipiko (Opsyonal)',
     'sa_upload_certs_click'    => 'I-click upang mag-upload ng iyong mga sertipiko',
-    'sa_upload_certs_desc'     => 'PDF, JPG, JPEG, PNG Ã¢â‚¬Â¢ Max 5MB bawat isa Ã¢â‚¬Â¢ Maramihang file ang pwede',
+    'sa_upload_certs_desc'     => 'PDF, JPG, JPEG, PNG • Max 5MB bawat isa • Maramihang file ang pwede',
     'sa_add_more'              => 'Magdagdag ng file',
     'sa_remove'                => 'Alisin',
     'sa_upload_certs_hint'     => 'Mag-upload ng anumang kaugnay na sertipiko (pet first aid, grooming, training, atbp.)',
+
     'sa_update_application'    => 'I-update ang Application',
     'sa_submit_application'    => 'Isumite ang Application',
+
     'sa_status_approved_title' => 'Aprubado na ang iyong sitter application!',
     'sa_status_approved_desc'  => 'Maaari ka nang tumanggap ng bookings.',
     'sa_status_pending_title'  => 'Sinusuri pa ang iyong application.',
     'sa_status_pending_desc'   => 'Aabisuhan ka namin kapag naaprubahan na.',
     'sa_status_rejected_title' => 'Tinanggihan ang iyong application.',
-    'sa_status_rejected_desc'  => 'Paki-update ang iyong impormasyon at mag-apply muli.',        // ========================================== //    // SITTER AVAILABILITY                          //    // ========================================== //    'sav_title'                 => 'Availability',
+    'sa_status_rejected_desc'  => 'Paki-update ang iyong impormasyon at mag-apply muli.',
+
+        // ========================================== //
+    // SITTER AVAILABILITY                          //
+    // ========================================== //
+    'sav_title'                 => 'Availability',
     'sav_subtitle'              => 'Pamahalaan ang iyong schedule at subaybayan ang bookings',
+
     'sav_total_slots'           => 'Kabuuang Slots',
     'sav_all_registered'        => 'Lahat ng rehistradong slots',
     'sav_available'             => 'Available',
@@ -1765,30 +2131,37 @@ return [
     'sav_confirmed_bookings'    => 'Kumpirmadong bookings',
     'sav_unavailable'           => 'Hindi Available',
     'sav_blocked_time'          => 'Nakablock na oras',
+
     'sav_todays_schedule'       => 'Schedule Ngayong Araw',
     'sav_no_slots_today'        => 'Walang slot ngayong araw. Magdagdag ng unang slot sa ibaba.',
     'sav_slots_today'           => 'Slots Ngayon',
     'sav_booked'                => 'Booked',
+
     'sav_add_availability'      => 'Magdagdag ng Availability',
     'sav_date'                  => 'Petsa',
     'sav_start'                 => 'Simula',
     'sav_end'                   => 'Tapos',
     'sav_status'                => 'Status',
     'sav_save_availability'     => 'I-save ang Availability',
+
     'sav_timeline'              => 'Timeline ng Availability',
     'sav_no_availability_yet'   => 'Wala pang naidagdag na availability.',
+
     'sav_upcoming_bookings'     => 'Mga Paparating na Booking',
     'sav_view_all'              => 'Tingnan Lahat',
     'sav_no_upcoming'           => 'Wala pang paparating na booking.',
     'sav_no_upcoming_desc'      => 'Lalabas dito ang mga booking kapag nag-iskedyul na ang mga owner ng bisita.',
+
     'sav_schedule'              => 'Schedule ng Availability',
     'sav_slots'                 => 'slots',
     'sav_no_availability_set'   => 'Wala pang nakatakdang availability.',
     'sav_no_availability_set_desc' => 'Magdagdag ng unang slot sa itaas upang magsimula.',
+
     'sav_delete_title'          => 'I-delete ang Availability?',
     'sav_delete_desc'           => 'Sigurado ka bang gusto mong alisin ang availability slot na ito? Hindi na ito maibabalik.',
     'sav_cancel'                => 'Kanselahin',
     'sav_delete'                => 'I-delete',
+
     'sav_calendar_reference'    => 'Reference ng Kalendaryo',
     'sav_sun'                   => 'Ling',
     'sav_mon'                   => 'Lun',
@@ -1797,7 +2170,12 @@ return [
     'sav_thu'                   => 'Huw',
     'sav_fri'                   => 'Biy',
     'sav_sat'                   => 'Sab',
-    'sav_today'                 => 'Ngayon',    // ========================================== //    // SITTER BOOKING VISITS                        //    // ========================================== //    'sbv_title'                 => 'Mga Bisita ng Booking',
+    'sav_today'                 => 'Ngayon',
+
+    // ========================================== //
+    // SITTER BOOKING VISITS                        //
+    // ========================================== //
+    'sbv_title'                 => 'Mga Bisita ng Booking',
     'sbv_booking_ref'           => 'Reference ng Booking',
     'sbv_pet'                   => 'Alagang Hayop',
     'sbv_pet_default'           => 'Alagang Hayop',
@@ -1806,10 +2184,12 @@ return [
     'sbv_overall_progress'      => 'Pangkalahatang Progreso',
     'sbv_special_instructions'  => 'Espesyal na Instruksyon',
     'sbv_tasks_every_visit'     => 'Mga Gawain (bawat bisita)',
+
     'sbv_status_pending'        => 'Naghihintay',
     'sbv_status_in_progress'    => 'Isinasagawa',
     'sbv_status_completed'      => 'Tapos Na',
     'sbv_status_missed'         => 'Napalampas',
+
     'sbv_visit_x_of'            => 'Bisita #:num / :total',
     'sbv_visits_count'          => ':count bisita',
     'sbv_completed_x_of_y'      => ':done / :total tapos na',
@@ -1818,10 +2198,16 @@ return [
     'sbv_photo_uploaded'        => 'May na-upload na litrato',
     'sbv_tasks_done_label'      => 'Mga Gawain (:done/:total tapos)',
     'sbv_more'                  => '+:count pa',
-    'sbv_overdue'               => 'Overdue Ã¢â‚¬â€ nakatakda :time',
-    'sbv_open_visit'            => 'Buksan ang bisita Ã¢â€ â€™',
-    'sbv_no_visits'             => 'Wala pang nabuong bisita para sa booking na ito.',        // ========================================== //    // SITTER DASHBOARD                             //    // ========================================== //    'sd_title'                  => 'Dashboard ng Sitter',
+    'sbv_overdue'               => 'Overdue — nakatakda :time',
+    'sbv_open_visit'            => 'Buksan ang bisita →',
+    'sbv_no_visits'             => 'Wala pang nabuong bisita para sa booking na ito.',
+
+        // ========================================== //
+    // SITTER DASHBOARD                             //
+    // ========================================== //
+    'sd_title'                  => 'Dashboard ng Sitter',
     'sd_subtitle'               => 'Pangkalahatang-tanaw ng iyong kita at performance',
+
     'sd_total_earnings'         => 'Kabuuang Kita',
     'sd_completed'              => 'tapos na',
     'sd_pending'                => 'Nakabinbin',
@@ -1830,37 +2216,50 @@ return [
     'sd_next_7_days'            => 'Susunod na 7 araw',
     'sd_this_month'             => 'Ngayong Buwan',
     'sd_done'                   => 'tapos',
+
     'sd_monthly_earnings'       => 'Buwanang Kita',
     'sd_last_6_months'          => 'Huling 6 na buwan',
     'sd_no_earnings_yet'        => 'Wala pang kita',
+
     'sd_earnings_breakdown'     => 'Hati-hati ng Kita',
     'sd_by_category'            => 'Ayon sa kategorya',
     'sd_sitting'                => 'Pag-aalaga',
     'sd_no_completed_bookings'  => 'Wala pang natapos na booking',
+
     'sd_recent_payments'        => 'Mga Kamakailang Bayad',
     'sd_view_all'               => 'Tingnan Lahat',
     'sd_booking'                => 'Booking',
     'sd_no_completed_payments'  => 'Wala pang natapos na bayad',
+
     'sd_upcoming_visits'        => 'Mga Paparating na Bisita',
     'sd_today'                  => 'Ngayon',
     'sd_tomorrow'               => 'Bukas',
     'sd_visits_per_day'         => 'bisita/araw',
     'sd_no_upcoming_visits'     => 'Wala pang paparating na bisita',
-    'sd_avg_rating'             => 'Ã¢Â­Â Average na Rating',
+
+    'sd_avg_rating'             => '⭐ Average na Rating',
     'sd_from_reviews'           => 'Mula sa :count review',
-    'sd_completion_rate'        => 'Ã¢Å“â€¦ Rate ng Pagkumpleto',
+    'sd_completion_rate'        => '✅ Rate ng Pagkumpleto',
     'sd_visits_completed'       => ':done/:total bisita ang tapos na',
-    'sd_active_bookings'        => 'Ã°Å¸ÂÂ¾ Aktibong Booking',
+    'sd_active_bookings'        => '🐾 Aktibong Booking',
     'sd_owners_count'           => ':count may-ari',
-    'sd_total_visits'           => 'Ã°Å¸â€œâ€¦ Kabuuang Bisita',
+    'sd_total_visits'           => '📅 Kabuuang Bisita',
     'sd_last_30_days'           => 'Huling 30 araw',
+
     'sd_owner_default'          => 'May-ari',
-    'sd_pet_default'            => 'Alagang Hayop',        // ========================================== //    // SITTER TASK INDEX                            //    // ========================================== //    'sti_title'                 => 'Aking mga Gawain',
+    'sd_pet_default'            => 'Alagang Hayop',
+
+        // ========================================== //
+    // SITTER TASK INDEX                            //
+    // ========================================== //
+    'sti_title'                 => 'Aking mga Gawain',
     'sti_subtitle'              => 'Pamahalaan ang iyong mga itinalagang gawain para sa mga aktibong booking',
+
     'sti_total_tasks'           => 'Kabuuang Gawain',
     'sti_completed'             => 'Tapos Na',
     'sti_pending'               => 'Nakabinbin',
     'sti_overdue'               => 'Overdue',
+
     'sti_booking_ref'           => 'Reference ng Booking',
     'sti_pet'                   => 'Alagang Hayop',
     'sti_pet_default'           => 'Alagang Hayop',
@@ -1868,36 +2267,49 @@ return [
     'sti_owner_default'         => 'May-ari',
     'sti_visit_progress'        => 'Progreso ng Bisita',
     'sti_visits'                => 'bisita',
+
     'sti_next_visit'            => 'Susunod na Bisita',
     'sti_today_at'              => 'Ngayon, :time',
     'sti_tomorrow_at'           => 'Bukas, :time',
     'sti_all_visits_completed'  => 'Tapos na ang lahat ng bisita',
+
     'sti_badge_in_progress'     => 'Isinasagawa',
     'sti_badge_completed'       => 'Tapos Na',
     'sti_badge_active'          => 'Aktibo',
     'sti_due_today'             => 'Due Ngayon',
     'sti_upcoming'              => 'Paparating',
-    'sti_done'                  => 'Ã¢Å“â€œ Tapos',
-    'sti_view_visits'           => 'Tingnan ang :count bisita Ã¢â€ â€™',
-    'sti_no_bookings'           => 'Wala pang aktibong booking na itinalaga sa iyo.',        // ========================================== //    // TASK TO-DO (Visit Detail)                    //    // ========================================== //    'std_title'                 => 'Gawain na Dapat Gawin',
+    'sti_done'                  => '✓ Tapos',
+
+    'sti_view_visits'           => 'Tingnan ang :count bisita →',
+
+    'sti_no_bookings'           => 'Wala pang aktibong booking na itinalaga sa iyo.',
+
+        // ========================================== //
+    // TASK TO-DO (Visit Detail)                    //
+    // ========================================== //
+    'std_title'                 => 'Gawain na Dapat Gawin',
     'std_subtitle'              => 'Tapusin ang iyong mga itinalagang gawain para sa bisitang ito',
+
     'std_status_pending'        => 'Naghihintay',
     'std_status_in_progress'    => 'Isinasagawa',
     'std_status_completed'      => 'Tapos Na',
     'std_status_missed'         => 'Napalampas',
+
     'std_booking_ref'           => 'Reference ng Booking',
     'std_pet'                   => 'Alagang Hayop',
     'std_pet_default'           => 'Alagang Hayop',
     'std_owner'                 => 'May-ari',
     'std_owner_default'         => 'May-ari',
     'std_status'                => 'Status',
+
     'std_visit_info'            => 'Impormasyon ng Bisita',
     'std_visit_number'          => 'Numero ng Bisita',
     'std_visit_x_of'            => 'Bisita #:num / :total',
     'std_scheduled_date'        => 'Nakatakdang Petsa',
     'std_scheduled_time'        => 'Nakatakdang Oras',
-    'std_late_msg'              => 'Ã¢Å¡Â Ã¯Â¸Â <strong>Huli ng :min minuto</strong> (:pct% bawas)',
+    'std_late_msg'              => '⚠️ <strong>Huli ng :min minuto</strong> (:pct% bawas)',
     'std_special_instructions'  => 'Espesyal na Instruksyon',
+
     'std_time_log'              => 'Talaan ng Oras',
     'std_check_in_time'         => 'Oras ng Check In',
     'std_check_out_time'        => 'Oras ng Check Out',
@@ -1907,31 +2319,43 @@ return [
     'std_duration'              => 'Tagal:',
     'std_minutes'               => 'Minuto',
     'std_auto_calculated'       => '(auto-kalkulado)',
+
     'std_tasks_to_complete'     => 'Mga Gawain na Dapat Tapusin',
     'std_save_tasks'            => 'I-save ang mga Gawain',
+
     'std_photo_proof'           => 'Patunay na Litrato',
     'std_photos_uploaded'       => ':count litrato ang nai-upload',
     'std_click_photo_fullsize'  => 'I-click ang litrato para tingnan ang buong laki',
     'std_last_upload'           => 'Huling upload: :time',
     'std_click_select_photos'   => 'I-click upang pumili ng mga litrato',
-    'std_photo_limits'          => 'PNG, JPG, WEBP hanggang 5MB bawat isa Ã‚Â· Maramihang pagpili Ã‚Â· Max 10',
+    'std_photo_limits'          => 'PNG, JPG, WEBP hanggang 5MB bawat isa · Maramihang pagpili · Max 10',
     'std_photos_selected'       => 'litrato ang napili',
     'std_clear_all'             => 'I-clear lahat',
     'std_add_more_photos'       => 'Magdagdag ng litrato',
-    'std_add_hint'              => '(hindi pinapalitan Ã¢â‚¬â€ dinadagdagan lang)',
+    'std_add_hint'              => '(hindi pinapalitan — dinadagdagan lang)',
     'std_upload'                => 'I-upload',
+
     'std_sitter_notes'          => 'Mga Tala ng Sitter',
     'std_notes_placeholder'     => 'Magdagdag ng tala tungkol sa bisitang ito...',
     'std_save_note'             => 'I-save ang Tala',
+
     'std_complete_visit'        => 'Tapusin ang Bisita',
     'std_complete_desc'         => 'Siguraduhing tapos na ang lahat ng gawain at may na-upload na patunay na litrato bago markahan bilang tapos na.',
     'std_mark_completed'        => 'Markahan ang Bisita bilang Tapos Na',
+
     'std_confirm_checkin'       => 'Mag-check in para sa bisitang ito?',
     'std_confirm_checkout'      => 'Mag-check out para sa bisitang ito?',
-    'std_confirm_complete'      => 'Markahan ang bisitang ito bilang TAPOS NA?',        // ========================================== //    // OWNER TASK MONITOR                           //    // ========================================== //    'otm_title'                 => 'Task Monitor',
+    'std_confirm_complete'      => 'Markahan ang bisitang ito bilang TAPOS NA?',
+
+        // ========================================== //
+    // OWNER TASK MONITOR                           //
+    // ========================================== //
+    'otm_title'                 => 'Task Monitor',
     'otm_subtitle'              => 'Subaybayan ang mga natapos na bisita at itinalagang gawain ng iyong sitter',
+
     'otm_alert_select_rating'   => 'Mangyaring pumili ng rating (1-5 bituin).',
     'otm_alert_write_comment'   => 'Mangyaring magsulat ng komento.',
+
     'otm_booking_ref'           => 'Reference ng Booking',
     'otm_status_completed'      => 'Tapos Na',
     'otm_status_active'         => 'Aktibo',
@@ -1942,13 +2366,16 @@ return [
     'otm_visit_progress'        => 'Progreso ng Bisita',
     'otm_visits'                => 'bisita',
     'otm_no_visits_scheduled'   => 'Wala pang nakatakdang bisita.',
-    'otm_view_details'          => 'Tingnan ang detalye Ã¢â€ â€™',
+    'otm_view_details'          => 'Tingnan ang detalye →',
+
     'otm_reviewed'              => 'Ni-review Na',
     'otm_rate_sitter'           => 'I-rate ang Sitter',
     'otm_rate_count'            => 'I-rate (:done/:total)',
     'otm_complete_all_visits'   => 'Tapusin ang lahat ng :total bisita bago mag-rate',
+
     'otm_no_bookings'           => 'Wala pang aktibong booking na masusubaybayan.',
-    'otm_find_sitter'           => 'Ã¢â€ â€™ Maghanap ng sitter',
+    'otm_find_sitter'           => '→ Maghanap ng sitter',
+
     'otm_rate_your_sitter'      => 'I-rate ang Iyong Sitter',
     'otm_how_was_experience'    => 'Kumusta ang iyong karanasan?',
     'otm_x_of_5_stars'          => ':rating / 5 bituin',
@@ -1957,25 +2384,34 @@ return [
     'otm_review_placeholder'    => 'Ibahagi ang iyong karanasan sa sitter na ito...',
     'otm_review_visible'        => 'Makikita ito sa profile ng sitter.',
     'otm_cancel'                => 'Kanselahin',
-    'otm_submit_review'         => 'Isumite ang Review',    // ========================================== //    // OWNER VISIT DETAIL (read-only)               //    // ========================================== //    'ovs_title'                 => 'Detalye ng Bisita',
+    'otm_submit_review'         => 'Isumite ang Review',
+
+    // ========================================== //
+    // OWNER VISIT DETAIL (read-only)               //
+    // ========================================== //
+    'ovs_title'                 => 'Detalye ng Bisita',
     'ovs_subtitle'              => 'Bisita #:num sa :total',
+
     'ovs_status_pending'        => 'Naghihintay',
     'ovs_status_in_progress'    => 'Isinasagawa',
     'ovs_status_completed'      => 'Tapos Na',
     'ovs_status_missed'         => 'Napalampas',
+
     'ovs_booking_ref'           => 'Reference ng Booking',
     'ovs_pet'                   => 'Alagang Hayop',
     'ovs_pet_default'           => 'Alagang Hayop',
     'ovs_owner'                 => 'May-ari',
     'ovs_owner_default'         => 'May-ari',
     'ovs_status'                => 'Status',
+
     'ovs_visit_info'            => 'Impormasyon ng Bisita',
     'ovs_visit_number'          => 'Numero ng Bisita',
     'ovs_visit_x_of'            => 'Bisita #:num / :total',
     'ovs_scheduled_date'        => 'Nakatakdang Petsa',
     'ovs_scheduled_time'        => 'Nakatakdang Oras',
-    'ovs_late_msg'              => 'Ã¢Å¡Â Ã¯Â¸Â <strong>Huli ng :min minuto</strong> (:pct% bawas)',
+    'ovs_late_msg'              => '⚠️ <strong>Huli ng :min minuto</strong> (:pct% bawas)',
     'ovs_special_instructions'  => 'Espesyal na Instruksyon',
+
     'ovs_time_log'              => 'Talaan ng Oras',
     'ovs_check_in_time'         => 'Oras ng Check In',
     'ovs_check_out_time'        => 'Oras ng Check Out',
@@ -1983,30 +2419,43 @@ return [
     'ovs_not_yet_checked_out'   => 'Wala pang check out',
     'ovs_duration'              => 'Tagal:',
     'ovs_minutes'               => 'Minuto',
+
     'ovs_tasks'                 => 'Mga Gawain',
     'ovs_tasks_completed'       => ':done / :total gawain ang tapos na',
+
     'ovs_photo_proof'           => 'Patunay na Litrato',
     'ovs_click_photo_fullsize'  => 'I-click ang litrato para makita ang buong laki (:count)',
     'ovs_uploaded_at'           => 'Nai-upload: :time',
     'ovs_no_photo_proof'        => 'Wala pang nai-upload na patunay na litrato.',
+
     'ovs_sitter_notes'          => 'Mga Tala ng Sitter',
     'ovs_no_notes'              => 'Walang tala para sa bisitang ito.',
-    'ovs_back_visit_history'    => 'Ã¢â€ Â Bumalik sa Kasaysayan ng Bisita',    // ========================================== //    // OWNER BOOKING SHOW (Visit History)           //    // ========================================== //    'otb_overall_progress'      => 'Pangkalahatang Progreso ng Bisita',
+
+    'ovs_back_visit_history'    => '← Bumalik sa Kasaysayan ng Bisita',
+
+    // ========================================== //
+    // OWNER BOOKING SHOW (Visit History)           //
+    // ========================================== //
+    'otb_overall_progress'      => 'Pangkalahatang Progreso ng Bisita',
     'otb_visits_count'          => ':done / :total Bisita',
     'otb_assigned_sitter'       => 'Itinalagang Sitter',
     'otb_booking_status'        => 'Status ng Booking',
     'otb_special_instructions'  => 'Espesyal na Instruksyon',
+
     'otb_bstatus_pending'       => 'Naghihintay',
     'otb_bstatus_active'        => 'Aktibo',
     'otb_bstatus_completed'     => 'Tapos Na',
     'otb_bstatus_cancelled'     => 'Kinansela',
     'otb_bstatus_rejected'      => 'Tinanggihan',
+
     'otb_vstatus_pending'       => 'Naghihintay',
     'otb_vstatus_in_progress'   => 'Isinasagawa',
     'otb_vstatus_completed'     => 'Tapos Na',
     'otb_vstatus_missed'        => 'Napalampas',
+
     'otb_visit_history'         => 'Kasaysayan ng Bisita (:count)',
     'otb_no_visits_scheduled'   => 'Wala pang naka-iskedyul na bisita.',
+
     'otb_visit_x_of'            => 'Bisita #:num / :total',
     'otb_checked_in_at'         => 'Nag-check in: :time',
     'otb_checked_out_at'        => 'Nag-check out: :time',
@@ -2014,11 +2463,29 @@ return [
     'otb_photo_proof_uploaded'  => 'May na-upload na patunay na litrato',
     'otb_late_by'               => 'Huli ng :min min',
     'otb_tasks_progress'        => 'Progreso ng mga Gawain',
-    'otb_overdue'               => 'Overdue Ã¢â‚¬â€ nakatakda :time',
-    'otb_view_details'          => 'Tingnan ang detalye ng bisita Ã¢â€ â€™',    // Onboarding profile completeness    'onboard_profile_incomplete_title' => 'Hindi Kumpleto ang Profile',
+    'otb_overdue'               => 'Overdue — nakatakda :time',
+    'otb_view_details'          => 'Tingnan ang detalye ng bisita →',
+
+
+    // Onboarding profile completeness
+    'onboard_profile_incomplete_title' => 'Hindi Kumpleto ang Profile',
     'onboard_profile_incomplete_desc'  => 'Pakikompleto ang impormasyon ng iyong profile (petsa ng kapanganakan, kasarian, contact, address) bago i-verify ang iyong ID.',
     'onboard_complete_profile'         => 'Kumpletuhin ang Profile',
-    'pf_retake' => 'Kunan Muli',    // Step 3: Profile Incomplete Warning    'pf_profile_incomplete_title' => 'Hindi Kumpleto ang Profile',
-    'pf_profile_incomplete_desc'  => 'Bago mag-submit para sa ID verification, pakikompleto ang impormasyon ng iyong profile.',
-    'pf_missing_field'            => 'Kulang',
-    'pf_complete_profile_btn'     => 'Kumpletuhin ang Profile',];
+    'sa_st_small'  => 'Maliliit na Alagang Hayop - Pusa, maliliit na aso, kuneho, hamster',
+    'sa_st_large'  => 'Malalaking Alagang Hayop - Malalaking aso, kahit anong laki',
+    'sa_st_exotic' => 'Exotic na Alagang Hayop - Ibon, reptilya, isda',
+    'sa_st_all'    => 'Lahat ng Alagang Hayop - Kahit anong laki, kahit anong uri',
+    'sa_pending_title'     => 'Sinusuri ang Aplikasyon',
+    'sa_pending_desc'      => 'Kasalukuyang sinusuri ng aming team ang iyong aplikasyon.',
+    'sa_pending_applied'   => 'Nag-apply noong:',
+    'sa_pending_contact'   => 'Kontakin ang Suporta',
+    'sa_pending_dashboard' => 'Bumalik sa Dashboard',
+    'sa_approved_settings'  => 'Mga Setting ng Sitter',
+    'sa_approved_dashboard' => 'Dashboard ng Sitter',
+    'sa_rejected_reason' => 'Dahilan ng Pagtanggi',
+    'sa_reapply_btn'     => 'Mag-apply Muli',
+    'sa_confirm_title'  => 'Isumite ang Aplikasyon',
+    'sa_confirm_desc'   => 'Sigurado ka bang gusto mong isumite?',
+    'sa_cancel'         => 'Kanselahin',
+    'sa_confirm_submit' => 'Oo, Isumite',
+];
