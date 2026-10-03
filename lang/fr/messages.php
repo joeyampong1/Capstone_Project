@@ -1,4 +1,5 @@
-<?phpreturn [    'dashboard'         => 'Dashboard',
+<?php
+return [    'dashboard'         => 'Dashboard',
     'settings'          => 'Settings',
     'profile'           => 'Profile',
     'logout'            => 'Logout',
