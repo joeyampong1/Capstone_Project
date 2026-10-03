@@ -9,12 +9,10 @@ class FindSitterController extends Controller
 {
     public function index()
     {
-        // For testing: include all sitters even 'pending'
-        // TODO: Enable ->where('sitter_status', 'approved') once admin panel is ready
-
+        // Only approved sitters appear on Find a Sitter page
         $sitters = User::with('sitterProfile')
             ->where('is_sitter', true)
-            // ->where('sitter_status', 'approved')
+            ->where('sitter_status', 'approved')
             ->whereHas('sitterProfile')
             ->get();
 

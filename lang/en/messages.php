@@ -2669,4 +2669,13 @@ return [
     'sa_confirm_desc'   => 'Are you sure you want to submit?',
     'sa_cancel'         => 'Cancel',
     'sa_confirm_submit' => 'Yes, Submit',
+    'sa_st_small_short'  => 'Small Pets',
+    'sa_st_large_short'  => 'Large Pets',
+    'sa_st_exotic_short' => 'Exotic Pets',
+    'sa_st_all_short'    => 'All Pets',
+    // Sitter Type (Admin Modal)
+    'sv_sitter_type' => 'Sitter Type',
+    // Promote / Demote buttons
+    'ud_promote_btn' => 'Promote to Admin',
+    'ud_demote_btn'  => 'Demote from Admin',
 ];

@@ -2488,4 +2488,11 @@ return [
     'sa_confirm_desc'   => 'Sigurado ka bang gusto mong isumite?',
     'sa_cancel'         => 'Kanselahin',
     'sa_confirm_submit' => 'Oo, Isumite',
+    'sa_st_small_short'  => 'Maliliit na Hayop',
+    'sa_st_large_short'  => 'Malalaking Hayop',
+    'sa_st_exotic_short' => 'Exotic na Hayop',
+    'sa_st_all_short'    => 'Lahat ng Hayop',
+    'sv_sitter_type' => 'Uri ng Sitter',
+    'ud_promote_btn' => 'I-promote bilang Admin',
+    'ud_demote_btn'  => 'I-demote mula Admin',
 ];

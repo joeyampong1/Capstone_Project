@@ -2526,4 +2526,11 @@ return [
     'sa_confirm_desc'   => '¿Estás seguro de que quieres enviar?',
     'sa_cancel'         => 'Cancelar',
     'sa_confirm_submit' => 'Sí, Enviar',
+    'sa_st_small_short'  => 'Mascotas Pequeñas',
+    'sa_st_large_short'  => 'Mascotas Grandes',
+    'sa_st_exotic_short' => 'Mascotas Exóticas',
+    'sa_st_all_short'    => 'Todas las Mascotas',
+    'sv_sitter_type' => 'Tipo de Cuidador',
+    'ud_promote_btn' => 'Ascender a Administrador',
+    'ud_demote_btn'  => 'Degradar de Administrador',
 ];
