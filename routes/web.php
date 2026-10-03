@@ -357,6 +357,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/sitter/apply', [ApplicationController::class, 'store'])->name('sitter.application.store');
     Route::put('/sitter/apply', [ApplicationController::class, 'update'])->name('sitter.application.update');
 
+
     /*
     |--------------------------------------------------------------------------
     | SHARED: SITTER PROFILE VIEW

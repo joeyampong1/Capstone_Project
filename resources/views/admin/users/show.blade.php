@@ -179,6 +179,36 @@
                             </button>
                         @endif
 
+                        {{-- PROMOTE TO ADMIN --}}
+                        @if(! $user->isAdmin() && $accStatus === 'active' && $user->id !== auth()->id())
+                            <form method="POST" action="{{ route('admin.users.promote', $user->id) }}" class="inline"
+                                onsubmit="return confirm('Promote {{ addslashes($fullName) }} to Administrator?')">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                                    </svg>
+                                    {{ __('messages.ud_promote_btn') }}
+                                </button>
+                            </form>
+                        @endif
+
+                        {{-- DEMOTE FROM ADMIN --}}
+                        @if($user->isAdmin() && $user->id !== auth()->id() && \App\Models\User::where('role', 'admin')->count() > 1)
+                            <form method="POST" action="{{ route('admin.users.demote', $user->id) }}" class="inline"
+                                onsubmit="return confirm('Demote {{ addslashes($fullName) }} from Administrator?')">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex items-center gap-1.5 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                                    </svg>
+                                    {{ __('messages.ud_demote_btn') }}
+                                </button>
+                            </form>
+                        @endif
+
                     </div>
 
                 </div>

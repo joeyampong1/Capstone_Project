@@ -5,13 +5,14 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -22,10 +23,9 @@ class User extends Authenticatable
         // ========================================== //
         // PROFILE INFORMATION FIELDS                 //
         // ========================================== //
-        'name',
-        'f_name',         
-        'm_name',          
-        'l_name',   
+        'f_name',
+        'm_name',
+        'l_name',
         'email',
         'date_of_birth',
         'gender',
@@ -36,7 +36,7 @@ class User extends Authenticatable
         // ROLE & BASIC INFO                          //
         // ========================================== //
         'role',
-        
+
         // ========================================== //
         // SITTER-SPECIFIC FIELDS                     //
         // ========================================== //
@@ -45,21 +45,21 @@ class User extends Authenticatable
         'sitter_status',
         'sitter_applied_at',
         'sitter_approved_at',
-        
+
         // ========================================== //
         // OWNER-SPECIFIC FIELDS                     //
         // ========================================== //
         'location',
         'latitude',
         'longitude',
-        
+
         // ========================================== //
         // PROFILE & VERIFICATION                    //
         // ========================================== //
         'profile_photo',
         'gov_id_path',
         'id_validation_status',
-        'id_type',          
+        'id_type',
         'selfie_photo',
         'admin_notes',
         'id_reviewed_by',
@@ -74,7 +74,8 @@ class User extends Authenticatable
         'name_match',
         'birthdate_match',
         'locale',
-        
+        'onboarding_dismissed',
+
         // ========================================== //
         // SYSTEM & STATUS                          //
         // ========================================== //
@@ -115,6 +116,7 @@ class User extends Authenticatable
             'ocr_result' => 'array',
             'face_detected_on_id' => 'boolean',
             'face_detected_on_selfie' => 'boolean',
+            'onboarding_dismissed' => 'boolean',
         ];
     }
 
@@ -215,7 +217,7 @@ class User extends Authenticatable
         return $this->selfie_photo
             ? \Illuminate\Support\Facades\Storage::url($this->selfie_photo)
             : null;
-    } 
+    }
 
     // ========================================== //
     // SITTER LEVEL METHODS                       //
@@ -267,13 +269,13 @@ class User extends Authenticatable
     /**
      * Get profile photo URL or avatar fallback
      */
-    
+
     public function getProfilePhotoUrlAttribute(): string
     {
         if ($this->profile_photo) {
             return asset('storage/' . $this->profile_photo);
         }
-        
+
         $nameToUse = $this->f_name ?? $this->email;
         return 'https://ui-avatars.com/api/?name=' . urlencode($nameToUse) . '&background=f07a3a&color=fff&size=100';
     }
@@ -295,14 +297,14 @@ class User extends Authenticatable
         if ($fullName === '') {
             $fullName = $this->email; // fallback to email if no names
         }
-        
+
         $suffix = '';
         if ($this->isAdmin()) {
             $suffix = ' (Admin)';
         } elseif ($this->isSitter()) {
             $suffix = ' ★' . $this->getSitterLevelBadge();
         }
-        
+
         return $fullName . $suffix;
     }
 
@@ -319,9 +321,9 @@ class User extends Authenticatable
      */
     public function canApplyToBeSitter(): bool
     {
-        return $this->isOwner() && 
-               !$this->is_sitter && 
-               $this->isActive() && 
+        return $this->isOwner() &&
+               !$this->is_sitter &&
+               $this->isActive() &&
                $this->isIdVerified();
     }
 
@@ -462,9 +464,14 @@ class User extends Authenticatable
      */
     public function getSettingAttribute()
     {
-        return $this->relationLoaded('setting')
-            ? $this->getRelation('setting')
-            : ($this->setting()->firstOrCreate([])); // lazy create
+        if ($this->relationLoaded('setting')) {
+            return $this->getRelation('setting');
+        }
+
+        $setting = $this->setting()->firstOrCreate([]);
+        $this->setRelation('setting', $setting);
+
+        return $setting;
     }
 
     protected static function booted(): void
