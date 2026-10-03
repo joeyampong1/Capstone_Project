@@ -29,7 +29,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        
+
         <!-- ========================================== -->
         <!-- ALPINE STORE INIT (BEFORE Alpine loads)   -->
         <!-- ========================================== -->
@@ -44,7 +44,11 @@
                             ? (
                                 auth()->user()->isAdmin()
                                     ? 'admin'
-                                    : (auth()->user()->is_sitter ? 'sitter' : 'owner')
+                                    : (
+                                        (auth()->user()->is_sitter && auth()->user()->sitter_status === 'approved')
+                                            ? 'sitter'
+                                            : 'owner'
+                                    )
                             )
                             : 'guest'
                     )
@@ -71,7 +75,7 @@
 
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-neutral-900">
-            
+
             <!-- Alpine State -->
             <div
                 x-data="{
@@ -91,7 +95,7 @@
                 <!-- Main Content Wrapper -->
                 <div :class="isDesktop ? (sidebarOpen ? 'ml-64' : 'ml-16') : ''"
                      class="transition-all duration-300 min-h-screen">
-                    
+
                     <!-- Navigation (dynamic: admin / owner / sitter) -->
                     @include('layouts.navigation')
 
@@ -210,20 +214,20 @@
                 } else {
                     initToggle();
                 }
-                
+
                 function initToggle() {
                     const toggleBtn = document.getElementById('mobileToggleBtn');
                     const iconOpen = document.getElementById('toggleIconOpen');
                     const iconClose = document.getElementById('toggleIconClose');
-                    
+
                     if (!toggleBtn) return;
-                    
+
                     function toggleSidebar() {
                         const sidebar = document.querySelector('aside');
                         if (!sidebar) return;
-                        
+
                         const isOpen = sidebar.classList.contains('translate-x-0');
-                        
+
                         if (isOpen) {
                             sidebar.classList.remove('translate-x-0');
                             sidebar.classList.add('-translate-x-full');
@@ -236,9 +240,9 @@
                             iconClose.classList.remove('hidden');
                         }
                     }
-                    
+
                     toggleBtn.addEventListener('click', toggleSidebar);
-                    
+
                     document.addEventListener('click', function(e) {
                         const backdrop = document.querySelector('.fixed.inset-0.z-30.bg-black\\/50');
                         if (backdrop && e.target === backdrop) {
