@@ -5,6 +5,16 @@
         stream: null,
         capturedImage: null,
 
+        // ID upload state
+        idFileChosen: false,
+        idFileName: '',
+        idPreviewUrl: null,
+
+        // Selfie upload state
+        selfieFileChosen: false,
+        selfieFileName: '',
+        selfiePreviewUrl: null,
+
         async openCamera(mode) {
             this.cameraMode = mode;
             this.facingMode = mode === 'selfie' ? 'user' : 'environment';
@@ -62,10 +72,15 @@
                 const dt = new DataTransfer();
                 dt.items.add(file);
 
+                // Determine target input
                 let input = null;
+                let previewUrl = URL.createObjectURL(blob);
 
                 if (this.cameraMode === 'selfie') {
                     input = document.getElementById('selfie_photo');
+                    this.selfieFileChosen = true;
+                    this.selfieFileName = file.name;
+                    this.selfiePreviewUrl = previewUrl;
                 } else {
                     const retryInput = document.getElementById('gov_id_path_retry');
                     if (retryInput && retryInput.offsetParent !== null) {
@@ -73,6 +88,9 @@
                     } else {
                         input = document.getElementById('gov_id_path');
                     }
+                    this.idFileChosen = true;
+                    this.idFileName = file.name;
+                    this.idPreviewUrl = previewUrl;
                 }
 
                 if (input) {
@@ -82,6 +100,51 @@
 
                 this.closeCamera();
             }, 'image/jpeg', 0.92);
+        },
+
+        // ═══════════════════════════════════════════════════════════════
+        // FILE HANDLERS
+        // ═══════════════════════════════════════════════════════════════
+        handleIdFileChange(event) {
+            const file = event.target.files[0];
+            this.idFileChosen = !!file;
+            this.idFileName = file ? file.name : '';
+            this.idPreviewUrl = file ? URL.createObjectURL(file) : null;
+        },
+
+        handleIdRetryFileChange(event) {
+            const file = event.target.files[0];
+            this.idFileChosen = !!file;
+            this.idFileName = file ? file.name : '';
+            this.idPreviewUrl = file ? URL.createObjectURL(file) : null;
+        },
+
+        handleSelfieFileChange(event) {
+            const file = event.target.files[0];
+            this.selfieFileChosen = !!file;
+            this.selfieFileName = file ? file.name : '';
+            this.selfiePreviewUrl = file ? URL.createObjectURL(file) : null;
+        },
+
+        // ═══════════════════════════════════════════════════════════════
+        // RESET HANDLERS
+        // ═══════════════════════════════════════════════════════════════
+        resetIdInput() {
+            this.idFileChosen = false;
+            this.idFileName = '';
+            this.idPreviewUrl = null;
+            const input = document.getElementById('gov_id_path');
+            if (input) input.value = '';
+            const retryInput = document.getElementById('gov_id_path_retry');
+            if (retryInput) retryInput.value = '';
+        },
+
+        resetSelfieInput() {
+            this.selfieFileChosen = false;
+            this.selfieFileName = '';
+            this.selfiePreviewUrl = null;
+            const input = document.getElementById('selfie_photo');
+            if (input) input.value = '';
         }
     }">
 
@@ -209,10 +272,11 @@
                         <p class="text-xs text-neutral-400">{{ __('messages.pf_id_accepted') }}</p>
                         <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('gov_id_path')" />
 
-                        <input id="gov_id_path" name="gov_id_path" type="file" accept="image/*" class="hidden">
+                        <input id="gov_id_path" name="gov_id_path" type="file" accept="image/*" class="hidden"
+                               @change="handleIdFileChange($event)">
 
                         {{-- Before file chosen --}}
-                        <div id="gov_id_select_btn" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                        <div x-show="!idFileChosen" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                             {{-- Camera --}}
                             <button type="button" @click="openCamera('id')"
                                     class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-sm
@@ -238,18 +302,37 @@
                             </label>
                         </div>
 
-                        {{-- After file chosen --}}
-                        <div id="gov_id_confirm_section" class="hidden space-y-3">
-                            <p class="text-sm text-neutral-600 dark:text-neutral-300 font-medium">
+                        {{-- After file chosen — preview + Retake + Upload --}}
+                        <div x-show="idFileChosen" x-cloak class="space-y-3">
+                            <div class="flex items-center justify-center">
+                                <img :src="idPreviewUrl" x-show="idPreviewUrl" alt="ID Preview"
+                                     class="w-40 h-40 object-cover rounded-xl border-2 border-primary/30 shadow-md">
+                            </div>
+
+                            <p class="text-sm text-neutral-600 dark:text-neutral-300 font-medium text-center">
                                 <span class="text-green-600 dark:text-green-400">✓</span>
-                                <span id="gov_id_filename"></span>
+                                <span x-text="idFileName"></span>
                             </p>
-                            <button type="submit" name="action" value="upload_id"
-                                    class="bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                           px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
-                                           transform hover:-translate-y-0.5">
-                                {{ __('messages.pf_upload_id_btn') }}
-                            </button>
+
+                            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                                {{-- Retake --}}
+                                <button type="button" @click="resetIdInput()"
+                                        class="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700
+                                               text-neutral-700 dark:text-neutral-200 font-bold text-xs sm:text-sm
+                                               px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-700 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    {{ __('messages.pf_retake') }}
+                                </button>
+
+                                {{-- Upload --}}
+                                <button type="submit" name="action" value="upload_id"
+                                        class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm
+                                               px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition">
+                                    {{ __('messages.pf_upload_id_btn') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -311,25 +394,17 @@
                     </div>
 
                     {{-- Retry upload --}}
-                    <form method="POST" action="{{ route('profile.id') }}" enctype="multipart/form-data" class="mt-4 space-y-3"
-                        x-data="{
-                            retryFileChosen: false,
-                            retryFileName: '',
-                            handleFileChange(e) {
-                                this.retryFileChosen = e.target.files.length > 0;
-                                this.retryFileName = e.target.files[0]?.name || '';
-                            }
-                        }">
+                    <form method="POST" action="{{ route('profile.id') }}" enctype="multipart/form-data" class="mt-4 space-y-3">
                         @csrf
                         <input type="hidden" name="action" value="upload_id">
                         <input type="hidden" name="id_type" value="{{ $user->id_type }}">
 
                         {{-- File input (hidden) --}}
                         <input id="gov_id_path_retry" name="gov_id_path" type="file" accept="image/*" class="hidden"
-                            @change="handleFileChange($event)">
+                               @change="handleIdRetryFileChange($event)">
 
-                        {{-- State 1: Walang file — show Retake + Choose Different --}}
-                        <div x-show="!retryFileChosen" class="flex flex-wrap items-center gap-2 sm:gap-3">
+                        {{-- State 1: Walang file --}}
+                        <div x-show="!idFileChosen" class="flex flex-wrap items-center gap-2 sm:gap-3">
                             <button type="button" @click="openCamera('id')"
                                     class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm
                                         px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition">
@@ -350,31 +425,36 @@
                             </label>
                         </div>
 
-                        {{-- State 2: May file na — show filename + Upload + Change --}}
-                        <div x-show="retryFileChosen" x-cloak class="space-y-3">
-                            <p class="text-sm text-neutral-600 dark:text-neutral-300 font-medium flex items-center gap-2">
+                        {{-- State 2: May file na — preview + Retake + Upload --}}
+                        <div x-show="idFileChosen" x-cloak class="space-y-3">
+                            <div class="flex items-center justify-center">
+                                <img :src="idPreviewUrl" x-show="idPreviewUrl" alt="ID Preview"
+                                     class="w-40 h-40 object-cover rounded-xl border-2 border-primary/30 shadow-md">
+                            </div>
+
+                            <p class="text-sm text-neutral-600 dark:text-neutral-300 font-medium text-center">
                                 <span class="text-green-600 dark:text-green-400">✓</span>
-                                <span x-text="retryFileName"></span>
+                                <span x-text="idFileName"></span>
                             </p>
 
-                            <div class="flex flex-wrap items-center gap-2">
-                                {{-- Upload --}}
-                                <button type="submit"
-                                        class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm
-                                            px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition">
-                                    {{ __('messages.pf_upload_id_btn') }}
-                                </button>
-
-                                {{-- Change file --}}
-                                <label for="gov_id_path_retry"
-                                    class="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700
-                                            text-neutral-700 dark:text-neutral-200 font-bold text-xs sm:text-sm
-                                            px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-700 transition cursor-pointer">
+                            <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                                {{-- Retake --}}
+                                <button type="button" @click="resetIdInput()"
+                                        class="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700
+                                               text-neutral-700 dark:text-neutral-200 font-bold text-xs sm:text-sm
+                                               px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-700 transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                                     </svg>
-                                    {{ __('messages.pf_retry_gallery') }}
-                                </label>
+                                    {{ __('messages.pf_retake') }}
+                                </button>
+
+                                {{-- Upload --}}
+                                <button type="submit"
+                                        class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm
+                                               px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition">
+                                    {{ __('messages.pf_upload_id_btn') }}
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -396,10 +476,11 @@
                     <p class="text-xs text-neutral-400">{{ __('messages.pf_id_accepted') }}</p>
                     <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('selfie_photo')" />
 
-                    <input id="selfie_photo" name="selfie_photo" type="file" accept="image/*" capture="user" class="hidden">
+                    <input id="selfie_photo" name="selfie_photo" type="file" accept="image/*" class="hidden"
+                           @change="handleSelfieFileChange($event)">
 
                     {{-- Before file chosen --}}
-                    <div id="selfie_select_btn" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    <div x-show="!selfieFileChosen" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                         <button type="button" @click="openCamera('selfie')"
                                 class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-sm
                                        px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
@@ -422,18 +503,37 @@
                         </label>
                     </div>
 
-                    {{-- After file chosen --}}
-                    <div id="selfie_confirm_section" class="hidden space-y-3">
-                        <p class="text-sm text-neutral-600 dark:text-neutral-300 font-medium">
+                    {{-- After file chosen — preview + Retake + Next --}}
+                    <div x-show="selfieFileChosen" x-cloak class="space-y-3">
+                        <div class="flex items-center justify-center">
+                            <img :src="selfiePreviewUrl" x-show="selfiePreviewUrl" alt="Selfie Preview"
+                                 class="w-40 h-40 object-cover rounded-xl border-2 border-primary/30 shadow-md">
+                        </div>
+
+                        <p class="text-sm text-neutral-600 dark:text-neutral-300 font-medium text-center">
                             <span class="text-green-600 dark:text-green-400">✓</span>
-                            <span id="selfie_filename"></span>
+                            <span x-text="selfieFileName"></span>
                         </p>
-                        <button type="submit" name="action" value="upload_selfie"
-                                class="bg-primary hover:bg-primary-600 text-white font-bold text-sm
-                                       px-6 py-2.5 sm:px-8 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
-                                       transform hover:-translate-y-0.5">
-                            {{ __('messages.pf_next_btn') }}
-                        </button>
+
+                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                            {{-- Retake --}}
+                            <button type="button" @click="resetSelfieInput()"
+                                    class="inline-flex items-center gap-2 bg-white dark:bg-neutral-800 border-2 border-gray-200 dark:border-neutral-700
+                                           text-neutral-700 dark:text-neutral-200 font-bold text-xs sm:text-sm
+                                           px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-neutral-700 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                {{ __('messages.pf_retake') }}
+                            </button>
+
+                            {{-- Next --}}
+                            <button type="submit" name="action" value="upload_selfie"
+                                    class="inline-flex items-center gap-2 bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm
+                                           px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition">
+                                {{ __('messages.pf_next_btn') }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

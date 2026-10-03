@@ -6,11 +6,11 @@
         <div class="flex items-center gap-3">
             <!-- Search Icon -->
             <svg class="w-12 h-12 text-[#1B3B36] dark:text-white"
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24" 
-                stroke-width="2.5" 
-                stroke-linecap="round" 
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                stroke-width="2.5"
+                stroke-linecap="round"
                 stroke-linejoin="round">
                 <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
@@ -35,16 +35,16 @@
         <!-- ========================================== -->
         <div class="px-2 sm:px-16 lg:px-24 pt-2 sm:pt-6 pb-6 sm:pb-12">
             <div class="relative rounded-2xl sm:rounded-[2.5rem] overflow-hidden min-h-[380px] sm:min-h-[440px] lg:min-h-[480px] flex items-center px-4 sm:px-10 lg:px-16">
-                
+
                 <!-- Background Image -->
-                <img src="{{ asset('assets/image/animie_findsitter_bg.png') }}" 
-                     alt="" 
-                     class="absolute inset-0 w-full h-full object-cover object-center" 
+                <img src="{{ asset('assets/image/animie_findsitter_bg.png') }}"
+                     alt=""
+                     class="absolute inset-0 w-full h-full object-cover object-center"
                      style="object-position: center 15%;">
-                
+
                 <!-- Gradient Overlay -->
                 <div class="absolute inset-0 bg-gradient-to-r from-white/80 via-white/40 to-transparent dark:from-neutral-950/80 dark:via-neutral-950/40"></div>
-                
+
                 <!-- Hero Content -->
                 <div class="max-w-xl relative z-10">
                     <div class="inline-flex items-center gap-1.5 bg-[#1B3B36]/5 text-[#1B3B36] text-xs font-bold px-3 py-1.5 rounded-full mb-6">
@@ -62,14 +62,14 @@
 
                     <!-- Search Bar -->
                     <div class="bg-white p-2 sm:p-2.5 rounded-2xl shadow-xl shadow-neutral-200/50 border border-neutral-100 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 max-w-2xl w-full overflow-hidden">
-                        
+
                         <!-- Location Input -->
                         <div class="flex items-center gap-2 pl-2 flex-1 w-full sm:w-auto border-b sm:border-b-0 sm:border-r border-neutral-100 pb-2 sm:pb-0">
                             <svg class="w-5 h-5 text-neutral-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            <input type="text" placeholder="{{ __('messages.fs_location_ph') }}" 
+                            <input type="text" placeholder="{{ __('messages.fs_location_ph') }}"
                                    class="w-full bg-transparent text-sm font-medium outline-none text-neutral-700 placeholder-neutral-400 rounded-xl px-2 py-1.5 focus:ring-2 focus:ring-primary/20 focus:bg-white/50 transition">
                         </div>
 
@@ -85,16 +85,17 @@
                             </select>
                         </div>
 
-                        <!-- Level Dropdown -->
+                        <!-- Sitter Type Dropdown -->
                         <div class="flex items-center gap-2 flex-1 w-full sm:w-auto border-b sm:border-b-0 sm:border-r border-neutral-100 pb-2 sm:pb-0">
                             <svg class="w-5 h-5 text-neutral-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                             </svg>
                             <select class="w-full bg-transparent text-sm font-bold text-neutral-700 outline-none appearance-none cursor-pointer rounded-xl px-2 py-1.5 focus:ring-2 focus:ring-primary/20 focus:bg-white/50 transition">
-                                <option>{{ __('messages.fs_level_any') }}</option>
-                                <option>{{ __('messages.fs_level_st1') }}</option>
-                                <option>{{ __('messages.fs_level_st2') }}</option>
-                                <option>{{ __('messages.fs_level_st3') }}</option>
+                                <option value="all">{{ __('messages.fs_level_any') }}</option>
+                                <option value="small_pets">🐱 {{ __('messages.sa_st_small') }}</option>
+                                <option value="large_pets">🐕 {{ __('messages.sa_st_large') }}</option>
+                                <option value="exotic_pets">🦜 {{ __('messages.sa_st_exotic') }}</option>
+                                <option value="all_pets">🐾 {{ __('messages.sa_st_all') }}</option>
                             </select>
                         </div>
 
@@ -115,7 +116,7 @@
         <!-- ========================================== -->
         <div class="px-2 sm:px-16 lg:px-24 py-4 sm:py-6 border-b border-neutral-100 bg-white dark:bg-neutral-900 dark:border-neutral-800">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-                
+
                 <!-- Badge 1: ID Verified -->
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-amber-600 font-bold border border-amber-100 dark:border-amber-800 shrink-0">
@@ -194,14 +195,15 @@
                             $initials = strtoupper(substr($sitter->f_name ?? '', 0, 1)) . strtoupper(substr($sitter->l_name ?? '', 0, 1));
                             $rating = $profile->average_ratings ?? 0;
                             $fullStars = floor($rating);
-                            $level = (int) ($profile->sitter_type ?? 1);
                             $matchPct = $sitter->match_percentage ?? 0;
 
-                            $levelColors = match($level) {
-                                1 => ['bg' => 'bg-amber-600', 'text' => 'text-white', 'circle' => '#D97706', 'stroke' => '#F59E0B', 'label' => 'ST 1'],
-                                2 => ['bg' => 'bg-gray-300', 'text' => 'text-gray-800', 'circle' => '#D1D5DB', 'stroke' => '#9CA3AF', 'label' => 'ST 2'],
-                                3 => ['bg' => 'bg-yellow-400', 'text' => 'text-yellow-900', 'circle' => '#FBBF24', 'stroke' => '#F59E0B', 'label' => 'ST 3'],
-                                default => ['bg' => 'bg-gray-300', 'text' => 'text-gray-800', 'circle' => '#D1D5DB', 'stroke' => '#9CA3AF', 'label' => 'ST 1'],
+                            // Sitter Type — category-based
+                            $typeInfo = match($profile->sitter_type) {
+                                'small_pets'  => ['bg' => 'bg-blue-100',   'text' => 'text-blue-700',   'icon' => '🐱', 'label' => __('messages.sa_st_small_short')],
+                                'large_pets'  => ['bg' => 'bg-green-100',  'text' => 'text-green-700',  'icon' => '🐕', 'label' => __('messages.sa_st_large_short')],
+                                'exotic_pets' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'icon' => '🦜', 'label' => __('messages.sa_st_exotic_short')],
+                                'all_pets'    => ['bg' => 'bg-amber-100',  'text' => 'text-amber-700',  'icon' => '🐾', 'label' => __('messages.sa_st_all_short')],
+                                default       => ['bg' => 'bg-neutral-100','text' => 'text-neutral-700','icon' => '🐱', 'label' => __('messages.sa_st_small_short')],
                             };
 
                             $matchColor = $matchPct >= 85
@@ -211,10 +213,10 @@
                                     : 'bg-neutral-200 text-neutral-700');
 
                             $foodLabel = match($profile->food_preference ?? '') {
-                                'owner_provides' => __('messages.fs_food_owner_full'),
-                                'sitter_provides' => __('messages.fs_food_sitter_full'),
-                                'flexible' => __('messages.fs_food_flexible_full'),
-                                default => __('messages.fs_food_not_set'),
+                                'owner_provides', 'owner_provided'   => __('messages.fs_food_owner_full'),
+                                'sitter_provides', 'sitter_provided' => __('messages.fs_food_sitter_full'),
+                                'flexible'                            => __('messages.fs_food_flexible_full'),
+                                default                               => __('messages.fs_food_not_set'),
                             };
                         @endphp
 
@@ -224,8 +226,8 @@
                                     <div class="relative h-[220px] rounded-xl sm:rounded-[1.5rem] overflow-hidden bg-neutral-100 dark:bg-neutral-800 mb-4">
                                         {{-- Profile Photo --}}
                                         @if($sitter->profile_photo && file_exists(public_path('storage/' . $sitter->profile_photo)))
-                                            <img src="{{ asset('storage/' . $sitter->profile_photo) }}" 
-                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                            <img src="{{ asset('storage/' . $sitter->profile_photo) }}"
+                                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 alt="{{ $fullName }}">
                                         @else
                                             <div class="w-full h-full flex items-center justify-center bg-primary/10">
@@ -274,7 +276,7 @@
                                         <span class="text-xs font-bold text-neutral-400 dark:text-neutral-500">{{ __('messages.fs_bookings_count', ['count' => $profile->total_bookings ?? 0]) }}</span>
                                     </div>
 
-                                    {{-- Food Preference + Level Badge --}}
+                                    {{-- Food Preference + Sitter Type Badge --}}
                                     <div class="px-2 text-xs font-bold text-neutral-500 dark:text-neutral-400 flex items-center justify-between mb-4">
                                         <div class="flex items-center gap-1 min-w-0">
                                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -282,13 +284,9 @@
                                             </svg>
                                             <span class="truncate">{{ $foodLabel }}</span>
                                         </div>
-                                        <span class="{{ $levelColors['bg'] }} {{ $levelColors['text'] }} text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wide inline-flex items-center gap-1 shrink-0 ml-2">
-                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                                                <circle cx="12" cy="12" r="10" fill="{{ $levelColors['circle'] }}" stroke="{{ $levelColors['stroke'] }}" stroke-width="1.5"/>
-                                                <text x="12" y="15.5" text-anchor="middle" font-size="13" font-weight="bold" fill="{{ $level == 1 ? 'white' : '#1F2937' }}">{{ $level }}</text>
-                                                <path d="M12 2L8 6v4h8V6l-4-4z" fill="{{ $levelColors['stroke'] }}" opacity="0.3"/>
-                                            </svg>
-                                            {{ $levelColors['label'] }}
+                                        <span class="{{ $typeInfo['bg'] }} {{ $typeInfo['text'] }} text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wide inline-flex items-center gap-1 shrink-0 ml-2">
+                                            <span>{{ $typeInfo['icon'] }}</span>
+                                            {{ $typeInfo['label'] }}
                                         </span>
                                     </div>
                                 </div>

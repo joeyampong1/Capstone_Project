@@ -24,9 +24,9 @@ class SitterVerificationController extends Controller
         $dateSort   = $request->query('date', 'latest');
         $experience = $request->query('experience', 'all');
 
-        // Base query — users who applied as sitters
+        // Base query — users nga naay sitter profile (nag-apply)
         $query = User::query()
-            ->where('is_sitter', true)
+            ->whereHas('sitterProfile')
             ->with('sitterProfile')
             ->withCount([
                 'bookingsAsSitter as completed_bookings_count' => fn ($q) => $q->where('status', 'completed'),
@@ -35,19 +35,27 @@ class SitterVerificationController extends Controller
 
         // Filter by status
         if ($status !== 'all') {
-            $query->where('sitter_status', $status);
+            if ($status === 'pending') {
+                // pending OR NULL (kay wala pa na-set)
+                $query->where(function ($q) {
+                    $q->where('sitter_status', 'pending')
+                    ->orWhereNull('sitter_status');
+                });
+            } else {
+                $query->where('sitter_status', $status);
+            }
         }
 
         // Search
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('f_name', 'like', "%{$search}%")
-                  ->orWhere('l_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                ->orWhere('l_name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        // Experience filter — apply to sitterProfile
+        // Experience filter
         if ($experience !== 'all') {
             $query->whereHas('sitterProfile', function ($q) use ($experience) {
                 match ($experience) {
@@ -61,7 +69,7 @@ class SitterVerificationController extends Controller
         }
 
         // Sort
-        $query->orderBy('sitter_applied_at', $dateSort === 'oldest' ? 'asc' : 'desc');
+        $query->orderByRaw('COALESCE(sitter_applied_at, updated_at) ' . ($dateSort === 'oldest' ? 'asc' : 'desc'));
 
         $applicants = $query->paginate(10)->withQueryString();
 
@@ -69,10 +77,14 @@ class SitterVerificationController extends Controller
         // STATS
         // ==========================================
         $stats = [
-            'pending'  => User::where('is_sitter', true)->where('sitter_status', 'pending')->count(),
-            'approved' => User::where('is_sitter', true)->where('sitter_status', 'approved')->count(),
-            'rejected' => User::where('is_sitter', true)->where('sitter_status', 'rejected')->count(),
-            'total'    => User::where('is_sitter', true)->count(),
+            'pending'  => User::whereHas('sitterProfile')
+                            ->where(function ($q) {
+                                $q->where('sitter_status', 'pending')
+                                ->orWhereNull('sitter_status');
+                            })->count(),
+            'approved' => User::where('sitter_status', 'approved')->count(),
+            'rejected' => User::where('sitter_status', 'rejected')->count(),
+            'total'    => User::whereHas('sitterProfile')->count(),
         ];
 
         // ==========================================
@@ -81,18 +93,24 @@ class SitterVerificationController extends Controller
         $applicantsData = $applicants->map(function ($user) {
             $profile = $user->sitterProfile;
 
-            // documents — single certificates_path
+            // Documents — handle both string and array (JSON)
             $documents = [];
             if ($profile?->certificates_path) {
-                $ext = strtolower(pathinfo($profile->certificates_path, PATHINFO_EXTENSION));
-                $documents[] = [
-                    'name' => 'Sitter Certificate',
-                    'type' => strtoupper($ext ?: 'FILE'),
-                    'url'  => Storage::disk('public')->url($profile->certificates_path),
-                ];
+                $paths = is_array($profile->certificates_path)
+                    ? $profile->certificates_path
+                    : [$profile->certificates_path];
+
+                foreach ($paths as $index => $path) {
+                    if (!$path) continue;
+                    $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+                    $documents[] = [
+                        'name' => 'Sitter Certificate ' . ($index + 1),
+                        'type' => strtoupper($ext ?: 'FILE'),
+                        'url'  => Storage::disk('public')->url($path),
+                    ];
+                }
             }
 
-            // preferred_pet_types / sizes — probably JSON
             $petsAccepted = [];
             if ($profile?->preferred_pet_types) {
                 $decoded = is_array($profile->preferred_pet_types)
@@ -110,14 +128,27 @@ class SitterVerificationController extends Controller
                 'location'          => $user->location ?? 'N/A',
                 'registered_at'     => $user->created_at?->format('M d, Y') ?? 'N/A',
                 'applied_at'        => ($user->sitter_applied_at ?? $user->updated_at)?->format('M d, Y') ?? 'N/A',
-                'status'            => $user->sitter_status,
+                'status'            => $user->sitter_status ?? 'pending',
                 'profile_photo'     => $user->profile_photo,
 
-                // From sitter_profiles
                 'experience_years'  => $profile?->experience_years ?? 0,
                 'bio'               => $profile?->bio ?? '',
                 'base_rate'         => $profile?->base_rate ?? 0,
-                'sitter_type'       => $profile?->sitter_type ?? '1',
+                'sitter_type'       => $profile?->sitter_type ?? 'small_pets',
+                'sitter_type_label' => match($profile?->sitter_type) {
+                    'small_pets'  => 'Small Pets',
+                    'large_pets'  => 'Large Pets',
+                    'exotic_pets' => 'Exotic Pets',
+                    'all_pets'    => 'All Pets',
+                    default       => 'Small Pets',
+                },
+                'sitter_type_icon'  => match($profile?->sitter_type) {
+                    'small_pets'  => '🐱',
+                    'large_pets'  => '🐕',
+                    'exotic_pets' => '🦜',
+                    'all_pets'    => '🐾',
+                    default       => '🐱',
+                },
                 'food_preference'   => $profile?->food_preference ?? 'owner_provides',
                 'food_budget'       => $profile?->food_budget ?? 0,
                 'average_rating'    => $profile?->average_ratings ?? 3.0,
@@ -131,16 +162,14 @@ class SitterVerificationController extends Controller
                 'min_pets_capacity' => $profile?->min_pets_capacity,
                 'max_pets_capacity' => $profile?->max_pets_capacity,
 
-                // Computed via withCount
                 'completed_bookings'=> $user->completed_bookings_count ?? 0,
                 'cancelled_count'   => $user->cancelled_bookings_count ?? 0,
 
-                // Hindi pa supported — iwan 0 muna
                 'completed_visits'  => 0,
                 'missed_visits'     => 0,
                 'complaints_count'  => 0,
 
-                'services'          => [],   // walang services column — empty
+                'services'          => [],
                 'documents'         => $documents,
                 'admin_remarks'     => $user->admin_notes ?? '',
             ];
@@ -239,7 +268,7 @@ class SitterVerificationController extends Controller
     }
 
     // ==========================================
-    // DOWNLOAD — bundle certificates into ZIP
+    // DOWNLOAD — single file o ZIP bundle
     // ==========================================
     public function download($id)
     {
@@ -250,15 +279,48 @@ class SitterVerificationController extends Controller
             return back()->with('error', 'No documents found for this application.');
         }
 
-        $path = $profile->certificates_path;
+        $paths = is_array($profile->certificates_path)
+            ? $profile->certificates_path
+            : [$profile->certificates_path];
 
-        if (! Storage::disk('public')->exists($path)) {
+        // Filter existing files
+        $existingPaths = array_values(array_filter($paths, function ($path) {
+            return $path && Storage::disk('public')->exists($path);
+        }));
+
+        if (empty($existingPaths)) {
             return back()->with('error', 'File not found on storage.');
         }
 
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-        $downloadName = 'sitter_' . $user->id . '_certificate.' . $ext;
+        // Single file — download directly
+        if (count($existingPaths) === 1) {
+            $path = $existingPaths[0];
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+            $downloadName = 'sitter_' . $user->id . '_certificate.' . $ext;
 
-        return Storage::disk('public')->download($path, $downloadName);
+            return Storage::disk('public')->download($path, $downloadName);
+        }
+
+        // Multiple files — create ZIP
+        $zipFileName = 'sitter_' . $user->id . '_certificates_' . time() . '.zip';
+        $zipDir = storage_path('app/temp');
+
+        if (!file_exists($zipDir)) {
+            mkdir($zipDir, 0755, true);
+        }
+
+        $zipPath = $zipDir . '/' . $zipFileName;
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            foreach ($existingPaths as $index => $path) {
+                $fullPath = Storage::disk('public')->path($path);
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                $zip->addFile($fullPath, 'certificate_' . ($index + 1) . '.' . $ext);
+            }
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 }

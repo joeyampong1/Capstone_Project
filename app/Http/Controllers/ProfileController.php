@@ -31,17 +31,7 @@ class ProfileController extends Controller
         $user = $request->user();
         $validated = $request->validated();
 
-        if (! empty($validated['name']) && (empty($validated['f_name']) || empty($validated['l_name']))) {
-            $parts = preg_split('/\s+/', trim($validated['name']), 2);
-            $validated['f_name'] = $validated['f_name'] ?? ($parts[0] ?? '');
-            $validated['l_name'] = $validated['l_name'] ?? ($parts[1] ?? '');
-        }
-
-        if (! empty($validated['f_name']) || ! empty($validated['l_name'])) {
-            $validated['name'] = trim(($validated['f_name'] ?? '') . ' ' . ($validated['l_name'] ?? ''));
-        } elseif (! empty($validated['name'])) {
-            $validated['name'] = trim($validated['name']);
-        }
+        unset($validated['name']);
 
         $user->fill($validated);
 
@@ -470,17 +460,32 @@ class ProfileController extends Controller
         }
 
         $validated = $request->validate([
-            'rate_per_visit'   => 'nullable|numeric|min:0|max:99999',
-            'food_preference'  => 'nullable|in:owner_provides,sitter_provides,flexible',
+            'base_rate'        => 'nullable|numeric|min:0|max:99999',
+            'food_preference'  => 'nullable|in:owner_provides,sitter_provides,flexible,owner_provided,sitter_provided',
             'bio'              => 'nullable|string|max:2000',
-            'pet_types'        => 'nullable|string|max:255',
-            'can_provide_food' => 'nullable|boolean',
+            'sitter_type'      => 'nullable|in:small_pets,large_pets,exotic_pets,all_pets',
+            'preferred_pet_sizes' => 'nullable|array',
+            'preferred_pet_sizes.*' => 'in:small,medium,large,giant',
+            'min_pets_capacity' => 'nullable|integer|min:0|max:20',
+            'max_pets_capacity' => 'nullable|integer|min:1|max:20',
         ]);
 
-        // Handle can_provide_food checkbox (unchecked = not present in request)
-        $validated['can_provide_food'] = $request->boolean('can_provide_food');
+        // I-save sa sitterProfile — dili sa users table
+        $sitterProfile = $user->sitterProfile;
 
-        $user->update($validated);
+        if (!$sitterProfile) {
+            return back()->with('error', 'No sitter profile found.');
+        }
+
+        $sitterProfile->update([
+            'base_rate'         => $validated['base_rate'] ?? $sitterProfile->base_rate,
+            'food_preference'   => $validated['food_preference'] ?? $sitterProfile->food_preference,
+            'bio'               => $validated['bio'] ?? $sitterProfile->bio,
+            'sitter_type'       => $validated['sitter_type'] ?? $sitterProfile->sitter_type,
+            'preferred_pet_sizes' => $validated['preferred_pet_sizes'] ?? $sitterProfile->preferred_pet_sizes,
+            'min_pets_capacity' => $validated['min_pets_capacity'] ?? $sitterProfile->min_pets_capacity,
+            'max_pets_capacity' => $validated['max_pets_capacity'] ?? $sitterProfile->max_pets_capacity,
+        ]);
 
         return redirect()
             ->route('profile.edit')

@@ -9,18 +9,14 @@ class FindSitterController extends Controller
 {
     public function index()
     {
-        // ✅ PARA SA TESTING: I-include ang tanan sitters bisan 'pending' pa
-        // TODO: I-enable ang ->where('sitter_status', 'approved') kung naa nay admin panel
-        
+        // For testing: include all sitters even 'pending'
+        // TODO: Enable ->where('sitter_status', 'approved') once admin panel is ready
+
         $sitters = User::with('sitterProfile')
             ->where('is_sitter', true)
-            // ->where('sitter_status', 'approved')  // 🔒 I-uncomment kung naa nay admin
-            ->whereHas('sitterProfile')  // Siguroha nga naay sitter_profile record
+            // ->where('sitter_status', 'approved')
+            ->whereHas('sitterProfile')
             ->get();
-
-        // Debug: Check kung pila ka sitter ang nakuha
-        // Uncomment ang line sa ubos kung gusto nimo i-verify
-        // dd($sitters->count(), $sitters->pluck('sitter_status'));
 
         // Compute match percentage for each sitter
         $sitters = $sitters->map(function ($sitter) {
@@ -32,8 +28,8 @@ class FindSitterController extends Controller
     }
 
     /**
-     * Match algorithm – base sa rating, ID verified, experience, level
-     * Pwede nimo i-enhance later base sa location, food preference, etc.
+     * Match algorithm — based on rating, ID verification, experience, and sitter type.
+     * Can be enhanced later with location, food preference, etc.
      */
     private function computeMatch($sitter)
     {
@@ -55,9 +51,15 @@ class FindSitterController extends Controller
         $years = min($profile->experience_years ?? 0, 5);
         $score += ($years / 5) * 20;
 
-        // 4. Sitter Level (0-15 points)
-        $level = (int) ($profile->sitter_type ?? 1);
-        $score += ($level / 3) * 15;
+        // 4. Sitter Type (0-15 points) — category-based
+        $typeScore = match($profile->sitter_type) {
+            'small_pets'  => 8,    // Basic — small pets only
+            'large_pets'  => 10,   // Medium — large pets
+            'exotic_pets' => 12,   // Advanced — exotic pets
+            'all_pets'    => 15,   // Expert — all pets
+            default       => 5,    // Fallback
+        };
+        $score += $typeScore;
 
         // 5. Total Bookings (0-5 points, capped at 50 bookings)
         $bookings = min($profile->total_bookings ?? 0, 50);

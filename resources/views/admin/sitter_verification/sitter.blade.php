@@ -196,9 +196,28 @@
                                         </div>
                                     </td>
                                     <td class="py-2.5 sm:py-3 px-2 sm:px-4">
-                                        <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 whitespace-nowrap">
-                                            {{ $expYears }} {{ $expYears == 1 ? __('messages.sv_year') : __('messages.sv_years') }}
-                                        </span>
+                                        <div class="flex flex-wrap items-center gap-1.5">
+                                            {{-- Experience --}}
+                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 whitespace-nowrap">
+                                                {{ $expYears }} {{ $expYears == 1 ? __('messages.sv_year') : __('messages.sv_years') }}
+                                            </span>
+
+                                            {{-- Sitter Type Badge --}}
+                                            @php
+                                                $sitterType = $applicant->sitterProfile?->sitter_type ?? 'small_pets';
+                                                $typeBadge = match($sitterType) {
+                                                    'small_pets'  => ['icon' => '🐱', 'label' => 'Small',  'class' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'],
+                                                    'large_pets'  => ['icon' => '🐕', 'label' => 'Large',  'class' => 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'],
+                                                    'exotic_pets' => ['icon' => '🦜', 'label' => 'Exotic', 'class' => 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'],
+                                                    'all_pets'    => ['icon' => '🐾', 'label' => 'All',    'class' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'],
+                                                    default       => ['icon' => '🐱', 'label' => 'Small',  'class' => 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'],
+                                                };
+                                            @endphp
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold {{ $typeBadge['class'] }} whitespace-nowrap">
+                                                <span>{{ $typeBadge['icon'] }}</span>
+                                                {{ $typeBadge['label'] }}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td class="py-2.5 sm:py-3 px-2 sm:px-4 text-neutral-500 dark:text-neutral-400 whitespace-nowrap">
                                         {{ $applicant->updated_at?->format('M d, Y') }}

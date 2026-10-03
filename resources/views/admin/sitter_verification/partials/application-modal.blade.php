@@ -56,14 +56,30 @@
                     </div>
                 </div>
 
-                {{-- Experience --}}
+                {{-- Experience + Sitter Type --}}
                 <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
                     <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.sv_experience') }}</p>
                     <p class="font-black text-lg text-[#1B3B36] dark:text-white">
                         <span x-text="selected.experience_years"></span>
                         <span x-text="selected.experience_years == 1 ? '{{ __('messages.sv_year') }}' : '{{ __('messages.sv_years') }}'"></span>
                     </p>
-                    <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-2 leading-relaxed italic"
+
+                    {{-- Sitter Type Badge --}}
+                    <div class="mt-3 pt-3 border-t border-gray-200 dark:border-neutral-700">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-1.5">{{ __('messages.sv_sitter_type') }}</p>
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
+                              :class="{
+                                  'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400': selected.sitter_type === 'small_pets',
+                                  'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': selected.sitter_type === 'large_pets',
+                                  'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400': selected.sitter_type === 'exotic_pets',
+                                  'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400': selected.sitter_type === 'all_pets'
+                              }">
+                            <span x-text="selected.sitter_type_icon"></span>
+                            <span x-text="selected.sitter_type_label"></span>
+                        </span>
+                    </div>
+
+                    <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-3 leading-relaxed italic"
                        x-text="selected.bio ? '\"' + selected.bio + '\"' : '{{ __('messages.sv_no_bio') }}'"></p>
                 </div>
 

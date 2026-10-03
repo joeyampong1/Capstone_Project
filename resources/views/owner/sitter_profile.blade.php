@@ -7,9 +7,17 @@
         $rating = $profile->average_ratings ?? 0;
         $fullStars = floor($rating);
         $halfStar = ($rating - $fullStars) >= 0.5;
-        $level = (int) ($profile->sitter_type ?? 1);
 
-        // ✅ Fetch reviews via sitter_profile
+        // Sitter Type — category-based
+        $typeInfo = match($profile->sitter_type) {
+            'small_pets'  => ['bg' => 'bg-blue-100',   'text' => 'text-blue-700',   'icon' => '🐱', 'label' => 'Small Pets'],
+            'large_pets'  => ['bg' => 'bg-green-100',  'text' => 'text-green-700',  'icon' => '🐕', 'label' => 'Large Pets'],
+            'exotic_pets' => ['bg' => 'bg-purple-100', 'text' => 'text-purple-700', 'icon' => '🦜', 'label' => 'Exotic Pets'],
+            'all_pets'    => ['bg' => 'bg-amber-100',  'text' => 'text-amber-700',  'icon' => '🐾', 'label' => 'All Pets'],
+            default       => ['bg' => 'bg-neutral-100','text' => 'text-neutral-700','icon' => '🐱', 'label' => 'Small Pets'],
+        };
+
+        // Fetch reviews via sitter_profile
         $reviews = \App\Models\Review::with(['reviewer', 'booking'])
             ->where('sitter_id', $profile?->id)
             ->orderByDesc('created_at')
@@ -18,15 +26,22 @@
         $reviewsCount = $reviews->count();
         $commentsCount = $sitter->comments ? $sitter->comments->count() : 0;
 
+        // Food arrangement — support both old and new enum values
         $foodLabel = match($profile->food_preference ?? '') {
-            'owner_provides' => __('messages.sp_food_owner'),
-            'sitter_provides' => __('messages.sp_food_sitter'),
-            'flexible' => __('messages.sp_food_flexible'),
-            default => __('messages.sp_food_not_set_short'),
+            'owner_provides', 'owner_provided'   => __('messages.sp_food_owner'),
+            'sitter_provides', 'sitter_provided' => __('messages.sp_food_sitter'),
+            'flexible'                            => __('messages.sp_food_flexible'),
+            default                               => __('messages.sp_food_not_set_short'),
         };
 
+        // Pet types — handle JSON string
         $petTypeIds = $profile->preferred_pet_types ?? [];
-        $petTypeNames = \App\Models\PetType::whereIn('id', $petTypeIds)->pluck('name')->toArray();
+        if (is_string($petTypeIds)) {
+            $petTypeIds = json_decode($petTypeIds, true) ?? [];
+        }
+        $petTypeNames = !empty($petTypeIds)
+            ? \App\Models\PetType::whereIn('id', $petTypeIds)->pluck('name')->toArray()
+            : [];
         $petsLabel = !empty($petTypeNames) ? strtolower(implode(', ', $petTypeNames)) : __('messages.sp_pets_not_specified');
 
         $availableDatesCount = \App\Models\Availability::where('sitter_id', $sitter->id)
@@ -77,8 +92,9 @@
                                 {{ __('messages.sp_id_verified') }}
                             </span>
                         @endif
-                        <span class="flex items-center gap-1 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-                            ST {{ $level }}
+                        <span class="{{ $typeInfo['bg'] }} {{ $typeInfo['text'] }} text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <span>{{ $typeInfo['icon'] }}</span>
+                            {{ $typeInfo['label'] }}
                         </span>
                     </div>
                 </div>
