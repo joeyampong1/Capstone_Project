@@ -296,20 +296,22 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('mypets', PetController::class);
 
     // ============================================================
-    // BOOKINGS (Owner + Sitter)
+    // BOOKINGS (Owner + Sitter) — requires verified ID
     // ============================================================
-    Route::get('/mybookings', [BookingController::class, 'index'])->name('mybookings.index');
-    Route::get('/mybookings/create', [BookingController::class, 'create'])->name('mybookings.create');
-    Route::post('/mybookings', [BookingController::class, 'store'])->name('mybookings.store');
-    Route::get('/mybookings/{booking}', [BookingController::class, 'show'])->name('mybookings.show');
+    Route::middleware(['id.verified'])->group(function () {
+        Route::get('/mybookings', [BookingController::class, 'index'])->name('mybookings.index');
+        Route::get('/mybookings/create', [BookingController::class, 'create'])->name('mybookings.create');
+        Route::post('/mybookings', [BookingController::class, 'store'])->name('mybookings.store');
+        Route::get('/mybookings/{booking}', [BookingController::class, 'show'])->name('mybookings.show');
 
-    // Booking actions (Sitter)
-    Route::post('/bookings/{booking}/accept', [BookingController::class, 'accept'])->name('bookings.accept');
-    Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject'])->name('bookings.reject');
-    Route::post('/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('bookings.complete');
+        // Booking actions (Sitter)
+        Route::post('/bookings/{booking}/accept', [BookingController::class, 'accept'])->name('bookings.accept');
+        Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject'])->name('bookings.reject');
+        Route::post('/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('bookings.complete');
 
-    // Booking actions (Owner)
-    Route::post('/mybookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('mybookings.cancel');
+        // Booking actions (Owner)
+        Route::post('/mybookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('mybookings.cancel');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -352,11 +354,12 @@ Route::middleware(['auth'])->group(function () {
     //     return view('sitters.sitter_payment_index');
     // })->name('sitter.payments');
 
-    // ---------- SITTER APPLICATION ----------
-    Route::get('/sitter/apply', [ApplicationController::class, 'create'])->name('sitter.application');
-    Route::post('/sitter/apply', [ApplicationController::class, 'store'])->name('sitter.application.store');
-    Route::put('/sitter/apply', [ApplicationController::class, 'update'])->name('sitter.application.update');
-
+// ---------- SITTER APPLICATION (requires verified ID) ----------
+    Route::middleware(['id.verified'])->group(function () {
+        Route::get('/sitter/apply', [ApplicationController::class, 'create'])->name('sitter.application');
+        Route::post('/sitter/apply', [ApplicationController::class, 'store'])->name('sitter.application.store');
+        Route::put('/sitter/apply', [ApplicationController::class, 'update'])->name('sitter.application.update');
+    });
 
     /*
     |--------------------------------------------------------------------------
@@ -368,7 +371,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/sitter/{id}', [SitterProfileController::class, 'show'])->name('owner.sitter.profile');
 
     // Sitter profile actions
-    Route::get('/sitter/{id}/book', [BookingController::class, 'create'])->name('owner.book');
+    Route::get('/sitter/{id}/book', [BookingController::class, 'create'])
+        ->middleware(['id.verified'])
+        ->name('owner.book');
 
     // Community Chat / Comments
     Route::post('/sitter/{id}/comment', [CommentController::class, 'store'])->name('sitter.comment.store');

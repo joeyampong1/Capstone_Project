@@ -200,7 +200,7 @@
                 <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-800 p-4 sm:p-5 hover:shadow-md transition">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-sm font-black text-[#1B3B36] dark:text-white">{{ __('messages.sd_recent_payments') }}</h3>
-                        <a href="{{ route('sitter.payments') }}" class="text-xs text-primary font-semibold hover:underline">{{ __('messages.sd_view_all') }}</a>
+                        {{-- <a href="{{ route('sitter.payments') }}" class="text-xs text-primary font-semibold hover:underline">{{ __('messages.sd_view_all') }}</a> --}}
                     </div>
 
                     @if($recentPayments->count() > 0)
