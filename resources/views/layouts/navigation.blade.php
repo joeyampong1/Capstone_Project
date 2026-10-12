@@ -337,7 +337,7 @@
                                         @endphp
 
                                         @if($user && $user->profile_photo && file_exists(public_path('storage/' . $user->profile_photo)))
-                                            <img src="{{ asset('storage/' . $user->profile_photo) }}" 
+                                            <img src="{{ $user->profile_photo_url }}" 
                                                 alt="{{ $user->f_name ?? $displayName }}" 
                                                 class="w-8 h-8 rounded-full object-cover border-2 border-primary/20 shrink-0">
                                         @else

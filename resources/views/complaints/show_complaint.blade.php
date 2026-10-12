@@ -117,7 +117,7 @@
                         </p>
                         <div class="flex items-center gap-3">
                             @if($complainant && $complainant->profile_photo && file_exists(public_path('storage/' . $complainant->profile_photo)))
-                                <img src="{{ asset('storage/' . $complainant->profile_photo) }}"
+                                <img src="{{ $complainant->profile_photo_url }}"
                                      alt="{{ $complainantName }}"
                                      class="w-10 h-10 rounded-full object-cover border border-primary/20 shrink-0">
                             @else
@@ -139,7 +139,7 @@
                         </p>
                         <div class="flex items-center gap-3">
                             @if($respondent && $respondent->profile_photo && file_exists(public_path('storage/' . $respondent->profile_photo)))
-                                <img src="{{ asset('storage/' . $respondent->profile_photo) }}"
+                                <img src="{{ $respondent->profile_photo_url }}"
                                      alt="{{ $respondentName }}"
                                      class="w-10 h-10 rounded-full object-cover border border-red-300 dark:border-red-800 shrink-0">
                             @else
@@ -208,7 +208,7 @@
                         @foreach($evidencePaths as $idx => $path)
                             @php
                                 $type = $getFileType($path);
-                                $url = asset('storage/' . $path);
+                                $url = str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
                             @endphp
 
                             @if($type === 'image')

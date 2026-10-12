@@ -92,7 +92,7 @@
             <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-5 mb-4 sm:mb-6">
                 <div class="flex items-center gap-4">
                     @if($counterpart->profile_photo && file_exists(public_path('storage/' . $counterpart->profile_photo)))
-                        <img src="{{ asset('storage/' . $counterpart->profile_photo) }}"
+                        <img src="{{ $counterpart->profile_photo_url }}"
                              alt="{{ $cpName }}"
                              class="w-14 h-14 rounded-full object-cover border-2 border-primary/20 shrink-0">
                     @else
@@ -318,10 +318,10 @@
 
                                 @if($visit->photo_proof_path)
                                     <div class="shrink-0">
-                                        <img src="{{ asset('storage/' . $visit->photo_proof_path) }}"
+                                        <img src="{{ $visit->photo_proof_urls[0] ?? '' }}"
                                              alt="Visit photo"
                                              class="w-12 h-12 rounded-lg object-cover border border-gray-200 dark:border-neutral-700 cursor-pointer"
-                                             onclick="window.open('{{ asset('storage/' . $visit->photo_proof_path) }}', '_blank')">
+                                             onclick="window.open('{{ $visit->photo_proof_urls[0] ?? '' }}', '_blank')">
                                     </div>
                                 @endif
                             </div>

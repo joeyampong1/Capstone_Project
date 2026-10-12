@@ -54,7 +54,7 @@
                 'special_needs'        => $pet->special_needs,
                 'medical_conditions'   => $pet->medical_conditions,
                 'dietary_restrictions' => $pet->dietary_restrictions,
-                'photo_url'            => $hasPhoto ? asset('storage/' . $pet->photo_path) : null,
+                'photo_url'            => $pet->photo_url,
                 'emoji'                => $emoji,
             ];
         })->values();
@@ -96,7 +96,7 @@
                         {{-- Photo / Emoji banner --}}
                         <div class="relative h-36 sm:h-40 bg-gradient-to-r from-primary-100/30 to-accent-100/30 dark:from-primary-900/20 dark:to-accent-900/20">
                             @if($hasPhoto)
-                                <img src="{{ asset('storage/' . $pet->photo_path) }}"
+                                <img src="{{ $pet->photo_url }}"
                                      alt="{{ $pet->name }}"
                                      class="w-full h-full object-cover">
                             @else

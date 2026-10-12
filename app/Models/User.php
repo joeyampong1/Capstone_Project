@@ -57,10 +57,15 @@ class User extends Authenticatable
         // PROFILE & VERIFICATION                    //
         // ========================================== //
         'profile_photo',
+        'profile_photo_public_id',
+        'cover_photo',
+        'cover_photo_public_id',
         'gov_id_path',
+        'gov_id_public_id',
         'id_validation_status',
         'id_type',
         'selfie_photo',
+        'selfie_photo_public_id',
         'admin_notes',
         'id_reviewed_by',
         'id_reviewed_at',
@@ -200,23 +205,27 @@ class User extends Authenticatable
     }
 
     /**
-     * Government ID image URL for admin modal
+     * Government ID image URL — auto-detects Cloudinary vs local.
      */
     public function getGovIdUrlAttribute(): ?string
     {
-        return $this->gov_id_path
-            ? \Illuminate\Support\Facades\Storage::url($this->gov_id_path)
-            : null;
+        return $this->resolveImageUrl($this->gov_id_path);
     }
 
     /**
-     * Selfie image URL for admin modal
+     * Selfie image URL — auto-detects Cloudinary vs local.
      */
     public function getSelfieUrlAttribute(): ?string
     {
-        return $this->selfie_photo
-            ? \Illuminate\Support\Facades\Storage::url($this->selfie_photo)
-            : null;
+        return $this->resolveImageUrl($this->selfie_photo);
+    }
+
+    /**
+     * Cover photo URL — auto-detects Cloudinary vs local.
+     */
+    public function getCoverPhotoUrlAttribute(): ?string
+    {
+        return $this->resolveImageUrl($this->cover_photo);
     }
 
     // ========================================== //
@@ -270,14 +279,39 @@ class User extends Authenticatable
      * Get profile photo URL or avatar fallback
      */
 
+    /**
+     * Profile photo URL — auto-detects Cloudinary vs local.
+     * Falls back to ui-avatars.com if no photo.
+     */
     public function getProfilePhotoUrlAttribute(): string
     {
-        if ($this->profile_photo) {
-            return asset('storage/' . $this->profile_photo);
+        $url = $this->resolveImageUrl($this->profile_photo);
+
+        if ($url) return $url;
+
+        // Fallback: initials avatar
+        $nameToUse = $this->f_name ?? $this->email ?? 'User';
+        return 'https://ui-avatars.com/api/?name=' . urlencode($nameToUse) . '&background=f07a3a&color=fff&size=100';
+    }
+
+    /**
+     * Resolve image URL — Cloudinary (http) or local storage.
+     */
+    private function resolveImageUrl(?string $path): ?string
+    {
+        if (!$path) return null;
+
+        // Cloudinary or any external URL
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
         }
 
-        $nameToUse = $this->f_name ?? $this->email;
-        return 'https://ui-avatars.com/api/?name=' . urlencode($nameToUse) . '&background=f07a3a&color=fff&size=100';
+        // Local storage fallback
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            return asset('storage/' . $path);
+        }
+
+        return null;
     }
 
     /**

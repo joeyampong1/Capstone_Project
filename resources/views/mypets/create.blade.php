@@ -195,12 +195,11 @@
                             <select id="temperament" name="temperament"
                                     class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
                                 <option value="">{{ __('messages.mp_select_temperament') }}</option>
-                                <option value="calm"        @selected(old('temperament') === 'calm')>{{ __('messages.mp_temp_calm') }}</option>
-                                <option value="friendly"    @selected(old('temperament') === 'friendly')>{{ __('messages.mp_temp_friendly') }}</option>
-                                <option value="playful"     @selected(old('temperament') === 'playful')>{{ __('messages.mp_temp_playful') }}</option>
-                                <option value="energetic"   @selected(old('temperament') === 'energetic')>{{ __('messages.mp_temp_energetic') }}</option>
-                                <option value="shy"         @selected(old('temperament') === 'shy')>{{ __('messages.mp_temp_shy') }}</option>
-                                <option value="independent" @selected(old('temperament') === 'independent')>{{ __('messages.mp_temp_independent') }}</option>
+                                <option value="friendly"   @selected(old('temperament') === 'friendly')>{{ __('messages.mp_temp_friendly') }}</option>
+                                <option value="playful"    @selected(old('temperament') === 'playful')>{{ __('messages.mp_temp_playful') }}</option>
+                                <option value="shy"        @selected(old('temperament') === 'shy')>{{ __('messages.mp_temp_shy') }}</option>
+                                <option value="aggressive" @selected(old('temperament') === 'aggressive')>{{ __('messages.mp_temp_aggressive') }}</option>
+                                <option value="anxious"    @selected(old('temperament') === 'anxious')>{{ __('messages.mp_temp_anxious') }}</option>
                             </select>
                         </div>
                     </div>
@@ -311,6 +310,19 @@
                                 <option value="wet_food"     @selected(old('dietary_restrictions') === 'wet_food')>{{ __('messages.mp_diet_wet') }}</option>
                                 <option value="raw"          @selected(old('dietary_restrictions') === 'raw')>{{ __('messages.mp_diet_raw') }}</option>
                                 <option value="prescription" @selected(old('dietary_restrictions') === 'prescription')>{{ __('messages.mp_diet_prescription') }}</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="vaccination_status" class="block text-sm font-bold text-[#1B3B36] dark:text-white mb-1.5">
+                                {{ __('messages.mp_vaccination') }} <span class="text-red-500">*</span>
+                            </label>
+                            <select id="vaccination_status" name="vaccination_status"
+                                    class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                                <option value="">{{ __('messages.mp_select_vaccination') }}</option>
+                                <option value="complete" @selected(old('vaccination_status') === 'complete')>{{ __('messages.mp_vax_complete') }}</option>
+                                <option value="partial"  @selected(old('vaccination_status') === 'partial')>{{ __('messages.mp_vax_partial') }}</option>
+                                <option value="none"     @selected(old('vaccination_status') === 'none')>{{ __('messages.mp_vax_none') }}</option>
                             </select>
                         </div>
                     </div>

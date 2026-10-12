@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\CloudinaryService;
 use App\Services\OcrService;
 use App\Services\FaceMatchService;
 use Illuminate\Http\RedirectResponse;
@@ -13,6 +15,10 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    public function __construct(
+        private CloudinaryService $cloudinary
+    ) {}
+
     /**
      * Display the user's profile form.
      */
@@ -66,24 +72,83 @@ class ProfileController extends Controller
     }
 
     // ========================================== //
-    // Update Profile Photo                       //
+    // Update Profile Photo (Avatar) — Cloudinary //
     // ========================================== //
     public function updatePhoto(Request $request)
     {
         $request->validate([
-            'profile_photo' => 'required|image|max:2048', // Max 2MB
+            'profile_photo' => 'required|image|max:5120', // 5MB
         ]);
 
         $user = $request->user();
 
-        // Delete old photo if exists
-        if ($user->profile_photo) {
-            Storage::disk('public')->delete($user->profile_photo);
+        // Delete old photo (Cloudinary or local)
+        $this->deleteOldImage($user->profile_photo, $user->profile_photo_public_id);
+
+        // Upload to Cloudinary
+        $upload = $this->cloudinary->upload(
+            $request->file('profile_photo'),
+            'avatars',
+            [
+                'transformation' => [
+                    'width'   => 400,
+                    'height'  => 400,
+                    'crop'    => 'fill',
+                    'gravity' => 'face',
+                ],
+            ]
+        );
+
+        if (!$upload['success']) {
+            return response()->json([
+                'success' => false,
+                'error'   => $upload['error'] ?? 'Upload failed',
+            ], 500);
         }
 
-        // Store new photo
-        $path = $request->file('profile_photo')->store('profile-photos', 'public');
-        $user->profile_photo = $path;
+        $user->profile_photo           = $upload['url'];
+        $user->profile_photo_public_id = $upload['public_id'];
+        $user->save();
+
+        return response()->json(['success' => true]);
+    }
+
+    // ========================================== //
+    // Update Cover Photo — Cloudinary            //
+    // ========================================== //
+    public function updateCover(Request $request)
+    {
+        $request->validate([
+            'cover_photo' => 'required|image|max:5120',
+        ]);
+
+        $user = $request->user();
+
+        // Delete old cover (Cloudinary or local)
+        $this->deleteOldImage($user->cover_photo, $user->cover_photo_public_id);
+
+        // Upload to Cloudinary
+        $upload = $this->cloudinary->upload(
+            $request->file('cover_photo'),
+            'covers',
+            [
+                'transformation' => [
+                    'width'  => 1600,
+                    'height' => 400,
+                    'crop'   => 'fill',
+                ],
+            ]
+        );
+
+        if (!$upload['success']) {
+            return response()->json([
+                'success' => false,
+                'error'   => $upload['error'] ?? 'Upload failed',
+            ], 500);
+        }
+
+        $user->cover_photo           = $upload['url'];
+        $user->cover_photo_public_id = $upload['public_id'];
         $user->save();
 
         return response()->json(['success' => true]);
@@ -106,6 +171,9 @@ class ProfileController extends Controller
         return redirect()->route('profile.edit')->with('status', 'location-updated');
     }
 
+    // ========================================== //
+    // ID Verification — Cloudinary + OCR + Face  //
+    // ========================================== //
     public function updateId(Request $request, OcrService $ocr, FaceMatchService $faceMatch)
     {
         $user   = $request->user();
@@ -125,152 +193,80 @@ class ProfileController extends Controller
         // Step 2: Upload ID image + Run OCR
         // ==========================================
         if ($action === 'upload_id') {
-            // ------------------------------------------------------------
-            // REQUEST DEBUG
-            // ------------------------------------------------------------
             \Log::info('=== upload_id START ===', [
-                'user_id'   => $user->id,
-                'has_file'  => $request->hasFile('gov_id_path'),
-                'files'     => array_keys($request->allFiles()),
-                'input'     => array_keys($request->all()),
-                'action'    => $request->input('action'),
-                'id_type'   => $request->input('id_type'),
+                'user_id'  => $user->id,
+                'has_file' => $request->hasFile('gov_id_path'),
+                'id_type'  => $request->input('id_type'),
             ]);
 
-            // ------------------------------------------------------------
-            // VALIDATION
-            // ------------------------------------------------------------
+            // Validation
             $validator = \Validator::make($request->all(), [
                 'gov_id_path' => 'required|file|mimes:jpg,jpeg,png|max:5120',
                 'id_type'     => 'nullable|string|max:50',
             ]);
 
             if ($validator->fails()) {
-                \Log::error('=== VALIDATION FAILED ===', [
-                    'errors' => $validator->errors()->toArray(),
-                ]);
-
-                return back()
-                    ->withErrors($validator)
-                    ->withInput();
+                return back()->withErrors($validator)->withInput();
             }
 
-            \Log::info('Validation passed');
-
-            // ------------------------------------------------------------
-            // SAVE ID TYPE (kung gi-submit)
-            // ------------------------------------------------------------
+            // Save ID type kung gi-submit
             if ($request->filled('id_type')) {
                 $user->id_type = $request->input('id_type');
-                \Log::info('ID type saved', ['id_type' => $user->id_type]);
             }
 
-            // ------------------------------------------------------------
-            // DELETE OLD FILE
-            // ------------------------------------------------------------
-            if ($user->gov_id_path) {
-                \Log::info('Deleting old file', ['old_path' => $user->gov_id_path]);
+            // Delete old ID (Cloudinary o local)
+            $this->deleteOldImage($user->gov_id_path, $user->gov_id_public_id);
 
-                if (Storage::disk('public')->exists($user->gov_id_path)) {
-                    Storage::disk('public')->delete($user->gov_id_path);
-                    \Log::info('Old file deleted');
-                } else {
-                    \Log::warning('Old file not found on disk', ['path' => $user->gov_id_path]);
-                }
+            // Upload new ID to Cloudinary
+            $upload = $this->cloudinary->upload($request->file('gov_id_path'), 'ids');
+
+            if (!$upload['success']) {
+                \Log::error('Cloudinary ID upload failed', ['error' => $upload['error']]);
+                return back()->withErrors(['gov_id_path' => 'Upload failed: ' . $upload['error']]);
             }
 
-            // ------------------------------------------------------------
-            // STORE NEW FILE
-            // ------------------------------------------------------------
-            try {
-                $path = $request->file('gov_id_path')->store('ids', 'public');
-            } catch (\Exception $e) {
-                \Log::error('=== FILE STORE FAILED ===', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
+            $user->gov_id_path      = $upload['url'];
+            $user->gov_id_public_id = $upload['public_id'];
 
-                return back()->withErrors(['gov_id_path' => 'Failed to store file: ' . $e->getMessage()]);
-            }
-
-            $user->gov_id_path = $path;
-
-            $absolutePath = storage_path("app/public/{$path}");
-
-            \Log::info('File stored', [
-                'path'         => $path,
-                'absolute'     => $absolutePath,
-                'exists'       => file_exists($absolutePath),
-                'size'         => file_exists($absolutePath) ? filesize($absolutePath) : 0,
-                'mime'         => file_exists($absolutePath) ? mime_content_type($absolutePath) : 'unknown',
+            \Log::info('ID uploaded to Cloudinary', [
+                'url'       => $upload['url'],
+                'public_id' => $upload['public_id'],
             ]);
 
             // ------------------------------------------------------------
-            // RUN OCR
+            // RUN OCR — save temp local file for OCR service
             // ------------------------------------------------------------
-            \Log::info('Starting OCR...');
-
             try {
-                $ocrResult = $ocr->extractIdDetails($path);
+                $localTempPath = $request->file('gov_id_path')->getRealPath();
+                $tempStoragePath = 'temp/' . uniqid() . '.jpg';
+
+                Storage::disk('public')->put($tempStoragePath, file_get_contents($localTempPath));
+
+                $ocrResult = $ocr->extractIdDetails($tempStoragePath);
 
                 \Log::info('=== OCR COMPLETED ===', [
-                    'success'    => $ocrResult['success'] ?? false,
-                    'error'      => $ocrResult['error'] ?? null,
-                    'name'       => $ocrResult['name'] ?? null,
-                    'id_number'  => $ocrResult['id_number'] ?? null,
-                    'dob'        => $ocrResult['dob'] ?? null,
-                    'raw_length' => isset($ocrResult['raw_text']) ? strlen($ocrResult['raw_text']) : 0,
+                    'success'   => $ocrResult['success'] ?? false,
+                    'name'      => $ocrResult['name'] ?? null,
+                    'id_number' => $ocrResult['id_number'] ?? null,
+                    'dob'       => $ocrResult['dob'] ?? null,
                 ]);
 
                 $user->ocr_result = $ocrResult;
 
+                // Cleanup temp file
+                Storage::disk('public')->delete($tempStoragePath);
             } catch (\Exception $e) {
-                \Log::error('=== OCR EXCEPTION ===', [
+                \Log::error('OCR exception', [
                     'message' => $e->getMessage(),
-                    'file'    => $e->getFile(),
-                    'line'    => $e->getLine(),
                     'trace'   => $e->getTraceAsString(),
                 ]);
-
                 $user->ocr_result = [
                     'success' => false,
-                    'error'   => 'OCR service unavailable: ' . $e->getMessage(),
-                ];
-            } catch (\Throwable $e) {
-                \Log::error('=== OCR FATAL ERROR ===', [
-                    'message' => $e->getMessage(),
-                    'file'    => $e->getFile(),
-                    'line'    => $e->getLine(),
-                    'trace'   => $e->getTraceAsString(),
-                ]);
-
-                $user->ocr_result = [
-                    'success' => false,
-                    'error'   => 'Fatal error: ' . $e->getMessage(),
+                    'error'   => 'OCR failed: ' . $e->getMessage(),
                 ];
             }
 
-            // ------------------------------------------------------------
-            // SAVE USER
-            // ------------------------------------------------------------
-            try {
-                $user->save();
-
-                \Log::info('=== USER SAVED ===', [
-                    'user_id'     => $user->id,
-                    'gov_id_path' => $user->gov_id_path,
-                    'id_type'     => $user->id_type,
-                    'ocr_success' => $user->ocr_result['success'] ?? false,
-                ]);
-
-            } catch (\Exception $e) {
-                \Log::error('=== USER SAVE FAILED ===', [
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString(),
-                ]);
-
-                return back()->withErrors(['error' => 'Failed to save user data.']);
-            }
+            $user->save();
 
             \Log::info('=== upload_id END ===');
 
@@ -278,18 +274,24 @@ class ProfileController extends Controller
         }
 
         // ==========================================
-        // Step 3: Upload selfie
+        // Step 3: Upload Selfie — Cloudinary
         // ==========================================
         if ($action === 'upload_selfie') {
             $request->validate(['selfie_photo' => 'required|file|mimes:jpg,jpeg,png|max:5120']);
 
-            if ($user->selfie_photo) {
-                Storage::disk('public')->delete($user->selfie_photo);
+            // Delete old selfie
+            $this->deleteOldImage($user->selfie_photo, $user->selfie_photo_public_id);
+
+            // Upload to Cloudinary
+            $upload = $this->cloudinary->upload($request->file('selfie_photo'), 'selfies');
+
+            if (!$upload['success']) {
+                return back()->withErrors(['selfie_photo' => 'Upload failed: ' . $upload['error']]);
             }
 
-            $path = $request->file('selfie_photo')->store('selfies', 'public');
-            $user->selfie_photo = $path;
-            $user->id_validation_status = 'unverified';
+            $user->selfie_photo           = $upload['url'];
+            $user->selfie_photo_public_id = $upload['public_id'];
+            $user->id_validation_status   = 'unverified';
             $user->save();
 
             return redirect()->route('profile.edit')->with('status', 'id-updated');
@@ -299,9 +301,8 @@ class ProfileController extends Controller
         // Step 4: Submit for verification (face match)
         // ==========================================
         if ($action === 'submit_verification') {
-            // CHECK PROFILE COMPLETENESS
+            // Check profile completeness
             $missingFields = [];
-
             if (empty($user->f_name))         $missingFields[] = 'First Name';
             if (empty($user->l_name))         $missingFields[] = 'Last Name';
             if (empty($user->date_of_birth))  $missingFields[] = 'Date of Birth';
@@ -309,105 +310,90 @@ class ProfileController extends Controller
             if (empty($user->contact_number)) $missingFields[] = 'Contact Number';
             if (empty($user->address))        $missingFields[] = 'Address';
 
-            if (! empty($missingFields)) {
+            if (!empty($missingFields)) {
                 return back()->withErrors([
                     'error' => 'Please complete your profile first: ' . implode(', ', $missingFields),
                 ]);
             }
 
             // ------------------------------------------------------------
-            // RUN FACE MATCH
+            // RUN FACE MATCH — download selfie from Cloudinary to temp
             // ------------------------------------------------------------
-            $result = $faceMatch->verify($user->selfie_photo);
+            try {
+                $localSelfiePath = $this->downloadToTemp($user->selfie_photo);
 
-            if (! $result['success']) {
+                // FaceMatchService expects relative path on 'public' disk
+                // Move to storage temporarily
+                $tempStoragePath = 'temp/selfies/' . uniqid() . '.jpg';
+                Storage::disk('public')->put($tempStoragePath, file_get_contents($localSelfiePath));
+
+                $result = $faceMatch->verify($tempStoragePath);
+
+                // Cleanup
+                @unlink($localSelfiePath);
+                Storage::disk('public')->delete($tempStoragePath);
+            } catch (\Exception $e) {
+                \Log::error('Face match exception', ['error' => $e->getMessage()]);
+                return back()->withErrors([
+                    'selfie_photo' => 'Face verification failed: ' . $e->getMessage(),
+                ]);
+            }
+
+            if (!$result['success']) {
                 return back()->withErrors([
                     'selfie_photo' => 'Face verification failed: ' . ($result['error'] ?? 'unknown error'),
                 ]);
             }
 
-            // ------------------------------------------------------------
-            // STORE FACE MATCH RESULTS
-            // ------------------------------------------------------------
+            // Store face match results
             $user->face_match_score        = $result['confidence'];
             $user->face_detected_on_id     = true;
             $user->face_detected_on_selfie = true;
             $user->id_expired              = false;
 
-            // ------------------------------------------------------------
-            // NAME MATCH — compare OCR name vs user profile name
-            // ------------------------------------------------------------
+            // Name match
             $ocrName   = strtoupper($user->ocr_result['name'] ?? '');
             $userLast  = strtoupper($user->l_name ?? '');
             $userFirst = strtoupper($user->f_name ?? '');
 
             $nameMatch = false;
             if ($ocrName && ($userLast || $userFirst)) {
-                // Check kung naa ang last name o first name sa OCR text
-                if ($userLast && str_contains($ocrName, $userLast)) {
-                    $nameMatch = true;
-                } elseif ($userFirst && str_contains($ocrName, $userFirst)) {
-                    $nameMatch = true;
-                }
+                if ($userLast && str_contains($ocrName, $userLast))         $nameMatch = true;
+                elseif ($userFirst && str_contains($ocrName, $userFirst))   $nameMatch = true;
             }
             $user->name_match = $nameMatch ? 'matched' : 'not_matched';
 
-            \Log::info('=== NAME MATCH ===', [
-                'ocr_name'   => $ocrName,
-                'user_last'  => $userLast,
-                'user_first' => $userFirst,
-                'result'     => $user->name_match,
-            ]);
-
-            // ------------------------------------------------------------
-            // BIRTHDATE MATCH — compare OCR DOB vs user date_of_birth
-            // ------------------------------------------------------------
+            // Birthdate match
             $ocrDob  = $user->ocr_result['dob'] ?? null;
             $userDob = $user->date_of_birth ? $user->date_of_birth->format('Y/m/d') : null;
 
             $birthdateMatch = false;
             if ($ocrDob && $userDob) {
-                // Normalize format
                 $ocrDobNorm  = str_replace(['-', '.'], '/', $ocrDob);
                 $userDobNorm = str_replace(['-', '.'], '/', $userDob);
                 $birthdateMatch = ($ocrDobNorm === $userDobNorm);
             }
             $user->birthdate_match = ($ocrDob && $userDob) ? ($birthdateMatch ? 'matched' : 'not_matched') : null;
 
-            \Log::info('=== BIRTHDATE MATCH ===', [
-                'ocr_dob'  => $ocrDob,
-                'user_dob' => $userDob,
-                'result'   => $user->birthdate_match,
-            ]);
-
-            // ------------------------------------------------------------
-            // Placeholder for future features
-            // ------------------------------------------------------------
             $user->document_authenticity = null;
             $user->liveness_detection    = null;
 
-            // ------------------------------------------------------------
-            // HANDLE MATCH / NO MATCH
-            // ------------------------------------------------------------
-            if (! $result['match']) {
+            // Handle match / no match
+            if (!$result['match']) {
                 $user->id_validation_status = 'rejected';
                 $user->save();
-
                 return back()->withErrors([
                     'selfie_photo' => 'Face does not match the ID. Distance: ' . $result['distance'],
                 ]);
             }
 
-            // Match! Queue for admin review
             $user->id_validation_status = 'pending';
             $user->save();
 
             \Log::info('=== SUBMIT VERIFICATION ===', [
-                'user_id'        => $user->id,
-                'face_score'     => $user->face_match_score,
-                'name_match'     => $user->name_match,
-                'birthdate_match'=> $user->birthdate_match,
-                'status'         => $user->id_validation_status,
+                'user_id'   => $user->id,
+                'status'    => $user->id_validation_status,
+                'face_score'=> $user->face_match_score,
             ]);
 
             return redirect()->route('profile.edit')->with('status', 'submitted');
@@ -419,22 +405,15 @@ class ProfileController extends Controller
     // ========================================== //
     // Toggle Sitter Mode                         //
     // ========================================== //
-    /**
-     * Toggle Sitter Mode using the existing is_sitter boolean.
-     * Only available for approved sitters.
-     */
     public function toggleSitterMode()
     {
         $user = auth()->user();
 
-        // Only users who were approved as sitters can toggle
         if ($user->sitter_status !== 'approved') {
             return back()->with('error', 'Only approved pet sitters can toggle Sitter Mode.');
         }
 
-        $user->update([
-            'is_sitter' => ! $user->is_sitter,
-        ]);
+        $user->update(['is_sitter' => !$user->is_sitter]);
 
         return back()->with(
             'status',
@@ -447,10 +426,6 @@ class ProfileController extends Controller
     // ========================================== //
     // Update Sitter Settings                     //
     // ========================================== //
-    /**
-     * Update sitter-specific settings (rate, food preference, etc.)
-     * Only available for approved sitters.
-     */
     public function updateSitterSettings(Request $request)
     {
         $user = $request->user();
@@ -460,17 +435,16 @@ class ProfileController extends Controller
         }
 
         $validated = $request->validate([
-            'base_rate'        => 'nullable|numeric|min:0|max:99999',
-            'food_preference'  => 'nullable|in:owner_provides,sitter_provides,flexible,owner_provided,sitter_provided',
-            'bio'              => 'nullable|string|max:2000',
-            'sitter_type'      => 'nullable|in:small_pets,large_pets,exotic_pets,all_pets',
-            'preferred_pet_sizes' => 'nullable|array',
+            'base_rate'             => 'nullable|numeric|min:0|max:99999',
+            'food_preference'       => 'nullable|in:owner_provides,sitter_provides,flexible,owner_provided,sitter_provided',
+            'bio'                   => 'nullable|string|max:2000',
+            'sitter_type'           => 'nullable|in:small_pets,large_pets,exotic_pets,all_pets',
+            'preferred_pet_sizes'   => 'nullable|array',
             'preferred_pet_sizes.*' => 'in:small,medium,large,giant',
-            'min_pets_capacity' => 'nullable|integer|min:0|max:20',
-            'max_pets_capacity' => 'nullable|integer|min:1|max:20',
+            'min_pets_capacity'     => 'nullable|integer|min:0|max:20',
+            'max_pets_capacity'     => 'nullable|integer|min:1|max:20',
         ]);
 
-        // I-save sa sitterProfile — dili sa users table
         $sitterProfile = $user->sitterProfile;
 
         if (!$sitterProfile) {
@@ -478,18 +452,16 @@ class ProfileController extends Controller
         }
 
         $sitterProfile->update([
-            'base_rate'         => $validated['base_rate'] ?? $sitterProfile->base_rate,
-            'food_preference'   => $validated['food_preference'] ?? $sitterProfile->food_preference,
-            'bio'               => $validated['bio'] ?? $sitterProfile->bio,
-            'sitter_type'       => $validated['sitter_type'] ?? $sitterProfile->sitter_type,
+            'base_rate'           => $validated['base_rate'] ?? $sitterProfile->base_rate,
+            'food_preference'     => $validated['food_preference'] ?? $sitterProfile->food_preference,
+            'bio'                 => $validated['bio'] ?? $sitterProfile->bio,
+            'sitter_type'         => $validated['sitter_type'] ?? $sitterProfile->sitter_type,
             'preferred_pet_sizes' => $validated['preferred_pet_sizes'] ?? $sitterProfile->preferred_pet_sizes,
-            'min_pets_capacity' => $validated['min_pets_capacity'] ?? $sitterProfile->min_pets_capacity,
-            'max_pets_capacity' => $validated['max_pets_capacity'] ?? $sitterProfile->max_pets_capacity,
+            'min_pets_capacity'   => $validated['min_pets_capacity'] ?? $sitterProfile->min_pets_capacity,
+            'max_pets_capacity'   => $validated['max_pets_capacity'] ?? $sitterProfile->max_pets_capacity,
         ]);
 
-        return redirect()
-            ->route('profile.edit')
-            ->with('status', 'sitter-settings-updated');
+        return redirect()->route('profile.edit')->with('status', 'sitter-settings-updated');
     }
 
     /**
@@ -497,17 +469,11 @@ class ProfileController extends Controller
      */
     public function updateLanguage(Request $request)
     {
-        $request->validate([
-            'locale' => 'required|in:en,fil,es,fr',
-        ]);
+        $request->validate(['locale' => 'required|in:en,fil,es,fr']);
 
         $locale = $request->input('locale');
+        $request->user()->update(['locale' => $locale]);
 
-        $request->user()->update([
-            'locale' => $locale,
-        ]);
-
-        // Apply instantly for the current request
         app()->setLocale($locale);
         session(['locale' => $locale]);
 
@@ -516,5 +482,45 @@ class ProfileController extends Controller
             'locale'  => $locale,
             'message' => 'Language updated successfully.',
         ]);
+    }
+
+    // ========================================== //
+    // PRIVATE HELPERS                            //
+    // ========================================== //
+
+    /**
+     * Delete an image — Cloudinary (via public_id) or local storage.
+     */
+    private function deleteOldImage(?string $path, ?string $publicId): void
+    {
+        if (!$path) return;
+
+        // Cloudinary image
+        if (str_starts_with($path, 'http') && $publicId) {
+            $this->cloudinary->delete($publicId);
+            return;
+        }
+
+        // Local storage image
+        if (!str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
+    /**
+     * Download a remote URL to a local temp file.
+     * Used for Python scripts that need local paths.
+     */
+    private function downloadToTemp(string $url): string
+    {
+        $tempPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'petnanny_' . uniqid() . '.jpg';
+
+        $content = @file_get_contents($url);
+        if ($content === false) {
+            throw new \Exception('Failed to download image from ' . $url);
+        }
+
+        file_put_contents($tempPath, $content);
+        return $tempPath;
     }
 }

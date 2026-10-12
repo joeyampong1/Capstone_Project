@@ -25,7 +25,8 @@ class Visit extends Model
         'completed_tasks',
         'notes',
         'photo_proof_path',
-        'photo_proof_paths',      
+        'photo_proof_paths',
+        'photo_proof_public_ids',   // ← NEW (Cloudinary tracking)
         'photo_timestamp',
     ];
 
@@ -38,7 +39,8 @@ class Visit extends Model
         'check_out'                 => 'datetime',
         'photo_timestamp'           => 'datetime',
         'completed_tasks'           => 'array',
-        'photo_proof_paths'         => 'array',      
+        'photo_proof_paths'         => 'array',
+        'photo_proof_public_ids'    => 'array',   // ← NEW
         'lateness_minutes'          => 'integer',
         'duration_minutes'          => 'integer',
         'late_deduction_percentage' => 'decimal:2',
@@ -47,7 +49,6 @@ class Visit extends Model
     // ==========================================
     // RELATIONSHIPS
     // ==========================================
-
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);
@@ -56,7 +57,6 @@ class Visit extends Model
     // ==========================================
     // HELPERS
     // ==========================================
-
     public function isPending(): bool
     {
         return $this->status === 'pending';
@@ -80,7 +80,6 @@ class Visit extends Model
     // ==========================================
     // SCOPES
     // ==========================================
-
     public function scopeForSitter($query, int $sitterId)
     {
         return $query->whereHas('booking', fn($q) => $q->where('sitter_id', $sitterId));
@@ -102,9 +101,9 @@ class Visit extends Model
     }
 
     // ==========================================
-    // ACCESSOR — All photos (legacy + new)
+    // ACCESSOR — All raw photo paths (legacy + new)
+    // for delete/management logic (raw values).
     // ==========================================
-
     public function getAllPhotosAttribute(): array
     {
         $paths = $this->photo_proof_paths ?? [];
@@ -126,5 +125,27 @@ class Visit extends Model
         return count($this->all_photos) > 0;
     }
 
-    
+    // ==========================================
+    // ACCESSOR — Resolved photo URLs (Cloudinary o local)
+    // for BLADE display only.
+    // Returns: array of full URLs (https://res.cloudinary.com/... O asset('storage/...'))
+    // ==========================================
+    public function getPhotoProofUrlsAttribute(): array
+    {
+        return array_values(array_filter(array_map(function ($path) {
+            if (!$path) return null;
+
+            // Cloudinary or external URL
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+                return $path;
+            }
+
+            // Local storage fallback
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                return asset('storage/' . $path);
+            }
+
+            return null;
+        }, $this->all_photos)));
+    }
 }

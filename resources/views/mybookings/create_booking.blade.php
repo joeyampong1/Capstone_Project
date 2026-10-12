@@ -58,7 +58,7 @@
                         @endphp
                         <div class="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border-2 border-primary/30 bg-primary/5 dark:bg-primary/10">
                             @if($sitter->profile_photo && file_exists(public_path('storage/' . $sitter->profile_photo)))
-                                <img src="{{ asset('storage/' . $sitter->profile_photo) }}"
+                                <img src="{{ $sitter->profile_photo_url }}"
                                      alt="{{ $sitterFullName }}"
                                      class="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover border-2 border-primary/20 shrink-0">
                             @else

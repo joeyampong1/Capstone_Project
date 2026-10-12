@@ -152,7 +152,7 @@
                                     @if($visit->duration_minutes)
                                         <span>⏱️ {{ __('messages.otb_duration_min', ['min' => $visit->duration_minutes]) }}</span>
                                     @endif
-                                    @if($visit->photo_proof_path)
+                                    @if($visit->has_photos)
                                         <span class="text-green-600">📸 {{ __('messages.otb_photo_proof_uploaded') }}</span>
                                     @endif
                                     @if($visit->lateness_minutes > 0)
@@ -174,11 +174,19 @@
                                 @endif
 
                                 {{-- Photo thumbnail preview (kung naa) --}}
-                                @if($visit->photo_proof_path)
-                                    <div class="mt-3 flex gap-2">
-                                        <img src="{{ asset('storage/' . $visit->photo_proof_path) }}"
-                                             alt="Visit #{{ $visit->visit_number }}"
-                                             class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-neutral-700">
+                                @if($visit->has_photos)
+                                    <div class="mt-3 flex gap-2 flex-wrap">
+                                        @foreach(array_slice($visit->photo_proof_urls, 0, 3) as $url)
+                                            <img src="{{ $url }}"
+                                                alt="Visit #{{ $visit->visit_number }}"
+                                                class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-neutral-700">
+                                        @endforeach
+
+                                        @if(count($visit->photo_proof_urls) > 3)
+                                            <div class="w-16 h-16 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-xs font-bold text-neutral-500 dark:text-neutral-400">
+                                                +{{ count($visit->photo_proof_urls) - 3 }}
+                                            </div>
+                                        @endif
                                     </div>
                                 @endif
 

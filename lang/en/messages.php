@@ -1,11 +1,11 @@
 <?php
 
 return [
+
     'dashboard'         => 'Dashboard',
     'settings'          => 'Settings',
     'profile'           => 'Profile',
     'logout'            => 'Logout',
-
     'system_settings'   => 'System Settings',
     'system_settings_desc' => 'Manage your account preferences and system configurations',
     'preferences'       => 'Preferences',
@@ -19,19 +19,16 @@ return [
     'push_notifications_desc'  => 'Receive notifications on your device',
     'email_notifications_desc' => 'Receive updates via email',
     'sms_notifications_desc'   => 'Receive SMS updates for bookings',
-
     'small'             => 'Small',
     'default'           => 'Default',
     'large'             => 'Large',
     'extra_large'       => 'Extra Large',
-
     // ========================================== //
     // ADMIN DASHBOARD                             //
     // ========================================== //
     'admin_dashboard_title'        => 'Administrator Dashboard',
     'admin_dashboard_subtitle'     => 'Monitor the overall performance of the PetNanny platform',
     'admin_filter_label'           => 'Filter:',
-
     'admin_total_users'            => 'Total Users',
     'admin_all_accounts'           => 'All accounts',
     'admin_pet_owners'             => 'Pet Owners',
@@ -52,15 +49,12 @@ return [
     'admin_completed'              => 'Completed',
     'admin_new_sitters'            => 'New Sitters',
     'admin_this_month'             => 'This month',
-
     'admin_booking_trend'          => 'Booking Trend',
     'admin_last_7_months'          => 'Last 7 months',
     'admin_status_distribution'    => 'Booking Status Distribution',
-
     'admin_recent_activities'      => 'Recent Activities',
     'admin_view_all'               => 'View All',
     'admin_no_recent_activities'   => 'No recent activities',
-
     'admin_recent_booking_requests'=> 'Recent Booking Requests',
     'admin_col_id'                 => 'ID',
     'admin_col_pet_owner'          => 'Pet Owner',
@@ -68,22 +62,18 @@ return [
     'admin_col_action'             => 'Action',
     'admin_view'                   => 'View',
     'admin_no_bookings_yet'        => 'No bookings yet',
-
     'admin_pending_verification'   => 'Pending Verification',
     'admin_government_id'          => 'Government ID',
     'admin_approve'                => 'Approve',
     'admin_reject'                 => 'Reject',
     'admin_no_pending_verifications'=> 'No pending verifications',
-
     'admin_recent_complaints'      => 'Recent Complaints',
     'admin_review'                 => 'Review',
     'admin_no_recent_complaints'   => 'No recent complaints',
-
     'admin_quick_actions'          => 'Quick Actions',
     'admin_verify_sitter'          => 'Verify Sitter',
     'admin_users'                  => 'Users',
     'admin_reports'                => 'Reports',
-
     // Status labels
     'status_pending'               => 'Pending',
     'status_confirmed'             => 'Confirmed',
@@ -94,32 +84,27 @@ return [
     'status_under_review'          => 'Under Review',
     'status_resolved'              => 'Resolved',
     'status_dismissed'             => 'Dismissed',
-
     // Complaint types
     'complaint_missed_visit'       => 'Missed Visit',
     'complaint_poor_service'       => 'Poor Service',
     'complaint_no_proof'           => 'No Proof',
     'complaint_rude_behavior'      => 'Rude Behavior',
     'complaint_others'             => 'Others',
-
     // Activity text patterns
     'activity_submitted_id'              => ':name submitted ID Verification',
     'activity_filed_complaint'           => ':name filed a complaint against :target',
     'activity_booking_created'           => 'Booking :ref by :name',
     'activity_user_registered'           => ':name registered',
     'activity_sitter_approved'           => ':name approved as sitter',
-
     // Status labels
     'status_verified'                    => 'Verified',
     'status_accepted'                    => 'Accepted',
     'status_under_review_activity'       => 'Under Review',
-
     // ========================================== //
     // BOOKING MANAGEMENT (Admin)                  //
     // ========================================== //
     'booking_title'              => 'Booking Management',
     'booking_subtitle'           => 'Monitor and manage all bookings within the platform',
-
     'booking_total'              => 'Total Bookings',
     'booking_pending'            => 'Pending',
     'booking_active'             => 'Active',
@@ -129,13 +114,11 @@ return [
     'booking_awaiting'           => 'Awaiting',
     'booking_ongoing'            => 'Ongoing',
     'booking_finished'           => 'Finished',
-
     'booking_search_ph'          => 'Search booking...',
     'booking_all_status'         => 'All Status',
     'booking_all_owners'         => 'All Owners',
     'booking_all_sitters'        => 'All Sitters',
     'booking_reset'              => 'Reset',
-
     'booking_col_id'             => 'Booking ID',
     'booking_col_owner'          => 'Owner',
     'booking_col_sitter'         => 'Pet Sitter',
@@ -145,48 +128,38 @@ return [
     'booking_col_status'         => 'Status',
     'booking_col_action'         => 'Action',
     'booking_view'               => 'View',
-
     'booking_no_found'           => 'No bookings found.',
     'booking_no_match'           => 'No records match your filters on this page.',
-
-    'booking_showing'            => 'Showing :from–:to of :total bookings',
+    'booking_showing'            => 'Showing :from�:to of :total bookings',
     'booking_previous'           => 'Previous',
     'booking_next'               => 'Next',
-
     'booking_details'            => 'Booking Details',
     'booking_tab_details'        => 'Details',
     'booking_tab_visits'         => 'Visit Logs',
-
     'booking_info'               => 'Booking Information',
     'booking_date'               => 'Booking Date',
     'booking_visit_sched'        => 'Visit Schedule',
-
     'booking_owner_info'         => 'Owner Information',
     'booking_verified'           => 'Verified',
     'booking_phone'              => 'Phone:',
     'booking_email'              => 'Email:',
-
     'booking_sitter_info'        => 'Pet Sitter Information',
     'booking_verified_sitter'    => 'Verified Sitter',
     'booking_rating'             => 'Rating',
     'booking_completed_jobs'     => 'Completed Jobs',
-
     'booking_pet_info'           => 'Pet Information',
     'booking_pet_name'           => 'Name',
     'booking_pet_type'           => 'Type',
     'booking_pet_breed'          => 'Breed',
     'booking_pet_age'            => 'Age',
     'booking_pet_weight'         => 'Weight',
-
     'booking_services'           => 'Booking Services',
     'booking_no_services'        => 'No services listed.',
     'booking_no_visits'          => 'No visits scheduled.',
-
     'booking_summary'            => 'Summary',
     'booking_total_label'        => 'Total Booking',
     'booking_completed_visits'   => 'Completed Visits',
     'booking_remaining_visits'   => 'Remaining Visits',
-
     'booking_admin_actions'      => 'Admin Actions',
     'booking_view_owner'         => 'View Owner Profile',
     'booking_view_sitter'        => 'View Sitter Profile',
@@ -194,18 +167,14 @@ return [
     'booking_cancel'             => 'Cancel Booking',
     'booking_confirm_force'      => 'Force complete this booking? This will mark all visits as done.',
     'booking_confirm_cancel'     => 'Cancel this booking? Both owner and sitter will be notified.',
-
     'booking_no_visit_logs'      => 'No Visit Logs',
     'booking_visit_logs_hint'    => 'Visit logs will be displayed here.',
-
     'booking_guidelines'         => 'Booking Guidelines',
     'booking_guide_1'            => 'Monitor all booking activities.',
     'booking_guide_2'            => 'Track completed and missed visits.',
     'booking_guide_3'            => 'Investigate complaints when necessary.',
     'booking_guide_4'            => 'Cancel bookings only when required.',
-
     'booking_visit_label'        => 'Visit :n',
-
     // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
@@ -216,14 +185,12 @@ return [
     'analytics_range_month'      => 'Month',
     'analytics_range_year'       => 'Year',
     'analytics_refresh'          => 'Refresh',
-
     // KPI Cards
     'analytics_total_users'      => 'Total Users',
     'analytics_active_sitters'   => 'Active Sitters',
     'analytics_verified_pct'     => ':pct% verified',
     'analytics_growth_this'      => 'this :range',
     'analytics_complaints_pending'=> ':n pending',
-
     // Chart titles
     'analytics_booking_trend'    => 'Booking Trend',
     'analytics_last_n_months'    => 'Last :n months',
@@ -235,7 +202,6 @@ return [
     'analytics_complaint_dist'   => 'Complaint Distribution',
     'analytics_complaint_status' => 'Complaint Status',
     'analytics_no_complaint_data'=> 'No complaint data yet.',
-
     // Distribution labels
     'analytics_label_owners'     => 'Owners',
     'analytics_label_sitters'    => 'Pet Sitters',
@@ -249,7 +215,6 @@ return [
     'analytics_label_evening'    => 'Evening',
     'analytics_label_resolved'   => 'Resolved',
     'analytics_label_dismissed'  => 'Dismissed',
-
     // Tables
     'analytics_top_sitters'      => 'Top Performing Pet Sitters',
     'analytics_most_active_owners'=> 'Most Active Pet Owners',
@@ -262,23 +227,19 @@ return [
     'analytics_col_rate'         => 'Rate',
     'analytics_no_sitter_data'   => 'No sitter data yet.',
     'analytics_no_owner_data'    => 'No owner data yet.',
-
     // Sections
     'analytics_recent_activities'=> 'Recent Activities',
     'analytics_no_recent_acts'   => 'No recent activities.',
     'analytics_platform_health'  => 'Platform Health',
     'analytics_platform_insights'=> 'Platform Insights',
-
     // Footer
     'analytics_last_updated'     => 'Last Updated:',
     'analytics_auto_refresh'     => 'Auto-refresh every 5 minutes',
-
     // ========================================== //
     // COMPLAINTS MANAGEMENT (Admin)               //
     // ========================================== //
     'complaint_title'             => 'Complaints Management',
     'complaint_subtitle'          => 'Review, investigate, and resolve user complaints',
-
     'complaint_stat_total'        => 'Total',
     'complaint_stat_pending'      => 'Pending',
     'complaint_stat_under_review' => 'Under Review',
@@ -288,11 +249,9 @@ return [
     'complaint_label_awaiting'    => 'Awaiting',
     'complaint_label_investigating'=> 'Investigating',
     'complaint_label_completed'   => 'Completed',
-
     'complaint_search_ph'         => 'Search complaint...',
     'complaint_all_status'        => 'All Status',
     'complaint_all_types'         => 'All Types',
-
     'complaint_col_id'            => 'Complaint ID',
     'complaint_col_booking'       => 'Booking',
     'complaint_col_complainant'   => 'Complainant',
@@ -301,18 +260,14 @@ return [
     'complaint_col_status'        => 'Status',
     'complaint_col_submitted'     => 'Submitted',
     'complaint_col_action'        => 'Action',
-
     'complaint_review'            => 'Review',
     'complaint_view'              => 'View',
     'complaint_no_found'          => 'No complaints found.',
     'complaint_no_match'          => 'No records match your filters.',
-
-    'complaint_showing'           => 'Showing :from–:to of :total complaints',
-
+    'complaint_showing'           => 'Showing :from�:to of :total complaints',
     'complaint_details_title'     => 'Complaint Details',
     'complaint_tab_details'       => 'Details',
     'complaint_tab_activity'      => 'Activity',
-
     'complaint_info'              => 'Complaint Information',
     'complaint_users_involved'    => 'Users Involved',
     'complaint_view_profiles'     => 'View Profiles',
@@ -324,19 +279,16 @@ return [
     'complaint_no_description'    => 'No description provided.',
     'complaint_evidence'          => 'Evidence',
     'complaint_no_evidence'       => 'No evidence attached.',
-
     'complaint_admin_notes'       => 'Admin Notes',
     'complaint_notes_ph'          => 'Add investigation notes...',
     'complaint_resolution'        => 'Resolution',
     'complaint_resolution_ph'     => 'Enter resolution details...',
     'complaint_actions'           => 'Actions',
-
     'complaint_mark_review'       => 'Mark Under Review',
     'complaint_resolve'           => 'Resolve Complaint',
     'complaint_dismiss'           => 'Dismiss Complaint',
     'complaint_confirm_dismiss'   => 'Dismiss this complaint? This cannot be undone.',
     'complaint_need_resolution'   => 'Please enter resolution details before resolving.',
-
     'complaint_timeline'          => 'Complaint Timeline',
     'complaint_tl_submitted'      => 'Submitted',
     'complaint_tl_under_review'   => 'Under Review',
@@ -345,34 +297,27 @@ return [
     'complaint_tl_pending'        => 'Pending',
     'complaint_tl_resolved'       => 'Resolved',
     'complaint_tl_dismissed'      => 'Dismissed',
-
     'complaint_activity_log'      => 'Activity Log',
     'complaint_activity_hint'     => 'Activity log will be displayed here.',
-
     'complaint_guidelines'        => 'Complaint Investigation Guidelines',
     'complaint_guide_1'           => 'Review all submitted evidence carefully.',
     'complaint_guide_2'           => 'Verify the booking details and visit records.',
     'complaint_guide_3'           => 'Communicate fairly with both parties.',
     'complaint_guide_4'           => 'Record investigation notes.',
     'complaint_guide_5'           => 'Mark the complaint as Resolved or Dismissed after investigation.',
-
     // Role labels
     'role_owner'                  => 'Owner',
     'role_sitter'                 => 'Pet Sitter',
-
     // ========================================== //
     // HELP & SUPPORT (Admin)                      //
     // ========================================== //
     'help_title'              => 'Help & Support',
     'help_subtitle'           => 'Find answers, read guides, and get technical assistance',
-
     'help_tab_help'           => 'Help & Guide',
     'help_tab_tickets'        => 'My Tickets',
-
     'help_search_title'       => 'How can we help you?',
     'help_search_subtitle'    => 'Search FAQs, guides, or system documentation',
     'help_search_ph'          => 'Search for help topics...',
-
     'help_cat_faqs'           => 'FAQs',
     'help_cat_faqs_desc'      => 'Common questions & answers',
     'help_cat_guide'          => 'User Guide',
@@ -381,10 +326,8 @@ return [
     'help_cat_contact_desc'   => 'Report technical issues',
     'help_cat_docs'           => 'Documentation',
     'help_cat_docs_desc'      => 'System info & policies',
-
     'help_faqs_header'        => 'Frequently Asked Questions',
     'help_faqs_header_desc'   => 'Common questions from administrators',
-
     // FAQ Q&A
     'help_faq_q1' => 'How do I verify a pet sitter?',
     'help_faq_a1' => 'Go to Pet Sitter Verification from the sidebar. Review the submitted application, check the supporting documents, and click Approve or Reject. The applicant will be notified automatically.',
@@ -402,83 +345,68 @@ return [
     'help_faq_a7' => 'Open User Management, click on a user to view details, then use the Suspend User or Ban User buttons. Suspended users can be reactivated; banned users need admin restore.',
     'help_faq_q8' => 'What is the difference between Help & Support and Complaints?',
     'help_faq_a8' => 'Help & Support is for admins who need technical help using the system. Complaints is for managing reports submitted by pet owners or sitters against other users.',
-
     'help_guide_header'       => 'Admin User Guide',
     'help_guide_header_desc'  => 'Step-by-step instructions for each module',
-
     // Guides
     'help_guide_user_title'   => 'User Management',
     'help_guide_user_s1'      => 'Open User Management from the sidebar.',
     'help_guide_user_s2'      => 'Use the search bar to find users by name or email.',
     'help_guide_user_s3'      => 'Click a user to view their profile and account details.',
     'help_guide_user_s4'      => 'Use Suspend, Ban, or Reactivate buttons to manage account status.',
-
     'help_guide_id_title'     => 'ID Verification',
     'help_guide_id_s1'        => 'Open ID Verification from the sidebar.',
     'help_guide_id_s2'        => 'Review the submitted government ID and selfie.',
     'help_guide_id_s3'        => 'Check the API result (face match, authenticity, liveness).',
     'help_guide_id_s4'        => 'Add admin notes, then click Approve or Reject.',
-
     'help_guide_sitter_title' => 'Pet Sitter Verification',
     'help_guide_sitter_s1'    => 'Open Pet Sitter Verification from the sidebar.',
     'help_guide_sitter_s2'    => 'Filter by status (Pending, Approved, Rejected).',
     'help_guide_sitter_s3'    => 'Review applicant profile, experience, and documents.',
     'help_guide_sitter_s4'    => 'Approve or Reject with optional admin remarks.',
-
     'help_guide_booking_title'=> 'Booking Management',
     'help_guide_booking_s1'   => 'Open Bookings from the sidebar.',
     'help_guide_booking_s2'   => 'Filter by status, owner, or sitter.',
     'help_guide_booking_s3'   => 'Click View to see booking details, visits, and payment status.',
     'help_guide_booking_s4'   => 'Use Force Complete or Cancel for admin override when needed.',
-
     'help_guide_complaint_title'=> 'Complaints',
     'help_guide_complaint_s1' => 'Open Complaints under Case Management.',
     'help_guide_complaint_s2' => 'Click Review to open a complaint with evidence and users involved.',
     'help_guide_complaint_s3' => 'Mark as Under Review while investigating.',
     'help_guide_complaint_s4' => 'Record resolution notes, then Resolve or Dismiss.',
-
     'help_guide_reports_title'=> 'Reports & Analytics',
     'help_guide_reports_s1'   => 'Open Reports to generate PDF or Excel summaries.',
     'help_guide_reports_s2'   => 'Choose report type and date range before exporting.',
     'help_guide_reports_s3'   => 'Open Analytics for live KPIs and charts.',
     'help_guide_reports_s4'   => 'Filter by Today, Week, Month, or Year.',
-
     'help_docs_header'        => 'System Documentation',
     'help_docs_header_desc'   => 'Key system information and policies',
-
     'help_doc_verif_title'    => 'Verification Standards',
     'help_doc_verif_1'        => 'All IDs must be clear, valid, and unexpired.',
     'help_doc_verif_2'        => 'Selfie must match the ID photo.',
     'help_doc_verif_3'        => 'Face match score of 80% or higher is acceptable.',
     'help_doc_verif_4'        => 'Reject only when documents fail validation.',
-
     'help_doc_complaint_title'=> 'Complaint Handling Policy',
     'help_doc_complaint_1'    => 'Review all evidence before deciding.',
     'help_doc_complaint_2'    => 'Communicate fairly with both parties.',
     'help_doc_complaint_3'    => 'Record admin notes for every action.',
     'help_doc_complaint_4'    => 'Escalate to ban only for repeated violations.',
-
     'help_doc_booking_title'  => 'Booking Policies',
     'help_doc_booking_1'      => 'Cancel bookings only on user request or disputes.',
     'help_doc_booking_2'      => 'Force complete only if sitter cannot check out.',
     'help_doc_booking_3'      => 'All admin actions are logged with timestamps.',
     'help_doc_booking_4'      => 'Both owner and sitter are notified of changes.',
-
     'help_doc_privacy_title'  => 'Data & Privacy',
     'help_doc_privacy_1'      => 'ID documents are stored securely and are admin-only.',
     'help_doc_privacy_2'      => 'Never share user data outside the platform.',
     'help_doc_privacy_3'      => 'Log out after each admin session.',
     'help_doc_privacy_4'      => 'Report suspicious accounts immediately.',
-
     // Tickets
     'help_ticket_total'       => 'Total',
     'help_ticket_open'        => 'Open',
     'help_ticket_in_progress' => 'In Progress',
     'help_ticket_resolved'    => 'Resolved',
-
     'help_ticket_new'         => 'New Ticket',
     'help_ticket_new_desc'    => 'Submit a technical concern',
-
     'help_ticket_concern'     => 'Concern Type',
     'help_ticket_select'      => 'Select a type',
     'help_ticket_priority'    => 'Priority',
@@ -487,7 +415,6 @@ return [
     'help_ticket_description' => 'Description',
     'help_ticket_description_ph' => 'Describe the issue. Include what you were doing, what happened, and any error messages you saw.',
     'help_ticket_submit'      => 'Submit Ticket',
-
     // Concern types
     'help_concern_login'      => 'Login / Access Issue',
     'help_concern_id'         => 'ID Verification Error',
@@ -496,25 +423,21 @@ return [
     'help_concern_user'       => 'User Management Issue',
     'help_concern_perf'       => 'System Performance',
     'help_concern_other'      => 'Other',
-
     // Priorities
     'help_priority_low'       => 'Low',
     'help_priority_normal'    => 'Normal',
     'help_priority_high'      => 'High',
     'help_priority_critical'  => 'Critical',
-
     'help_ticket_history'     => 'My Submitted Tickets',
     'help_ticket_history_desc'=> 'Track the status of your concerns',
     'help_ticket_empty'       => 'No tickets yet',
     'help_ticket_empty_desc'  => 'Submit your first ticket using the form.',
     'help_ticket_response'    => 'Support Response',
-
     // ========================================== //
     // ID VERIFICATION (Admin)                     //
     // ========================================== //
     'idv_title'                => 'ID Verification',
     'idv_subtitle'             => 'Review and manage user identity verification requests',
-
     'idv_stat_pending'         => 'Pending',
     'idv_stat_verified'        => 'Verified',
     'idv_stat_rejected'        => 'Rejected',
@@ -523,7 +446,6 @@ return [
     'idv_label_approved'       => 'Approved',
     'idv_label_resubmit'       => 'Resubmit',
     'idv_label_requests'       => 'Requests',
-
     'idv_search_ph'            => 'Search user...',
     'idv_all_status'           => 'All Status',
     'idv_all_result'           => 'All Result',
@@ -532,32 +454,26 @@ return [
     'idv_result_failed'        => 'Failed',
     'idv_result_partial'       => 'Partial',
     'idv_search_btn'           => 'Search',
-
     'idv_col_user'             => 'User',
     'idv_col_role'             => 'Role',
     'idv_col_submitted'        => 'Submitted',
     'idv_col_status'           => 'Status',
     'idv_col_action'           => 'Action',
     'idv_view'                 => 'View',
-
     'idv_no_requests'          => 'No verification requests yet.',
     'idv_no_match'             => 'No records match your filters on this page.',
-
-    'idv_showing'              => 'Showing :from–:to of :total verification requests',
-
+    'idv_showing'              => 'Showing :from�:to of :total verification requests',
     'idv_modal_title'          => 'Verification Details',
     'idv_email'                => 'Email',
     'idv_phone'                => 'Phone Number',
     'idv_registered'           => 'Registered',
     'idv_status'               => 'Verification Status',
-
     'idv_submitted_id'         => 'Submitted Government ID',
     'idv_type'                 => 'Type:',
     'idv_id_number'            => 'ID Number:',
     'idv_selfie'               => 'Selfie',
     'idv_no_id_image'          => 'No ID image',
     'idv_no_selfie_image'      => 'No selfie image',
-
     'idv_api_title'            => 'API Verification Result',
     'idv_face_match'           => 'Face Match',
     'idv_doc_auth'             => 'Document Authenticity',
@@ -569,21 +485,18 @@ return [
     'idv_no'                   => 'No',
     'idv_matched'              => 'Matched',
     'idv_not_matched'          => 'Not Matched',
-
     'idv_admin_notes'          => 'Admin Notes',
     'idv_admin_notes_ph'       => 'Add notes about this verification...',
     'idv_approve'              => 'Approve',
     'idv_reject'               => 'Reject',
     'idv_download'             => 'Download Documents',
     'idv_confirm_reject'       => 'Reject this verification? The user will be asked to resubmit.',
-
     'idv_guidelines'           => 'Verification Guidelines',
     'idv_guide_1'              => 'Review the submitted ID carefully.',
     'idv_guide_2'              => 'Ensure the selfie matches the ID photo.',
     'idv_guide_3'              => 'Check the verification result from the API.',
     'idv_guide_4'              => 'Reject only if verification fails or documents are invalid.',
-
-    // Admin ID Verification — OCR
+    // Admin ID Verification �� OCR
     'idv_ocr_title'        => 'OCR Extraction Result',
     'idv_ocr_success'      => 'Extracted',
     'idv_ocr_failed'       => 'Not Extracted',
@@ -591,24 +504,21 @@ return [
     'idv_ocr_id_number'    => 'ID Number',
     'idv_ocr_dob'          => 'Date of Birth',
     'idv_ocr_compare'      => 'Comparison with User Profile',
-    'idv_ocr_match_yes'    => '✓ Name Match',
-    'idv_ocr_match_check'  => '⚠ Check Manually',
+    'idv_ocr_match_yes'    => '? Name Match',
+    'idv_ocr_match_check'  => 'âš  Check Manually',
     'idv_ocr_match_hint'   => 'Cross-check ID name with user profile',
     'idv_ocr_failed_desc'  => 'OCR could not extract details. Please review the ID photo manually.',
-
     // ========================================== //
     // SUPPORT INBOX (Admin)                       //
     // ========================================== //
     'inbox_title'              => 'Support Inbox',
     'inbox_subtitle'           => 'Messages and problem reports from pet owners and sitters',
-
     'inbox_stat_total'         => 'Total',
     'inbox_stat_open'          => 'Open',
     'inbox_stat_in_progress'   => 'In Progress',
     'inbox_stat_resolved'      => 'Resolved',
     'inbox_stat_contacts'      => 'Contacts',
     'inbox_stat_reports'       => 'Reports',
-
     'inbox_search_ph'          => 'Search by code, subject, sender...',
     'inbox_all_status'         => 'All Status',
     'inbox_all_types'          => 'All Types',
@@ -616,7 +526,6 @@ return [
     'inbox_type_report'        => 'Problem Reports',
     'inbox_filter'             => 'Filter',
     'inbox_reset'              => 'Reset',
-
     'inbox_col_code'           => 'Code',
     'inbox_col_from'           => 'From',
     'inbox_col_type'           => 'Type',
@@ -624,12 +533,10 @@ return [
     'inbox_col_status'         => 'Status',
     'inbox_col_date'           => 'Date',
     'inbox_col_action'         => 'Action',
-
     'inbox_label_report'       => 'Report',
     'inbox_label_contact'      => 'Contact',
     'inbox_view'               => 'View',
     'inbox_no_messages'        => 'No messages yet.',
-
     // ========================================== //
     // MESSAGE DETAILS (Admin)                     //
     // ========================================== //
@@ -639,33 +546,27 @@ return [
     'msg_no_email'             => 'No email available',
     'msg_label_report'         => 'Problem Report',
     'msg_label_contact'        => 'Contact Message',
-
     'msg_category'             => 'Category',
     'msg_message'              => 'Message',
     'msg_steps'                => 'Steps to Reproduce',
     'msg_device'               => 'Device / Browser',
-
     'msg_previous_reply'       => 'Previous Reply',
     'msg_admin_fallback'       => 'Admin',
-
     'msg_update_reply'         => 'Update Reply',
     'msg_send_reply'           => 'Send Reply',
     'msg_reply_ph'             => 'Type your response to the user...',
     'msg_update_status'        => 'Update Status',
-    'msg_status_in_progress'   => 'In Progress — still being worked on',
-    'msg_status_resolved'      => 'Resolved — close this ticket',
-
+    'msg_status_in_progress'   => 'In Progress �� still being worked on',
+    'msg_status_resolved'      => 'Resolved �� close this ticket',
     'msg_danger_zone'          => 'Danger Zone',
     'msg_danger_desc'          => 'Deleting this message is permanent and cannot be undone.',
     'msg_delete'               => 'Delete Message',
     'msg_confirm_delete'       => 'Delete this message permanently? This action cannot be undone.',
-
     // ========================================== //
     // REPORTS (Admin)                             //
     // ========================================== //
     'reports_title'              => 'Reports',
     'reports_subtitle'           => 'Generate, view, and export system reports',
-
     'reports_total_users'        => 'Total Users',
     'reports_growth_this_month'  => 'this month',
     'reports_total_bookings'     => 'Total Bookings',
@@ -673,7 +574,6 @@ return [
     'reports_completed'          => 'Completed',
     'reports_complaints'         => 'Complaints',
     'reports_pending_count'      => ':count pending',
-
     'reports_filter_type'        => 'Report Type',
     'reports_all_reports'        => 'All Reports',
     'reports_booking_report'     => 'Booking Report',
@@ -688,7 +588,6 @@ return [
     'reports_reset_filters'      => 'Reset filters',
     'reports_generate_pdf'       => 'Generate PDF',
     'reports_generate_excel'     => 'Generate Excel',
-
     'reports_categories'         => 'Report Categories',
     'reports_label_booking'      => 'Booking Report',
     'reports_label_user'         => 'User Report',
@@ -708,7 +607,6 @@ return [
     'reports_resolved_short'     => 'Resolved:',
     'reports_dismissed_short'    => 'Dismissed:',
     'reports_common'             => 'Common:',
-
     'reports_analytics_overview' => 'Analytics Overview',
     'reports_booking_trend'      => 'Booking Trend',
     'reports_last_n_months'      => 'Last :n months',
@@ -717,12 +615,10 @@ return [
     'reports_complaint_dist'     => 'Complaint Distribution',
     'reports_by_type'            => 'By type',
     'reports_no_complaint_data'  => 'No complaint data yet.',
-
     'reports_recent_generated'   => 'Recent Generated Reports',
     'reports_download'           => 'Download',
     'reports_no_reports_yet'     => 'No reports generated yet.',
     'reports_generate_first'     => 'Generate First Report',
-
     'reports_history'            => 'Generated Reports History',
     'reports_col_id'             => 'Report ID',
     'reports_col_type'           => 'Report Type',
@@ -731,22 +627,20 @@ return [
     'reports_col_format'         => 'Format',
     'reports_col_action'         => 'Action',
     'reports_admin_fallback'     => 'Admin',
-    'reports_showing'            => 'Showing :from–:to of :total generated reports',
+    'reports_showing'            => 'Showing :from�:to of :total generated reports',
     'reports_no_history'         => 'No reports generated yet.',
-
     'reports_info_title'         => 'Report Information',
     'reports_info_1'             => 'Reports can be generated by date range.',
     'reports_info_2'             => 'Reports include only finalized records.',
     'reports_info_3'             => 'Export formats: PDF, Excel (CSV).',
     'reports_info_4'             => 'Generated reports are stored in the system history.',
-
     // ========================================== //
     // PDF EXPORT (Standalone HTML)                //
     // ========================================== //
-    'report_pdf_page_title'      => 'PetNanny Report — :type',
-    'report_pdf_back'            => '← Back',
-    'report_pdf_print'           => '🖨 Print / Save as PDF',
-    'report_pdf_heading'         => 'PetNanny — :type Report',
+    'report_pdf_page_title'      => 'PetNanny Report �� :type',
+    'report_pdf_back'            => '⬅ Back',
+    'report_pdf_print'           => '🖨️ Print / Save as PDF',
+    'report_pdf_heading'         => 'PetNanny �� :type Report',
     'report_pdf_full_system'     => 'Full System Report',
     'report_pdf_type_report'     => ':type Report',
     'report_pdf_from'            => 'From:',
@@ -772,14 +666,12 @@ return [
     'report_pdf_yes'             => 'Yes',
     'report_pdf_no'              => 'No',
     'report_pdf_empty'           => 'No records found for the selected filters.',
-    'report_pdf_footer'          => 'PetNanny Admin System · Report generated on :date',
-
+    'report_pdf_footer'          => 'PetNanny Admin System � Report generated on :date',
     // ========================================== //
     // SITTER VERIFICATION (Admin)                 //
     // ========================================== //
     'sv_title'                 => 'Pet Sitter Verification',
     'sv_subtitle'              => 'Review and approve pet sitter applications',
-
     'sv_stat_pending'          => 'Pending',
     'sv_stat_approved'         => 'Approved',
     'sv_stat_rejected'         => 'Rejected',
@@ -788,7 +680,6 @@ return [
     'sv_label_verified'        => 'Verified',
     'sv_label_resubmit'        => 'Resubmit',
     'sv_label_applications'    => 'Applications',
-
     'sv_search_ph'             => 'Search applicant...',
     'sv_all_status'            => 'All Status',
     'sv_latest'                => 'Latest',
@@ -799,21 +690,17 @@ return [
     'sv_exp_less1'             => 'Less than 1 Year',
     'sv_exp_none'              => 'No Experience',
     'sv_apply'                 => 'Apply',
-
     'sv_col_applicant'         => 'Applicant',
     'sv_col_experience'        => 'Experience',
     'sv_col_submitted'         => 'Submitted',
     'sv_col_status'            => 'Status',
     'sv_col_action'            => 'Action',
-
     'sv_year'                  => 'Year',
     'sv_years'                 => 'Years',
     'sv_review'                => 'Review',
     'sv_view'                  => 'View',
     'sv_no_applications'       => 'No applications found.',
-
-    'sv_showing'               => 'Showing :from–:to of :total applications',
-
+    'sv_showing'               => 'Showing :from�:to of :total applications',
     // ========================================== //
     // SITTER APPLICATION MODAL                    //
     // ========================================== //
@@ -823,10 +710,8 @@ return [
     'sv_phone'                 => 'Phone',
     'sv_location'              => 'Location',
     'sv_registered_since'      => 'Registered Since',
-
     'sv_experience'            => 'Experience',
     'sv_no_bio'                => 'No bio provided.',
-
     'sv_perf_summary'          => 'Performance Summary',
     'sv_avg_rating'            => 'Average Rating',
     'sv_completed_bookings'    => 'Completed Bookings',
@@ -834,36 +719,29 @@ return [
     'sv_cancelled'             => 'Cancelled',
     'sv_missed_visits'         => 'Missed Visits',
     'sv_complaints'            => 'Complaints',
-
     'sv_services_offered'      => 'Services Offered',
     'sv_no_services'           => 'No services listed.',
-
     'sv_pets_accepted'         => 'Pets Accepted',
     'sv_no_pets'               => 'No pets listed.',
-
     'sv_supporting_docs'       => 'Supporting Documents',
     'sv_doc_view'              => 'View',
     'sv_no_docs'               => 'No documents submitted.',
     'sv_doc_count'             => 'Document Count',
     'sv_files_submitted'       => 'Files Submitted',
-
     'sv_app_summary'           => 'Application Summary',
     'sv_app_date'              => 'Application Date',
     'sv_status'                => 'Status',
     'sv_base_rate'             => 'Base Rate',
     'sv_per_visit'             => '/ visit',
-
     'sv_approve_btn'           => 'Approve Application',
     'sv_reject_btn'            => 'Reject Application',
     'sv_download_all'          => 'Download All Documents',
-
     'sv_guidelines'            => 'Pet Sitter Verification Guidelines',
     'sv_guide_1'               => 'Review all submitted supporting documents.',
     'sv_guide_2'               => 'Ensure documents are clear and valid.',
     'sv_guide_3'               => 'Verify applicant qualifications.',
     'sv_guide_4'               => 'Approve only if requirements are satisfied.',
     'sv_guide_5'               => 'Reject if documents are incomplete or invalid.',
-
     // Approve confirmation
     'sv_approve_confirm_title' => 'Approve Application?',
     'sv_approve_confirm_desc'  => 'This applicant will become a verified pet sitter.',
@@ -872,15 +750,13 @@ return [
     'sv_approve_ph'            => 'e.g., All documents verified and valid.',
     'sv_cancel'                => 'Cancel',
     'sv_yes_approve'           => 'Yes, Approve',
-
     // Reject confirmation
     'sv_reject_confirm_title'  => 'Reject Application?',
-    'sv_reject_confirm_desc'   => 'Please provide a reason — this will be shown to the applicant.',
+    'sv_reject_confirm_desc'   => 'Please provide a reason �� this will be shown to the applicant.',
     'sv_reject_reason'         => 'Reason for Rejection',
     'sv_reject_ph'             => 'e.g., Documents are incomplete or unclear. Please re-upload a clear copy of your NBI Clearance.',
     'sv_reject_note'           => 'The reason will be sent via notification and email to the applicant.',
     'sv_yes_reject'            => 'Yes, Reject',
-
     // ========================================== //
     // USER MANAGEMENT (Admin)                     //
     // ========================================== //
@@ -888,7 +764,6 @@ return [
     'um_subtitle'              => 'Manage all registered users, pet owners, and pet sitters',
     'um_add_admin'             => 'Add Admin',
     'um_export_users'          => 'Export Users',
-
     'um_stat_total'            => 'Total Users',
     'um_stat_owners'           => 'Pet Owners',
     'um_stat_sitters'          => 'Pet Sitters',
@@ -897,7 +772,6 @@ return [
     'um_label_registered'      => 'Registered',
     'um_label_applicants'      => 'Applicants',
     'um_label_suspended_banned'=> 'Suspended/Banned',
-
     'um_search_ph'             => 'Search user...',
     'um_all_roles'             => 'All Roles',
     'um_role_admin'            => 'Admin',
@@ -916,7 +790,6 @@ return [
     'um_sort_name_asc'         => 'Name (A-Z)',
     'um_sort_name_desc'        => 'Name (Z-A)',
     'um_apply'                 => 'Apply',
-
     'um_col_user'              => 'User',
     'um_col_email'             => 'Email',
     'um_col_role'              => 'Role',
@@ -924,43 +797,36 @@ return [
     'um_col_status'            => 'Status',
     'um_col_joined'            => 'Joined',
     'um_col_actions'           => 'Actions',
-
     'um_no_users'              => 'No users found',
     'um_no_users_desc'         => 'Try changing your search or filter.',
-    'um_showing'               => 'Showing :from–:to of :total users',
-
+    'um_showing'               => 'Showing :from�:to of :total users',
     'um_tooltip_view'          => 'View',
     'um_tooltip_suspend'       => 'Suspend',
     'um_tooltip_ban'           => 'Ban',
     'um_tooltip_restore'       => 'Restore',
     'um_confirm_restore'       => 'Restore :name\'s account?',
-
     // Suspend modal
     'um_suspend_title'         => 'Suspend User?',
     'um_suspend_reason'        => 'Reason for Suspension',
     'um_suspend_ph'            => 'e.g., Multiple complaints received. Under investigation.',
     'um_cancel'                => 'Cancel',
     'um_yes_suspend'           => 'Yes, Suspend',
-
     // Ban modal
     'um_ban_title'             => 'Ban User?',
     'um_ban_warning'           => 'This will permanently ban the account and cancel all active bookings.',
     'um_ban_reason'            => 'Reason for Ban',
     'um_ban_ph'                => 'e.g., Multiple verified complaints of misconduct.',
     'um_yes_ban'               => 'Yes, Ban User',
-
     'um_tooltip_delete'   => 'Delete User',
     'um_delete_title'     => 'Delete User Account?',
     'um_delete_warning'   => 'The account will be hidden from active users. You can restore it within 30 days.',
     'um_delete_confirm_js'=> 'Are you absolutely sure you want to delete this user? This action can be undone by admin.',
     'um_yes_delete'       => 'Yes, Delete',
-
     // Promote / Demote
     'um_tooltip_promote'   => 'Promote to Admin',
     'um_tooltip_demote'    => 'Demote from Admin',
     'um_confirm_promote'   => 'Promote :name to Administrator?',
     'um_confirm_demote'    => 'Demote :name from Administrator to Pet Owner?',
-
     // Promote / Demote modals
     'um_promote_title'    => 'Promote to Admin?',
     'um_promote_warning'  => 'This user will gain full administrator privileges and access to all admin features.',
@@ -968,7 +834,6 @@ return [
     'um_demote_title'     => 'Demote from Admin?',
     'um_demote_warning'   => 'This user will lose all administrator privileges and become a Pet Owner.',
     'um_yes_demote'       => 'Yes, Demote',
-
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -979,17 +844,14 @@ return [
     'ud_location'              => 'Location',
     'ud_not_set'               => 'Not set',
     'ud_na'                    => 'N/A',
-
     'ud_suspend_btn'           => 'Suspend User',
     'ud_ban_btn'               => 'Ban User',
     'ud_restore_btn'           => 'Restore Account',
     'ud_confirm_restore'       => 'Restore :name\'s account?',
-
     'ud_stat_complaints_filed' => 'Complaints Filed',
     'ud_stat_complaints_against'=> 'Complaints Against',
     'ud_stat_pets'             => 'Pets',
     'ud_stat_role'             => 'Role',
-
     'ud_personal_info'         => 'Personal Information',
     'ud_full_name'             => 'Full Name',
     'ud_email'                 => 'Email',
@@ -998,7 +860,6 @@ return [
     'ud_dob'                   => 'Date of Birth',
     'ud_address'               => 'Address',
     'ud_bio'                   => 'Bio',
-
     'ud_sitter_profile'        => 'Sitter Profile',
     'ud_base_rate'             => 'Base Rate',
     'ud_experience'            => 'Experience',
@@ -1006,14 +867,11 @@ return [
     'ud_food_preference'       => 'Food Preference',
     'ud_rating'                => 'Rating',
     'ud_no_sitter_profile'     => 'No sitter profile yet.',
-
     'ud_pets_count'            => 'Pets (:count)',
     'ud_unknown_type'          => 'Unknown',
     'ud_yrs'                   => 'yrs',
-
-    'ud_back_btn'              => '← Back',
+    'ud_back_btn'              => '⬅ Back',
     'ud_delete_btn'          => 'Delete User',
-
     // ========================================== //
     // ADMIN HOME (Creative Homepage)             //
     // ========================================== //
@@ -1023,13 +881,11 @@ return [
     'ah_good_afternoon'        => 'Good afternoon',
     'ah_good_evening'          => 'Good evening',
     'ah_system_online'         => 'System Online',
-    'ah_welcome_desc'          => 'Here\'s your platform overview. Manage users, bookings, verifications, and complaints — all in one place.',
-
+    'ah_welcome_desc'          => 'Here\'s your platform overview. Manage users, bookings, verifications, and complaints �� all in one place.',
     'ah_qa_verify_sitter'      => 'Verify Sitter',
     'ah_qa_verify_id'          => 'Verify ID',
     'ah_qa_complaints'         => 'Complaints',
     'ah_qa_messages'           => 'Messages',
-
     'ah_kpi_users'             => 'Total Users',
     'ah_kpi_bookings'          => 'Total Bookings',
     'ah_kpi_pending_verify'    => 'Pending Verify',
@@ -1039,11 +895,9 @@ return [
     'ah_active'                => 'active',
     'ah_needs_review'          => 'Needs review',
     'ah_attention'             => 'Attention',
-
     'ah_recent_activity'       => 'Recent Activity',
     'ah_view_all'              => 'View All',
     'ah_no_activity'           => 'No recent activity yet.',
-
     'ah_pending_tasks'         => 'Pending Tasks',
     'ah_task_sitter_apps'      => 'Sitter Applications',
     'ah_task_id_verif'         => 'ID Verifications',
@@ -1052,7 +906,6 @@ return [
     'ah_task_review'           => 'Needs review',
     'ah_task_attention'        => 'Needs attention',
     'ah_task_respond'          => 'Awaiting response',
-
     'ah_quick_access'          => 'Quick Access',
     'ah_users'                 => 'Users',
     'ah_manage_accounts'       => 'Manage accounts',
@@ -1070,16 +923,13 @@ return [
     'ah_edit_profile'          => 'Edit profile',
     'ah_admin_dashboard'       => 'Admin Dashboard',
     'ah_full_dashboard'        => 'Full dashboard',
-
     'ah_system_healthy'        => 'All systems operational',
     'ah_last_login'            => 'Session started:',
-
     'ah_home_command_desc'  => 'Your personal command center. What needs your attention today?',
     'ah_needs_attention'    => 'Needs Your Attention',
     'ah_action_required'    => 'Action Required',
     'ah_action'             => 'Action',
     'ah_all_clear'          => 'All clear',
-
     // ========================================== //
     // NAVIGATION                                  //
     // ========================================== //
@@ -1099,7 +949,6 @@ return [
     'nav_logout'                     => 'Logout',
     'nav_log_out'                    => 'Log Out',
     'nav_profile'                    => 'Profile',
-
     // Demo notifications (placeholders)
     'nav_notif_demo_1'               => 'Maria Santos submitted ID Verification',
     'nav_notif_demo_2'               => 'Juan filed a Complaint',
@@ -1110,7 +959,6 @@ return [
     'nav_time_5h'                    => '5 hours ago',
     'nav_time_1d'                    => '1 day ago',
     'nav_time_2d'                    => '2 days ago',
-
     // ========================================== //
     // SIDEBAR                                     //
     // ========================================== //
@@ -1137,7 +985,6 @@ return [
     'sb_availability'          => 'Availability',
     'sb_task_monitor'          => 'Task Monitor',
     'sb_settings'              => 'Settings',
-
     // ========================================== //
     // COMPLAINTS (Owner/Sitter)                   //
     // ========================================== //
@@ -1147,26 +994,20 @@ return [
     'cp_create_subtitle_owner'     => 'Submit a complaint for a booking you made',
     'cp_errors_intro'              => 'Please fix the following:',
     'cp_details_header'            => 'Complaint Details',
-
     'cp_no_bookings_title'         => 'No bookings available for complaint',
     'cp_no_bookings_sitter'        => 'You have no accepted or completed bookings you served.',
     'cp_no_bookings_owner'         => 'You have no accepted or completed bookings.',
     'cp_view_my_bookings'          => 'View my bookings',
-
     'cp_booking_label'             => 'Booking',
     'cp_select_booking'            => 'Select Booking',
     'cp_booking_hint'              => 'Select the booking related to this complaint',
-
     'cp_respondent_label'          => 'Respondent',
     'cp_respondent_ph'             => 'Auto-filled from selected booking',
     'cp_respondent_hint'           => 'Auto-filled from selected booking',
-
     'cp_type_label'                => 'Complaint Type',
     'cp_select_type'               => 'Select Complaint Type',
-
     'cp_desc_label'                => 'Description',
     'cp_desc_ph'                   => 'Describe your complaint in detail...',
-
     'cp_evidence_label'            => 'Evidence (Optional)',
     'cp_evidence_photos'           => 'Photos',
     'cp_evidence_videos'           => 'Videos',
@@ -1174,17 +1015,14 @@ return [
     'cp_files_selected'            => ':count file(s) selected',
     'cp_clear_all'                 => 'Clear all',
     'cp_evidence_hint'             => 'Upload photos, videos, or documents as evidence (max 10 files, 10MB each)',
-
     'cp_cancel'                    => 'Cancel',
     'cp_submit'                    => 'Submit Complaint',
-
     // Index page
     'cp_index_title'               => 'Complaints',
     'cp_index_subtitle'            => 'Submit and manage complaints related to your bookings',
     'cp_file_card_title'           => 'File a Complaint',
     'cp_file_card_desc'            => 'Submit a complaint for a completed or active booking',
     'cp_file_btn'                  => 'File Complaint',
-
     'cp_stat_total'                => 'Total',
     'cp_stat_total_desc'           => 'All complaints',
     'cp_stat_pending'              => 'Pending',
@@ -1193,19 +1031,16 @@ return [
     'cp_stat_under_review_desc'    => 'In investigation',
     'cp_stat_resolved'             => 'Resolved',
     'cp_stat_resolved_desc'        => 'Completed',
-
     'cp_info_header'               => 'Complaint Information',
     'cp_info_1'                    => 'Complaints can only be filed for completed or active bookings.',
     'cp_info_2'                    => 'Provide accurate details when submitting a complaint.',
     'cp_info_3'                    => 'Supporting evidence may be attached.',
     'cp_info_4'                    => 'Our administrators will review every complaint before making a decision.',
-
     'cp_filter_all'                => 'All',
     'cp_filter_pending'            => 'Pending',
     'cp_filter_under_review'       => 'Under Review',
     'cp_filter_resolved'           => 'Resolved',
     'cp_filter_dismissed'          => 'Dismissed',
-
     'cp_card_complaint_id'         => 'Complaint ID',
     'cp_card_filed_on'             => 'Filed on :date',
     'cp_card_type'                 => 'Complaint Type',
@@ -1215,11 +1050,8 @@ return [
     'cp_card_you'                  => 'You',
     'cp_view_resolution'           => 'View Resolution',
     'cp_view_details'              => 'View Details',
-
     'cp_empty_title'               => 'No complaints yet',
-    'cp_empty_desc'                => "You haven't filed any complaints.",
-    'cp_empty_btn'                 => 'File Your First Complaint',
-
+    'cp_empty_desc'                => "You haven't filed any complaints.",    'cp_empty_btn'                 => 'File Your First Complaint',
     // Show page
     'cp_show_title'                => 'Complaint Details',
     'cp_parties_header'            => 'Parties Involved',
@@ -1236,16 +1068,13 @@ return [
     'cp_admin_notes'               => 'Admin Notes',
     'cp_resolution'                => 'Resolution',
     'cp_resolved_on'               => 'Resolved on :date',
-
     'cp_status_pending_title'      => 'Awaiting Admin Review',
     'cp_status_pending_desc'       => 'Your complaint has been submitted. Our admin team will review it shortly. You will receive a notification once a decision is made.',
     'cp_status_review_title'       => 'Under Investigation',
     'cp_status_review_desc'        => 'Our admin team is currently reviewing this complaint. We will notify you once a decision has been reached.',
-
-    'cp_back_to_complaints'        => '← Back to Complaints',
+    'cp_back_to_complaints'        => '⬅ Back to Complaints',
     'cp_role_owner'                => 'Owner',
     'cp_role_sitter'               => 'Sitter',
-
     // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
     // ========================================== //
@@ -1254,14 +1083,12 @@ return [
     'od_mode_owner'               => 'Pet Owner',
     'od_mode_sitter'              => 'Pet Sitter',
     'od_change_mode'              => 'Change mode in Settings →',
-
     'od_tag_home_based'           => 'Home-based pet care',
     'od_hero_title'               => 'A Nanny for Your Furry Family',
     'od_hero_desc'                => 'Connect with trusted pet sitters who care for your pets at home. Drop-in visits, photo updates, and complete peace of mind.',
     'od_find_sitter'              => 'Find a Sitter',
     'od_become_sitter'            => 'Become a Sitter',
     'od_sitter_dashboard'         => 'Sitter Dashboard',
-
     'od_why_title'                => 'Why PetNanny?',
     'od_why_subtitle'             => 'Everything your pet needs, right at home.',
     'od_why_1_title'              => 'Find Trusted Sitters',
@@ -1272,7 +1099,6 @@ return [
     'od_why_3_desc'               => 'ID verification, photo proof per visit, and a protection fund.',
     'od_why_4_title'              => 'Home-Based Care',
     'od_why_4_desc'               => 'Your pet is cared for in the comfort of their own home.',
-
     'od_bookings_title'           => 'My Bookings',
     'od_bookings_sitter_desc'     => 'Manage incoming booking requests',
     'od_bookings_owner_desc'      => 'View your booking statuses',
@@ -1293,7 +1119,6 @@ return [
     'od_view_tasks'               => 'View Tasks →',
     'od_tasks_count'              => ':count task(s)',
     'od_view_all_bookings'        => 'View all bookings',
-
     'od_how_title'                => 'How PetNanny Works',
     'od_how_subtitle'             => 'Three simple steps to happy pets.',
     'od_step_1_title'             => 'Create Your Profile',
@@ -1302,11 +1127,8 @@ return [
     'od_step_2_desc'              => 'Browse sitters, check ratings, and find the perfect match.',
     'od_step_3_title'             => 'Book & Relax',
     'od_step_3_desc'              => 'Confirm your booking, get visit updates with photos.',
-
     'od_cta_title'                => 'Ready to Get Started?',
-    'od_cta_desc'                 => "Join PetNanny today — it's free!",
-    'od_cta_explore'              => 'Explore Sitters',
-
+    'od_cta_desc'                 => "Join PetNanny today �� it's free!",    'od_cta_explore'              => 'Explore Sitters',
     // Onboarding Modal
     'onboard_title'         => 'Verify Your Account',
     'onboard_desc'          => 'To unlock all features and build trust with the community, please verify your identity.',
@@ -1316,25 +1138,23 @@ return [
     'onboard_later'         => 'Later',
     'onboard_continue'      => 'Continue',
     'onboard_verify_title'  => 'Verify Your Identity',
-
+    'onboard_profile_incomplete_title' => 'Profile Incomplete',
+    'onboard_profile_incomplete_desc'  => 'Please complete your profile (name, date of birth, gender, contact, address) before verifying your ID.',
+    'onboard_complete_profile'         => 'Complete Profile',
     // ========================================== //
     // HELP & SUPPORT (Owner/Sitter)               //
     // ========================================== //
     'hs_title'                    => 'Help & Support',
     'hs_subtitle'                 => 'Find answers to common questions or contact our support team',
-
     'hs_faq_card_title'           => 'Frequently Asked Questions',
     'hs_faq_card_desc'            => 'Browse answers to common questions',
     'hs_faq_card_btn'             => 'View FAQs →',
-
     'hs_contact_card_title'       => 'Contact Support',
     'hs_contact_card_desc'        => 'Need help? Send a message to our support team',
     'hs_contact_card_btn'         => 'Contact Support →',
-
     'hs_report_card_title'        => 'Report a Problem',
     'hs_report_card_desc'         => 'Report bugs or technical issues',
     'hs_report_card_btn'          => 'Report Issue →',
-
     'hs_my_messages'              => 'My Messages to Support',
     'hs_msg_pending'              => 'Pending',
     'hs_msg_in_progress'          => 'In Progress',
@@ -1342,9 +1162,7 @@ return [
     'hs_msg_type_report'          => 'Report',
     'hs_msg_type_contact'         => 'Contact',
     'hs_support_reply'            => 'Support Reply',
-
     'hs_faq_header'               => 'Frequently Asked Questions',
-
     // FAQ Q&A
     'hs_faq_q1' => 'How do I book a pet sitter?',
     'hs_faq_a1' => 'To book a pet sitter, go to the "Find a Sitter" page, browse available sitters, select your preferred sitter, and click "Book Now". Follow the prompts to complete your booking.',
@@ -1360,20 +1178,17 @@ return [
     'hs_faq_a6' => 'To submit a protection claim, go to the "Claims" page and click "Submit Claim". Select the booking, provide incident details, upload evidence, and submit for review.',
     'hs_faq_q7' => 'How long does claim investigation take?',
     'hs_faq_a7' => 'Claim investigations typically take 3-5 business days. Our team will review the evidence and communicate the decision through the platform. You will be notified of the outcome.',
-
     'hs_safety_header'            => 'Safety & Community',
     'hs_safety_1'                 => 'Meet in a safe location before the first service.',
     'hs_safety_2'                 => 'Keep communication inside the platform.',
     'hs_safety_3'                 => 'Upload accurate booking information.',
     'hs_safety_4'                 => 'Respect other users.',
     'hs_safety_5'                 => 'Report suspicious activities immediately.',
-
     'hs_contact_info_header'      => 'Contact Information',
     'hs_label_email'              => 'Email',
     'hs_label_phone'              => 'Phone',
     'hs_label_hours'              => 'Support Hours',
     'hs_hours_value'              => 'Monday - Friday|8:00 AM - 5:00 PM',
-
     'hs_resources_header'         => 'Helpful Resources',
     'hs_resource_privacy_title'   => 'Privacy Policy',
     'hs_resource_privacy_desc'    => 'How we handle your data',
@@ -1383,23 +1198,18 @@ return [
     'hs_resource_community_desc'  => 'Safe and respectful interactions',
     'hs_resource_protection_title'=> 'Protection Policy',
     'hs_resource_protection_desc' => 'How claims are handled',
-
     'hs_app_version'              => 'Version 1.0',
     'hs_app_description'          => 'Web-based Responsive System for On-Demand Pet Sitting with Matching Algorithm',
-    'hs_app_copyright'            => '© 2026 PetNanny. All rights reserved.',
-
+    'hs_app_copyright'            => '� 2026 PetNanny. All rights reserved.',
     'hs_back'                     => 'Back',
-
     // ========================================== //
     // REPORT ISSUE PAGE                           //
     // ========================================== //
     'ri_title'                    => 'Report a Problem',
     'ri_subtitle'                 => 'Report bugs or technical issues',
     'ri_header'                   => 'Issue Details',
-
     'ri_issue_title'              => 'Issue Title',
     'ri_issue_title_ph'           => 'Brief title of the issue',
-
     'ri_issue_category'           => 'Issue Category',
     'ri_select_category'          => 'Select a category',
     'ri_cat_bug'                  => 'Bug / Technical Error',
@@ -1408,41 +1218,32 @@ return [
     'ri_cat_payment'              => 'Payment Error',
     'ri_cat_feature'              => 'Feature Not Working',
     'ri_cat_other'                => 'Other',
-
     'ri_description'              => 'Description',
     'ri_description_ph'           => 'Describe the issue in detail...',
-
     'ri_steps'                    => 'Steps to Reproduce',
     'ri_steps_ph'                 => '1. Go to...\n2. Click on...\n3. See error...',
     'ri_steps_hint'               => 'Provide step-by-step instructions to help us reproduce the issue',
-
     'ri_screenshot'               => 'Screenshot (Optional)',
     'ri_screenshot_click'         => 'Click to upload screenshot',
     'ri_screenshot_hint'          => 'JPG, PNG, JPEG (max 5MB)',
-
     'ri_device'                   => 'Browser / Device Information (Optional)',
     'ri_device_ph'                => 'e.g. Chrome 120.0, Windows 11',
     'ri_device_hint'              => 'Helps us identify platform-specific issues',
-
     'ri_guidelines'               => 'Reporting Guidelines',
     'ri_guide_1'                  => 'Provide as much detail as possible about the issue',
     'ri_guide_2'                  => 'Include steps to reproduce for faster resolution',
     'ri_guide_3'                  => 'Screenshots help our team identify the problem quickly',
     'ri_guide_4'                  => 'Our team will respond within 24-48 hours',
-
     'ri_cancel'                   => 'Cancel',
     'ri_submit'                   => 'Submit Report',
-
     // ========================================== //
     // CONTACT SUPPORT PAGE                        //
     // ========================================== //
     'cs_title'                    => 'Contact Support',
     'cs_subtitle'                 => 'Send a message to our support team',
     'cs_header'                   => 'Message Details',
-
     'cs_subject'                  => 'Subject',
     'cs_subject_ph'               => 'Brief summary of your concern',
-
     'cs_category'                 => 'Category',
     'cs_select_category'          => 'Select a category',
     'cs_cat_booking'              => 'Booking Issues',
@@ -1451,28 +1252,23 @@ return [
     'cs_cat_technical'            => 'Technical Support',
     'cs_cat_feedback'             => 'Feedback & Suggestions',
     'cs_cat_other'                => 'Other',
-
     'cs_message'                  => 'Message',
     'cs_message_ph'               => 'Describe your concern or question in detail...',
-
     'cs_attachment'               => 'Attachment (Optional)',
     'cs_attachment_click'         => 'Click to attach file',
     'cs_attachment_hint'          => 'JPG, PNG, PDF, DOC, DOCX (max 5MB)',
-
     'cs_info_header'              => 'Support Information',
     'cs_info_1'                   => 'Response time: 24-48 hours on business days',
     'cs_info_2'                   => 'For urgent issues, call: (+63) 912 345 6789',
     'cs_info_3'                   => 'Support hours: Monday - Friday, 8:00 AM - 5:00 PM',
-
     'cs_cancel'                   => 'Cancel',
     'cs_send'                     => 'Send Message',
-
     // ========================================== //
     // MESSAGES (Chat View)                        //
     // ========================================== //
     'msg_index_title'             => 'Messages',
     'msg_chat_with'               => 'Chat with :name',
-    'msg_online_status'           => 'Online • Usually responds in minutes',
+    'msg_online_status'           => 'Online � Usually responds in minutes',
     'msg_typing'                  => 'typing...',
     'msg_no_messages'             => 'No messages yet',
     'msg_say_hi'                  => 'Say hi to start the conversation 👋',
@@ -1490,12 +1286,11 @@ return [
     'msg_sending'                 => 'Sending...',
     'msg_send'                    => 'Send',
     'msg_press'                   => 'Press',
-    'msg_to_send'                 => 'to send •',
+    'msg_to_send'                 => 'to send �',
     'msg_for_newline'             => 'for new line',
     'msg_file_too_large'          => 'File is too large. Maximum size is 20MB.',
     'msg_send_failed_status'      => 'Failed (:status). Please try again.',
     'msg_send_failed_error'       => 'Failed: :error',
-
     // ========================================== //
     // MESSAGES INDEX (Inbox)                      //
     // ========================================== //
@@ -1515,13 +1310,12 @@ return [
     'mi_delete_chat'              => 'Delete chat',
     'mi_report'                   => 'Report',
     'mi_confirm_delete'           => 'Are you sure you want to delete this conversation?',
-    'mi_feature_coming_soon'      => ':feature – feature coming soon!',
+    'mi_feature_coming_soon'      => ':feature � feature coming soon!',
     'mi_empty_active_title'       => 'No active conversations',
     'mi_empty_archived_title'     => 'No archived conversations',
     'mi_empty_active_desc'        => 'Start a conversation by contacting a sitter or owner.',
     'mi_empty_archived_desc'      => 'Archived conversations will appear here.',
     'mi_find_sitter'              => 'Find a Sitter',
-
     // ========================================== //
     // BOOKING CARD (Partial)                      //
     // ========================================== //
@@ -1531,7 +1325,7 @@ return [
     'bc_visit_per_day'            => ':count visit(s)/day',
     'bc_total_visits'             => ':count total visits',
     'bc_notes_label'              => 'Notes:',
-    'bc_food_sitter_provides'     => 'Sitter provides food (+₱:amount)',
+    'bc_food_sitter_provides'     => 'Sitter provides food (+?:amount)',
     'bc_food_owner_provides'      => 'Owner provides food',
     'bc_accept'                   => 'Accept',
     'bc_decline'                  => 'Decline',
@@ -1549,7 +1343,6 @@ return [
     'bc_decline_ph'               => 'e.g., I am not available on those dates...',
     'bc_decline_btn'              => 'Decline Booking',
     'status_declined'             => 'Declined',
-
     // ========================================== //
     // BOOKING CREATE                              //
     // ========================================== //
@@ -1576,7 +1369,7 @@ return [
     'cb_visits_2'                 => '2 visits per day',
     'cb_visits_3'                 => '3 visits per day',
     'cb_visits_4'                 => '4 visits per day',
-    'cb_visits_custom'            => 'Custom number…',
+    'cb_visits_custom'            => 'Custom number�',
     'cb_visits_custom_ph'         => 'Enter number (1-20)',
     'cb_visits_custom_hint'       => 'Minimum 1, maximum 20 visits per day.',
     'cb_rate_label'               => 'Sitter Rate per Visit',
@@ -1594,7 +1387,7 @@ return [
     'cb_food_owner'               => 'Owner provides food',
     'cb_food_sitter'              => 'Sitter provides food',
     'cb_food_flexible'            => 'Flexible / To be discussed',
-    'cb_food_budget_label'        => 'Food Budget per Visit (₱)',
+    'cb_food_budget_label'        => 'Food Budget per Visit (?)',
     'cb_not_applicable'           => '(not applicable)',
     'cb_food_budget_ph'           => 'e.g., 50',
     'cb_food_owner_note'          => 'You will provide the pet food. The sitter will only do the feeding.',
@@ -1608,15 +1401,14 @@ return [
     'cb_step8_title'              => '8. Special Instructions',
     'cb_special_ph'               => 'Any special instructions for the sitter...',
     'cb_payment_summary'          => 'Payment Summary',
-    'cb_sitter_rate_label'        => 'Sitter Rate (₱:rate × :visits visits)',
-    'cb_food_cost_label'          => 'Food (₱:budget × :visits visits)',
+    'cb_sitter_rate_label'        => 'Sitter Rate (?:rate � :visits visits)',
+    'cb_food_cost_label'          => 'Food (?:budget � :visits visits)',
     'cb_total_pay'                => 'Total to Pay Sitter',
-    'cb_breakdown'                => ':days day(s) × :visits visit(s)/day = :total total visits',
+    'cb_breakdown'                => ':days day(s) � :visits visit(s)/day = :total total visits',
     'cb_payment_notice_title'     => 'Direct payment.',
     'cb_payment_notice_desc'      => 'Pay the sitter directly after the service is completed.',
     'cb_cancel'                   => 'Cancel',
     'cb_confirm'                  => 'Confirm Booking',
-
     // ========================================== //
     // MY BOOKINGS (Index)                         //
     // ========================================== //
@@ -1644,7 +1436,6 @@ return [
     'mbi_cancel_note'             => 'The reason will be shared with the sitter.',
     'mbi_keep_booking'            => 'Keep Booking',
     'mbi_yes_cancel'              => 'Yes, Cancel',
-
     // ========================================== //
     // SHOW BOOKING (Details)                      //
     // ========================================== //
@@ -1659,15 +1450,15 @@ return [
     'sb_contact'                  => 'Contact',
     'sb_schedule_title'           => 'Schedule',
     'sb_date_range'               => 'Date Range',
-    'sb_days_visits_per_day'      => ':days day(s) • :per_day visit(s)/day',
+    'sb_days_visits_per_day'      => ':days day(s) � :per_day visit(s)/day',
     'sb_total_visits_label'       => 'Total Visits',
     'sb_visits_count'             => ':count visits',
     'sb_time_schedule_label'      => 'Time Schedule (same each day)',
     'sb_visit_progress'           => 'Visit Progress',
     'sb_progress_count'           => ':completed / :total completed',
     'sb_payment_details'          => 'Payment Details',
-    'sb_sitter_rate_label'        => 'Sitter Rate (₱:rate × :visits visits)',
-    'sb_food_cost_label'          => 'Food (₱:budget × :visits visits)',
+    'sb_sitter_rate_label'        => 'Sitter Rate (?:rate � :visits visits)',
+    'sb_food_cost_label'          => 'Food (?:budget � :visits visits)',
     'sb_total'                    => 'Total',
     'sb_tasks_instructions'       => 'Tasks & Instructions',
     'sb_tasks_every_visit'        => 'Tasks (every visit)',
@@ -1684,7 +1475,7 @@ return [
     'sb_rejection_reason'         => 'Rejection Reason',
     'sb_cancellation_reason'      => 'Cancellation Reason',
     'sb_by'                       => 'By:',
-    'sb_back_to_bookings'         => '← Back to Bookings',
+    'sb_back_to_bookings'         => '⬅ Back to Bookings',
     'sb_cancel_booking'           => 'Cancel Booking',
     'sb_cancel_modal_title'       => 'Cancel Booking?',
     'sb_cancel_modal_desc'        => 'Please provide a reason why you are cancelling this booking.',
@@ -1694,7 +1485,6 @@ return [
     'sb_cancel_note_owner'        => 'The reason will appear in the notification and email to the owner.',
     'sb_keep_booking'             => 'Keep Booking',
     'sb_yes_cancel'               => 'Yes, Cancel',
-
     // ========================================== //
     // MYPETS                                       //
     // ========================================== //
@@ -1775,7 +1565,16 @@ return [
     'mp_delete_confirm'    => 'Are you sure you want to delete',
     'mp_delete_warning'    => 'This action cannot be undone.',
     'mp_delete'            => 'Delete',
+    // Vaccination Status
+    'mp_vaccination'         => 'Vaccination Status',
+    'mp_select_vaccination'  => 'Select vaccination status',
+    'mp_vax_complete'        => 'Complete (all vaccines up to date)',
+    'mp_vax_partial'         => 'Partial (some vaccines only)',
+    'mp_vax_none'            => 'None / Not vaccinated',
 
+    // Temperament (additional options)
+    'mp_temp_aggressive'     => 'Aggressive',
+    'mp_temp_anxious'        => 'Anxious',
     // ========================================== //
     // NOTIFICATIONS                                //
     // ========================================== //
@@ -1800,8 +1599,7 @@ return [
     'notif_delete'            => 'Delete',
     'notif_close'             => 'Close',
     'notif_view_details_full' => 'View Details',
-
-    // ========================================== //
+        // ========================================== //
     // FIND SITTER                                  //
     // ========================================== //
     'fs_title'                => 'Find a Sitter',
@@ -1819,7 +1617,6 @@ return [
     'fs_level_st2'            => 'ST2 - Handle Large & Aggressive Pets',
     'fs_level_st3'            => 'ST3 - Handle Exotic Pets',
     'fs_search_btn'           => 'Search',
-
     'fs_badge_id_title'       => 'ID Verified Sitters',
     'fs_badge_id_desc'        => 'Government ID validation',
     'fs_badge_rating_title'   => 'Rated and Reviewed',
@@ -1828,7 +1625,6 @@ return [
     'fs_badge_booking_desc'   => 'Check availability instantly',
     'fs_badge_food_title'     => 'Flexible Food',
     'fs_badge_food_desc'      => 'Your choice, your budget',
-
     'fs_recommended_title'    => 'Recommended Sitters',
     'fs_recommended_desc'     => 'Ranked by matching algorithm: location, food preference, and rating',
     'fs_sitters_count'        => ':count sitters',
@@ -1842,16 +1638,22 @@ return [
     'fs_food_not_set'         => 'Food arrangement not set',
     'fs_no_sitters_title'     => 'No sitters available yet',
     'fs_no_sitters_desc'      => 'Check back later for available sitters in your area.',
-
+    'fs_no_pets_title'        => 'No pets yet',
+    'fs_no_pets_desc'         => 'Add a pet first so we can match you with the best sitters.',
+    'fs_add_pet'              => 'Add a Pet',
+    'fs_all_pets'             => 'All Pets (No filter)',
+    'fs_service_location_ph'   => 'Service location (e.g., your home address)',
+    'fs_service_location_tip'  => 'Where should the sitter provide service?',
+    'fs_service_location_hint' => 'Type a different address if you want the sitter to visit another location.',
     // ========================================== //
     // SITTER PROFILE (Owner viewing)              //
     // ========================================== //
-    'sp_back_to_sitters'      => '← Back to sitters',
+    'sp_back_to_sitters'      => '⬅ Back to sitters',
     'sp_location_not_set'     => 'Location not set',
     'sp_id_verified'          => 'ID Verified',
     'sp_reviews_count'        => ':count reviews',
     'sp_daily_rate'           => 'Daily rate',
-    'sp_food_budget_note'     => '+₱:amount/day if sitter provides food',
+    'sp_food_budget_note'     => '+?:amount/day if sitter provides food',
     'sp_no_bio'               => 'This sitter hasn\'t added a bio yet.',
     'sp_food_arrangement'     => 'Food Arrangement',
     'sp_available_dates'      => 'Available Dates',
@@ -1867,8 +1669,8 @@ return [
     'sp_be_respectful'        => 'Be respectful and kind 💚',
     'sp_post_comment'         => 'Post Comment',
     'sp_post'                 => 'Post',
-    'sp_reply'                => '← Reply',
-    'sp_cancel_reply'         => '← Cancel reply',
+    'sp_reply'                => '⬅ Reply',
+    'sp_cancel_reply'         => '⬅ Cancel reply',
     'sp_reply_ph'             => 'Write a reply...',
     'sp_reply_btn'            => 'Reply',
     'sp_no_comments'          => 'No comments yet. Be the first to ask a question! 💬',
@@ -1879,13 +1681,12 @@ return [
     'sp_food_not_set_short'   => 'Not set',
     'sp_pets_not_specified'   => 'Not specified',
     'sp_sitter_fallback'      => 'Sitter',
-
     // ========================================== //
     // PROFILE (Public View + Edit)                 //
     // ========================================== //
     // Public view
     'pf_title'                 => 'Profile',
-    'pf_role_sitter_level'     => 'Pet Sitter • Level :level',
+    'pf_role_sitter_level'     => 'Pet Sitter � Level :level',
     'pf_role_owner'            => 'Pet Owner',
     'pf_location_not_set'      => 'Location not set',
     'pf_id_verified'           => 'ID Verified',
@@ -1905,10 +1706,10 @@ return [
     'pf_pet_sizes_accepted'    => 'Pet Sizes Accepted',
     'pf_food_arrangement'      => 'Food Arrangement',
     'pf_food_owner'            => 'Owner provides food',
-    'pf_food_sitter'           => 'Sitter provides food (+₱:amount)',
+    'pf_food_sitter'           => 'Sitter provides food (+?:amount)',
     'pf_food_flexible'         => 'Flexible',
     'pf_pet_capacity'          => 'Pet Capacity',
-    'pf_pets_range'            => ':min – :max pets',
+    'pf_pets_range'            => ':min � :max pets',
     'pf_pets'                  => 'Pets',
     'pf_pets_count'            => ':count pets',
     'pf_no_pets'               => 'No pets added yet.',
@@ -1922,7 +1723,6 @@ return [
     'pf_contact'               => 'Contact',
     'pf_mixed'                 => 'Mixed',
     'pf_unknown'               => 'Unknown',
-
     // Edit page
     'pe_title'                 => 'Profile Settings',
     'pe_subtitle'              => 'Manage your account details and verification',
@@ -1936,7 +1736,6 @@ return [
     'pe_profile_information'   => 'Profile Information',
     'pe_location_contact'      => 'Location & Contact',
     'pe_update_password_title' => 'Update Password',
-
     // Partial: profile info
     'pf_first_name'            => 'First Name',
     'pf_middle_name'           => 'Middle Name',
@@ -1959,13 +1758,11 @@ return [
     'pf_resend_verification'   => 'Click here to re-send the verification email.',
     'pf_verification_sent'     => 'A new verification link has been sent.',
     'pf_contact_number_ph'     => '09xx xxx xxxx',
-
     // Partial: password
     'pf_current_password'      => 'Current Password',
     'pf_new_password'          => 'New Password',
     'pf_confirm_password'      => 'Confirm Password',
     'pf_update_password_btn'   => 'Update Password',
-
     // Partial: location
     'pf_city_municipality'     => 'City / Municipality',
     'pf_city_ph'               => 'e.g. Quezon City',
@@ -1974,13 +1771,12 @@ return [
     'pf_latitude_ph'           => 'e.g. 14.5995',
     'pf_longitude'             => 'Longitude',
     'pf_longitude_ph'          => 'e.g. 120.9842',
-    'pf_optional_geo'          => 'Optional – auto-filled if you use "Detect Location".',
+    'pf_optional_geo'          => 'Optional � auto-filled if you use "Detect Location".',
     'pf_detect_location'       => 'Detect My Current Location',
     'pf_update_location'       => 'Update Location',
     'pf_geo_not_supported'     => 'Geolocation is not supported by your browser.',
     'pf_geo_success'           => 'Location detected! Latitude and longitude have been filled.',
     'pf_geo_error'             => 'Unable to retrieve location: :error',
-
     // Partial: ID verification
     'pf_step_upload_id'        => 'Upload ID',
     'pf_step_selfie_id'        => 'Selfie with ID',
@@ -1989,7 +1785,7 @@ return [
     'pf_step_status_submit'    => 'Submit',
     'pf_upload_gov_id'         => 'Upload Your Government ID',
     'pf_upload_gov_id_desc'    => 'First, choose your ID type. Then upload a clear photo of it.',
-    'pf_select_id_type'        => '— Select ID type —',
+    'pf_select_id_type'        => '-- Select ID type --',
     'pf_id_passport'           => 'Passport',
     'pf_id_drivers_license'    => 'Driver\'s License',
     'pf_id_umid'               => 'UMID',
@@ -1998,7 +1794,7 @@ return [
     'pf_id_national'           => 'National ID',
     'pf_id_other'              => 'Other',
     'pf_upload_id_hint'        => 'Upload a clear photo of your :id.',
-    'pf_id_accepted'           => 'Accepted: JPG, PNG • Max size: 5MB',
+    'pf_id_accepted'           => 'Accepted: JPG, PNG � Max size: 5MB',
     'pf_select_id_btn'         => 'Select ID →',
     'pf_upload_id_btn'         => 'Upload ID →',
     'pf_take_selfie_id'        => 'Take a Selfie with Your ID',
@@ -2009,19 +1805,18 @@ return [
     'pf_ready_submit_desc'     => 'Your ID and selfie have been uploaded. Submit them for review.',
     'pf_submit_verification'   => 'Submit for Verification →',
     'pf_verifying_progress'    => 'Verification in Progress',
-    'pf_verifying_desc'        => 'We\'re reviewing your submitted documents. This usually takes 1–2 business days.',
+    'pf_verifying_desc'        => 'We\'re reviewing your submitted documents. This usually takes 1�2 business days.',
     'pf_verified_title'        => 'Identity Verified!',
     'pf_verified_desc'         => 'Your identity has been successfully verified. You can now:',
-    'pf_verified_item_1'       => '✓ Post sitting requests',
-    'pf_verified_item_2'       => '✓ Apply to become a sitter',
-    'pf_verified_item_3'       => '✓ Receive higher trust ratings',
+    'pf_verified_item_1'       => '? Post sitting requests',
+    'pf_verified_item_2'       => '? Apply to become a sitter',
+    'pf_verified_item_3'       => '? Receive higher trust ratings',
     'pf_failed_title'          => 'Verification Failed',
     'pf_failed_desc'           => 'Your submission was rejected. Please upload a clear selfie holding your valid ID and try again.',
     'pf_retry'                 => 'Retry Verification →',
-    'pf_photo_uploaded'        => '✅ Photo uploaded successfully.',
+    'pf_photo_uploaded'        => '? Photo uploaded successfully.',
     'pf_id_fallback'           => 'ID',
     'pf_id_doc'                => 'Government-issued ID',
-
     // OCR Result
     'pf_ocr_success_title'     => 'OCR Extraction Successful',
     'pf_ocr_success_desc'      => 'We successfully read the details on your ID.',
@@ -2029,7 +1824,6 @@ return [
     'pf_ocr_failed_desc'       => 'We could not read the text on your ID. Please try again with a clearer photo.',
     'pf_ocr_label_name'        => 'Name',
     'pf_ocr_label_id'          => 'ID Number',
-
     // Delete account
     'pf_delete_account'        => 'Delete Account',
     'pf_delete_account_desc'   => 'Once your account is deleted, all data will be permanently removed.      Please download any data you wish to keep before proceeding.',
@@ -2037,7 +1831,6 @@ return [
     'pf_delete_confirm_desc'   => 'This action is irreversible. Please enter your password to confirm.',
     'pf_password'              => 'Password',
     'pf_cancel'                => 'Cancel',
-
     // Camera / Gallery options
     'pf_open_camera'         => 'Open Camera',
     'pf_choose_gallery'      => 'Choose from Gallery',
@@ -2048,13 +1841,11 @@ return [
     'pf_id_camera_title'     => 'Capture Your ID',
     'pf_selfie_camera_title' => 'Take a Selfie with ID',
     'pf_capture_photo'       => 'Capture',
-
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
     'ss_title'                 => 'System Settings',
     'ss_subtitle'              => 'Manage your account preferences and system configurations',
-
     // Sitter Mode
     'ss_sitter_mode'           => 'Sitter Mode',
     'ss_sitter_switch'         => 'Switch between :sitter and :owner views. The sidebar changes based on your current mode.',
@@ -2067,7 +1858,6 @@ return [
     'ss_sitter_rejected'       => 'Your last application was :rejected. You can re-apply to become a pet sitter.',
     'ss_rejected_word'         => 'rejected',
     'ss_sitter_become'         => 'Become a pet sitter to accept bookings and earn. Turn on Sitter Mode to get started.',
-
     // Sitter Mode status indicators
     'ss_status_sitter_view'    => 'Currently: Pet Sitter View',
     'ss_status_owner_view'     => 'Currently: Pet Owner View',
@@ -2075,7 +1865,6 @@ return [
     'ss_status_app_pending'    => 'Application Pending',
     'ss_status_app_rejected'   => 'Application Rejected',
     'ss_status_not_sitter'     => 'Not a Sitter Yet',
-
     // Apply as Sitter modal
     'ss_modal_verify_id_title' => 'Verify Your ID First',
     'ss_modal_pending_title'   => 'Application Under Review',
@@ -2085,25 +1874,21 @@ return [
     'ss_modal_pending_desc'    => 'Your sitter application is still being reviewed by our admin team. You\'ll be notified once a decision is made.',
     'ss_modal_reapply_desc'    => 'Your previous application was rejected. You can submit a new application with updated documents.',
     'ss_modal_become_desc'     => 'To enable Sitter Mode, you need to apply as a pet sitter first. This lets you accept bookings, manage visits, and earn from pet owners.',
-
     // You need / benefits lists
     'ss_you_need'              => 'You need:',
     'ss_need_gov_id'           => 'Valid government-issued ID',
     'ss_need_selfie'           => 'Clear selfie holding the ID',
     'ss_need_admin_review'     => 'Admin review (1-2 business days)',
-
     'ss_you_can'               => 'As a Pet Sitter you can:',
     'ss_can_accept'            => 'Accept pet sitting bookings',
     'ss_can_set_rates'         => 'Set your own rates and availability',
     'ss_can_earn'              => 'Earn from completed visits',
-
     // Modal buttons
     'ss_cancel'                => 'Cancel',
     'ss_verify_id_btn'         => 'Verify ID →',
     'ss_contact_support'       => 'Contact Support',
     'ss_continue_application'  => 'Continue Application',
     'ss_reapply_btn'           => 'Re-apply →',
-
     // Preferences
     'ss_preferences'           => 'Preferences',
     'ss_push_notifications'    => 'Push Notifications',
@@ -2118,20 +1903,16 @@ return [
     'ss_language_desc'         => 'Select your preferred language',
     'ss_font_size'             => 'Font Size',
     'ss_font_desc'             => 'Adjust the text size for better readability',
-
     'ss_lang_en'               => 'English',
     'ss_lang_fil'              => 'Filipino',
     'ss_lang_es'               => 'Spanish',
     'ss_lang_fr'               => 'French',
-
     'ss_size_small'            => 'Small',
     'ss_size_default'          => 'Default',
     'ss_size_large'            => 'Large',
     'ss_size_xl'               => 'Extra Large',
-
     'ss_change_lang_failed'    => 'Failed to change language. Please try again.',
     'ss_network_error'         => 'Network error. Please try again.',
-
     // Privacy & Security
     'ss_privacy_security'      => 'Privacy & Security',
     'ss_profile_visibility'    => 'Profile Visibility',
@@ -2147,7 +1928,6 @@ return [
     'ss_active_sessions'       => 'Active Sessions',
     'ss_active_sessions_desc'  => 'Manage your active sessions',
     'ss_view_all'              => 'View All',
-
     // Account
     'ss_account'               => 'Account',
     'ss_email_address'         => 'Email Address',
@@ -2166,7 +1946,6 @@ return [
     'ss_delete_account_desc'   => 'Permanently delete your account and all data',
     'ss_delete'                => 'Delete',
     'ss_save_settings'         => 'Save Settings',
-
     // ========================================== //
     // SITTER APPLICATION                           //
     // ========================================== //
@@ -2174,73 +1953,66 @@ return [
     'sa_subtitle'              => 'Complete your sitter profile to start accepting bookings',
     'sa_back_dashboard'        => 'Back to Dashboard',
     'sa_sitter_details'        => 'Sitter Details',
-
     // About You
     'sa_about_you'             => 'About You',
-    'sa_about_placeholder'     => "Tell pet owners why you'd be a great sitter...",
-    'sa_about_hint'            => 'Share your experience, availability, and passion for pets.',
-
+    'sa_about_placeholder'     => "Tell pet owners why you'd be a great sitter...",    'sa_about_hint'            => 'Share your experience, availability, and passion for pets.',
     // Years of Experience
     'sa_years_exp'             => 'Years of Experience',
     'sa_years_placeholder'     => 'e.g. 2',
     'sa_years_hint'            => 'How many years of experience do you have caring for pets?',
-
     // Sitter Type
     'sa_sitter_type'           => 'Sitter Type',
     'sa_sitter_type_hint'      => 'Select the highest level of pet care you can provide.',
+    'sa_st_small'              => 'Small Pets - Cats, small dogs, rabbits, hamsters',
+    'sa_st_large'              => 'Large Pets - Large dogs, any size dogs',
+    'sa_st_exotic'             => 'Exotic Pets - Birds, reptiles, fish',
+    'sa_st_all'                => 'All Pets - Any size, any type',
     'sa_st1'                   => 'ST1 - Handle Regular Pets',
     'sa_st2'                   => 'ST2 - Handle Large & Aggressive Pets',
     'sa_st3'                   => 'ST3 - Handle Exotic Pets',
+    'sa_st_small_short'      => 'Small Pets',
+    'sa_st_large_short'      => 'Large Pets',
+    'sa_st_exotic_short'     => 'Exotic Pets',
+    'sa_st_all_short'        => 'All Pets',
 
     // Base Rate
-    'sa_rate_per_visit'        => 'Base Rate per Visit (₱)',
+    'sa_rate_per_visit'        => 'Base Rate per Visit (?)',
     'sa_rate_placeholder'      => 'e.g. 250',
-    'sa_rate_hint'             => 'Recommended: ₱150 – ₱500 per visit.',
-
+    'sa_rate_hint'             => 'Recommended: ?150 � ?500 per visit.',
     // Food Arrangement
     'sa_food_arrangement'      => 'Food Arrangement',
     'sa_food_arrangement_hint' => 'Choose your preferred food arrangement for pets.',
     'sa_food_owner'            => 'Owner provides food',
-    'sa_food_sitter'           => 'Sitter provides food (+₱100/visit)',
+    'sa_food_sitter'           => 'Sitter provides food (+?100/visit)',
     'sa_food_flexible'         => 'Flexible (both options)',
-
     // Food Budget
-    'sa_food_budget'           => 'Food Budget per Visit (₱)',
+    'sa_food_budget'           => 'Food Budget per Visit (?)',
     'sa_food_budget_placeholder' => 'e.g. 100',
-    'sa_food_budget_hint'      => 'How much do you budget for food per visit? (Default: ₱100)',
-
-    // Pet Types
+    'sa_food_budget_hint'      => 'How much do you budget for food per visit? (Default: ?100)',    // Pet Types
     'sa_pet_types'             => 'What pets can you handle?',
-    'sa_pet_types_hint'        => 'Select all types of pets you are comfortable handling.',
-
-    // Pet Sizes
-    'sa_pet_sizes'             => 'What sizes can you handle?',
+    'sa_pet_types_hint'        => 'Select all types of pets you are comfortable handling.',        'sa_pet_sizes'             => 'What sizes can you handle?',
     'sa_pet_sizes_hint'        => 'Select the sizes of pets you can care for.',
     'sa_size_small'            => 'Small',
     'sa_size_medium'           => 'Medium',
     'sa_size_large'            => 'Large',
     'sa_size_giant'            => 'Giant',
-
     // Pet Capacity
     'sa_pet_capacity'          => 'How many pets can you handle at a time?',
     'sa_min'                   => 'Minimum',
     'sa_max'                   => 'Maximum',
     'sa_min_placeholder'       => 'e.g. 1',
     'sa_max_placeholder'       => 'e.g. 3',
-    'sa_capacity_hint'         => 'Set the min/max number of pets you can handle in a single booking.',
-
+    'sa_capacity_hint'         => 'Set the min/max number of pets you can handle in a single booking',
     // Upload Certificates
     'sa_upload_certs'          => 'Upload Certificates (Optional)',
     'sa_upload_certs_click'    => 'Click to upload your certificates',
-    'sa_upload_certs_desc'     => 'PDF, JPG, JPEG, PNG • Max 5MB each • Multiple files allowed',
+    'sa_upload_certs_desc'     => 'PDF, JPG, JPEG, PNG � Max 5MB each � Multiple files allowed',
     'sa_add_more'              => 'Add more files',
     'sa_remove'                => 'Remove',
     'sa_upload_certs_hint'     => 'Upload any relevant certifications (pet first aid, grooming, training, etc.)',
-
     // Submit buttons
     'sa_update_application'    => 'Update Application',
     'sa_submit_application'    => 'Submit Application',
-
     // Status banners
     'sa_status_approved_title' => 'Your sitter application is approved!',
     'sa_status_approved_desc'  => 'You can now accept bookings.',
@@ -2248,13 +2020,27 @@ return [
     'sa_status_pending_desc'   => "We'll notify you once approved.",
     'sa_status_rejected_title' => 'Your application was rejected.',
     'sa_status_rejected_desc'  => 'Please update your information and reapply.',
+    // ?? Accepted Health Conditions (H factor) ??
+    'sa_accepted_health'             => 'Health Conditions You Can Handle',
+    'sa_accepted_health_hint'        => 'Select the health conditions you are comfortable caring for.',
+    'sa_health_special'              => 'Special Needs',
+    'sa_health_partial_vax'          => 'Partial Vaccination',
+    'sa_health_chronic'              => 'Chronic Illness',
+    'sa_health_recovering'           => 'Recovering from Illness',
 
-        // ========================================== //
+    // ?? Accepted Temperaments (T factor) ??
+    'sa_accepted_temperaments'       => 'Temperaments You Can Handle',
+    'sa_accepted_temperaments_hint'  => 'Select the pet temperaments you can safely manage.',
+    'sa_temp_friendly'               => 'Friendly',
+    'sa_temp_playful'                => 'Playful',
+    'sa_temp_shy'                    => 'Shy',
+    'sa_temp_aggressive'             => 'Aggressive',
+    'sa_temp_anxious'                => 'Anxious',
+    // ========================================== //
     // SITTER AVAILABILITY                          //
     // ========================================== //
     'sav_title'                 => 'Availability',
     'sav_subtitle'              => 'Manage your schedule and track bookings',
-
     // Summary cards
     'sav_total_slots'           => 'Total Slots',
     'sav_all_registered'        => 'All registered slots',
@@ -2264,13 +2050,11 @@ return [
     'sav_confirmed_bookings'    => 'Confirmed bookings',
     'sav_unavailable'           => 'Unavailable',
     'sav_blocked_time'          => 'Blocked time',
-
     // Today's schedule
     'sav_todays_schedule'       => "Today's Schedule",
     'sav_no_slots_today'        => 'No slots for today. Add your first slot below.',
     'sav_slots_today'           => 'Slots Today',
     'sav_booked'                => 'Booked',
-
     // Add availability form
     'sav_add_availability'      => 'Add Availability',
     'sav_date'                  => 'Date',
@@ -2278,29 +2062,24 @@ return [
     'sav_end'                   => 'End',
     'sav_status'                => 'Status',
     'sav_save_availability'     => 'Save Availability',
-
     // Timeline
     'sav_timeline'              => 'Availability Timeline',
     'sav_no_availability_yet'   => 'No availability added yet.',
-
     // Upcoming bookings
     'sav_upcoming_bookings'     => 'Upcoming Bookings',
     'sav_view_all'              => 'View All',
     'sav_no_upcoming'           => 'No upcoming bookings yet.',
     'sav_no_upcoming_desc'      => 'Bookings will appear here once owners schedule visits.',
-
     // Schedule
     'sav_schedule'              => 'Availability Schedule',
     'sav_slots'                 => 'slots',
     'sav_no_availability_set'   => 'No availability set yet.',
     'sav_no_availability_set_desc' => 'Add your first slot above to get started.',
-
     // Delete modal
     'sav_delete_title'          => 'Delete Availability?',
     'sav_delete_desc'           => 'Are you sure you want to remove this availability slot? This action cannot be undone.',
     'sav_cancel'                => 'Cancel',
     'sav_delete'                => 'Delete',
-
     // Calendar
     'sav_calendar_reference'    => 'Calendar Reference',
     'sav_sun'                   => 'Sun',
@@ -2311,7 +2090,6 @@ return [
     'sav_fri'                   => 'Fri',
     'sav_sat'                   => 'Sat',
     'sav_today'                 => 'Today',
-
     // ========================================== //
     // SITTER BOOKING VISITS                        //
     // ========================================== //
@@ -2324,13 +2102,11 @@ return [
     'sbv_overall_progress'      => 'Overall Progress',
     'sbv_special_instructions'  => 'Special Instructions',
     'sbv_tasks_every_visit'     => 'Tasks (every visit)',
-
     // Status labels
     'sbv_status_pending'        => 'Pending',
     'sbv_status_in_progress'    => 'In Progress',
     'sbv_status_completed'      => 'Completed',
     'sbv_status_missed'         => 'Missed',
-
     // Visit card
     'sbv_visit_x_of'            => 'Visit #:num / :total',
     'sbv_visits_count'          => ':count visit(s)',
@@ -2340,16 +2116,14 @@ return [
     'sbv_photo_uploaded'        => 'Photo uploaded',
     'sbv_tasks_done_label'      => 'Tasks (:done/:total done)',
     'sbv_more'                  => '+:count more',
-    'sbv_overdue'               => 'Overdue — scheduled :time',
+    'sbv_overdue'               => 'Overdue �� scheduled :time',
     'sbv_open_visit'            => 'Open visit →',
     'sbv_no_visits'             => 'No visits generated for this booking yet.',
-
-        // ========================================== //
+    // ========================================== //
     // SITTER DASHBOARD                             //
     // ========================================== //
     'sd_title'                  => 'Sitter Dashboard',
     'sd_subtitle'               => 'Overview of your earnings and performance',
-
     // Stats cards
     'sd_total_earnings'         => 'Total Earnings',
     'sd_completed'              => 'completed',
@@ -2359,57 +2133,48 @@ return [
     'sd_next_7_days'            => 'Next 7 days',
     'sd_this_month'             => 'This Month',
     'sd_done'                   => 'done',
-
     // Chart: Monthly Earnings
     'sd_monthly_earnings'       => 'Monthly Earnings',
     'sd_last_6_months'          => 'Last 6 months',
     'sd_no_earnings_yet'        => 'No earnings yet',
-
     // Chart: Earnings Breakdown
     'sd_earnings_breakdown'     => 'Earnings Breakdown',
     'sd_by_category'            => 'By category',
     'sd_sitting'                => 'Sitting',
     'sd_no_completed_bookings'  => 'No completed bookings yet',
-
     // Recent Payments
     'sd_recent_payments'        => 'Recent Payments',
     'sd_view_all'               => 'View All',
     'sd_booking'                => 'Booking',
     'sd_no_completed_payments'  => 'No completed payments yet',
-
     // Upcoming Visits
     'sd_upcoming_visits'        => 'Upcoming Visits',
     'sd_today'                  => 'Today',
     'sd_tomorrow'               => 'Tomorrow',
     'sd_visits_per_day'         => 'visits/day',
     'sd_no_upcoming_visits'     => 'No upcoming visits',
-
     // Performance stats
     'sd_avg_rating'             => '⭐ Average Rating',
     'sd_from_reviews'           => 'From :count review(s)',
-    'sd_completion_rate'        => '✅ Completion Rate',
+    'sd_completion_rate'        => '? Completion Rate',
     'sd_visits_completed'       => ':done/:total visits completed',
     'sd_active_bookings'        => '🐾 Active Bookings',
     'sd_owners_count'           => ':count owner(s)',
     'sd_total_visits'           => '📅 Total Visits',
     'sd_last_30_days'           => 'Last 30 days',
-
     // Fallbacks
     'sd_owner_default'          => 'Owner',
     'sd_pet_default'            => 'Pet',
-
     // ========================================== //
     // SITTER TASK INDEX                            //
     // ========================================== //
     'sti_title'                 => 'My Tasks',
     'sti_subtitle'              => 'Manage your assigned tasks for active bookings',
-
     // Stats cards
     'sti_total_tasks'           => 'Total Tasks',
     'sti_completed'             => 'Completed',
     'sti_pending'               => 'Pending',
     'sti_overdue'               => 'Overdue',
-
     // Booking card
     'sti_booking_ref'           => 'Booking Reference',
     'sti_pet'                   => 'Pet',
@@ -2418,39 +2183,32 @@ return [
     'sti_owner_default'         => 'Owner',
     'sti_visit_progress'        => 'Visit Progress',
     'sti_visits'                => 'visits',
-
     // Next visit
     'sti_next_visit'            => 'Next Visit',
     'sti_today_at'              => 'Today, :time',
     'sti_tomorrow_at'           => 'Tomorrow, :time',
     'sti_all_visits_completed'  => 'All visits completed',
-
     // Badges
     'sti_badge_in_progress'     => 'In Progress',
     'sti_badge_completed'       => 'Completed',
     'sti_badge_active'          => 'Active',
     'sti_due_today'             => 'Due Today',
     'sti_upcoming'              => 'Upcoming',
-    'sti_done'                  => '✓ Done',
-
+    'sti_done'                  => '? Done',
     // View details
     'sti_view_visits'           => 'View :count visit(s) →',
-
     // Empty state
     'sti_no_bookings'           => 'No active bookings assigned to you yet.',
-
-        // ========================================== //
+    // ========================================== //
     // TASK TO-DO (Visit Detail)                    //
     // ========================================== //
     'std_title'                 => 'Task To-Do',
     'std_subtitle'              => 'Complete your assigned tasks for this visit',
-
     // Status labels
     'std_status_pending'        => 'Pending',
     'std_status_in_progress'    => 'In Progress',
     'std_status_completed'      => 'Completed',
     'std_status_missed'         => 'Missed',
-
     // Booking summary
     'std_booking_ref'           => 'Booking Ref',
     'std_pet'                   => 'Pet',
@@ -2458,7 +2216,6 @@ return [
     'std_owner'                 => 'Owner',
     'std_owner_default'         => 'Owner',
     'std_status'                => 'Status',
-
     // Visit information
     'std_visit_info'            => 'Visit Information',
     'std_visit_number'          => 'Visit Number',
@@ -2467,7 +2224,6 @@ return [
     'std_scheduled_time'        => 'Scheduled Time',
     'std_late_msg'              => '⚠️ <strong>Late by :min minutes</strong> (:pct% deduction)',
     'std_special_instructions'  => 'Special Instructions',
-
     // Time log
     'std_time_log'              => 'Time Log',
     'std_check_in_time'         => 'Check In Time',
@@ -2478,49 +2234,40 @@ return [
     'std_duration'              => 'Duration:',
     'std_minutes'               => 'Minutes',
     'std_auto_calculated'       => '(auto-calculated)',
-
     // Tasks checklist
     'std_tasks_to_complete'     => 'Tasks to Complete',
     'std_save_tasks'            => 'Save Tasks',
-
     // Photo proof
     'std_photo_proof'           => 'Photo Proof',
     'std_photos_uploaded'       => ':count photo(s) uploaded',
     'std_click_photo_fullsize'  => 'Click a photo to view full size',
     'std_last_upload'           => 'Last upload: :time',
     'std_click_select_photos'   => 'Click to select photos',
-    'std_photo_limits'          => 'PNG, JPG, WEBP up to 5MB each · Multiple selection · Max 10',
+    'std_photo_limits'          => 'PNG, JPG, WEBP up to 5MB each � Multiple selection � Max 10',
     'std_photos_selected'       => 'photo(s) selected',
     'std_clear_all'             => 'Clear all',
     'std_add_more_photos'       => 'Add more photos',
-    'std_add_hint'              => "(doesn't replace — just adds)",
-    'std_upload'                => 'Upload',
-
+    'std_add_hint'              => "(doesn't replace �� just adds)",    'std_upload'                => 'Upload',
     // Sitter notes
     'std_sitter_notes'          => 'Sitter Notes',
     'std_notes_placeholder'     => 'Add your notes about this visit...',
     'std_save_note'             => 'Save Note',
-
     // Complete visit
     'std_complete_visit'        => 'Complete Visit',
     'std_complete_desc'         => 'Make sure all tasks are done and photo proof is uploaded before marking as completed.',
     'std_mark_completed'        => 'Mark Visit as Completed',
-
     // JS confirm dialogs
     'std_confirm_checkin'       => 'Check in for this visit?',
     'std_confirm_checkout'      => 'Check out for this visit?',
     'std_confirm_complete'      => 'Mark this visit as COMPLETED?',
-
     // ========================================== //
     // OWNER TASK MONITOR                           //
     // ========================================== //
     'otm_title'                 => 'Task Monitor',
     'otm_subtitle'              => "Monitor your sitter's completed visits and assigned tasks",
-
     // JS alerts
     'otm_alert_select_rating'   => 'Please select a rating (1-5 stars).',
     'otm_alert_write_comment'   => 'Please write a comment.',
-
     // Booking card
     'otm_booking_ref'           => 'Booking Reference',
     'otm_status_completed'      => 'Completed',
@@ -2533,17 +2280,14 @@ return [
     'otm_visits'                => 'visits',
     'otm_no_visits_scheduled'   => 'No visits scheduled yet.',
     'otm_view_details'          => 'View details →',
-
     // Rate button
     'otm_reviewed'              => 'Reviewed',
     'otm_rate_sitter'           => 'Rate Sitter',
     'otm_rate_count'            => 'Rate (:done/:total)',
     'otm_complete_all_visits'   => 'Complete all :total visits before rating',
-
     // Empty state
     'otm_no_bookings'           => 'No active bookings to monitor yet.',
     'otm_find_sitter'           => '→ Find a sitter',
-
     // Review modal
     'otm_rate_your_sitter'      => 'Rate Your Sitter',
     'otm_how_was_experience'    => 'How was your experience?',
@@ -2551,22 +2295,18 @@ return [
     'otm_tap_star'              => 'Tap a star to rate',
     'otm_your_review'           => 'Your Review',
     'otm_review_placeholder'    => 'Share your experience with this sitter...',
-    'otm_review_visible'        => "This will be visible on the sitter's profile.",
-    'otm_cancel'                => 'Cancel',
+    'otm_review_visible'        => "This will be visible on the sitter's profile.",    'otm_cancel'                => 'Cancel',
     'otm_submit_review'         => 'Submit Review',
-
     // ========================================== //
     // OWNER VISIT DETAIL (read-only)               //
     // ========================================== //
     'ovs_title'                 => 'Visit Details',
     'ovs_subtitle'              => 'Visit #:num of :total',
-
     // Status labels
     'ovs_status_pending'        => 'Pending',
     'ovs_status_in_progress'    => 'In Progress',
     'ovs_status_completed'      => 'Completed',
     'ovs_status_missed'         => 'Missed',
-
     // Booking summary
     'ovs_booking_ref'           => 'Booking Ref',
     'ovs_pet'                   => 'Pet',
@@ -2574,7 +2314,6 @@ return [
     'ovs_owner'                 => 'Owner',
     'ovs_owner_default'         => 'Owner',
     'ovs_status'                => 'Status',
-
     // Visit information
     'ovs_visit_info'            => 'Visit Information',
     'ovs_visit_number'          => 'Visit Number',
@@ -2583,7 +2322,6 @@ return [
     'ovs_scheduled_time'        => 'Scheduled Time',
     'ovs_late_msg'              => '⚠️ <strong>Late by :min minutes</strong> (:pct% deduction)',
     'ovs_special_instructions'  => 'Special Instructions',
-
     // Time log
     'ovs_time_log'              => 'Time Log',
     'ovs_check_in_time'         => 'Check In Time',
@@ -2592,25 +2330,20 @@ return [
     'ovs_not_yet_checked_out'   => 'Not yet checked out',
     'ovs_duration'              => 'Duration:',
     'ovs_minutes'               => 'Minutes',
-
     // Tasks
     'ovs_tasks'                 => 'Tasks',
     'ovs_tasks_completed'       => ':done / :total tasks completed',
-
     // Photo proof
     'ovs_photo_proof'           => 'Photo Proof',
     'ovs_click_photo_fullsize'  => 'Click a photo to view full size (:count)',
     'ovs_uploaded_at'           => 'Uploaded: :time',
     'ovs_no_photo_proof'        => 'No photo proof uploaded yet.',
-
     // Sitter notes
     'ovs_sitter_notes'          => 'Sitter Notes',
     'ovs_no_notes'              => 'No notes added for this visit.',
-
     // Back action
-    'ovs_back_visit_history'    => '← Back to Visit History',
-
-        // ========================================== //
+    'ovs_back_visit_history'    => '⬅ Back to Visit History',
+    // ========================================== //
     // OWNER BOOKING SHOW (Visit History)           //
     // ========================================== //
     'otb_overall_progress'      => 'Overall Visit Progress',
@@ -2618,24 +2351,20 @@ return [
     'otb_assigned_sitter'       => 'Assigned Sitter',
     'otb_booking_status'        => 'Booking Status',
     'otb_special_instructions'  => 'Special Instructions',
-
     // Booking status labels
     'otb_bstatus_pending'       => 'Pending',
     'otb_bstatus_active'        => 'Active',
     'otb_bstatus_completed'     => 'Completed',
     'otb_bstatus_cancelled'     => 'Cancelled',
     'otb_bstatus_rejected'      => 'Rejected',
-
     // Visit status labels
     'otb_vstatus_pending'       => 'Pending',
     'otb_vstatus_in_progress'   => 'In Progress',
     'otb_vstatus_completed'     => 'Completed',
     'otb_vstatus_missed'        => 'Missed',
-
     // Visit history
     'otb_visit_history'         => 'Visit History (:count)',
     'otb_no_visits_scheduled'   => 'No visits have been scheduled yet.',
-
     // Visit card
     'otb_visit_x_of'            => 'Visit #:num / :total',
     'otb_checked_in_at'         => 'Checked in: :time',
@@ -2644,38 +2373,7 @@ return [
     'otb_photo_proof_uploaded'  => 'Photo proof uploaded',
     'otb_late_by'               => 'Late by :min min',
     'otb_tasks_progress'        => 'Tasks Progress',
-    'otb_overdue'               => 'Overdue — scheduled :time',
+    'otb_overdue'               => "Overdue — scheduled :time",
     'otb_view_details'          => 'View visit details →',
 
-
-    // Onboarding profile completeness
-    'onboard_profile_incomplete_title' => 'Profile Incomplete',
-    'onboard_profile_incomplete_desc'  => 'Please complete your profile information (DOB, gender, contact, address) before verifying your ID.',
-    'onboard_complete_profile'         => 'Complete Profile First',
-    'sa_st_small'  => 'Small Pets - Cats, small dogs, rabbits, hamsters',
-    'sa_st_large'  => 'Large Pets - Large dogs, any size dogs',
-    'sa_st_exotic' => 'Exotic Pets - Birds, reptiles, fish',
-    'sa_st_all'    => 'All Pets - Any size, any type',
-    'sa_pending_title'     => 'Application Under Review',
-    'sa_pending_desc'      => 'Your application is being reviewed by our team.',
-    'sa_pending_applied'   => 'Applied on:',
-    'sa_pending_contact'   => 'Contact Support',
-    'sa_pending_dashboard' => 'Back to Dashboard',
-    'sa_approved_settings'  => 'Sitter Settings',
-    'sa_approved_dashboard' => 'Sitter Dashboard',
-    'sa_rejected_reason' => 'Reason for Rejection',
-    'sa_reapply_btn'     => 'Reapply Now',
-    'sa_confirm_title'  => 'Submit Application',
-    'sa_confirm_desc'   => 'Are you sure you want to submit?',
-    'sa_cancel'         => 'Cancel',
-    'sa_confirm_submit' => 'Yes, Submit',
-    'sa_st_small_short'  => 'Small Pets',
-    'sa_st_large_short'  => 'Large Pets',
-    'sa_st_exotic_short' => 'Exotic Pets',
-    'sa_st_all_short'    => 'All Pets',
-    // Sitter Type (Admin Modal)
-    'sv_sitter_type' => 'Sitter Type',
-    // Promote / Demote buttons
-    'ud_promote_btn' => 'Promote to Admin',
-    'ud_demote_btn'  => 'Demote from Admin',
 ];

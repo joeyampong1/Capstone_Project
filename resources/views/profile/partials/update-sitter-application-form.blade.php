@@ -2,11 +2,13 @@
 {{-- SITTER APPLICATION FORM                                     --}}
 {{-- ============================================================ --}}
 @php
-    $sitterProfile = auth()->user()->sitterProfile ?? null;
-    $currentPetTypes = $sitterProfile->preferred_pet_types ?? [];
-    $currentPetSizes = $sitterProfile->preferred_pet_sizes ?? [];
-    $petTypes = \App\Models\PetType::all();
-    $status = auth()->user()->sitter_status;
+    $sitterProfile    = auth()->user()->sitterProfile ?? null;
+    $currentPetTypes  = $sitterProfile->preferred_pet_types ?? [];
+    $currentPetSizes  = $sitterProfile->preferred_pet_sizes ?? [];
+    $currentHealth    = $sitterProfile->accepted_health_conditions ?? [];
+    $currentTemps     = $sitterProfile->accepted_temperaments ?? [];
+    $petTypes         = \App\Models\PetType::all();
+    $status           = auth()->user()->sitter_status;
 @endphp
 
 {{-- Status Card (if already applied) --}}
@@ -78,17 +80,26 @@
 
         {{-- 3. Sitter Type --}}
         <div>
-            <label for="sitter_level" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+            <label for="sitter_type" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.sa_sitter_type') }}
             </label>
-            <select id="sitter_level" name="sitter_level"
+            <select id="sitter_type" name="sitter_type"
                 class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
-                <option value="1" {{ old('sitter_level', $sitterProfile->sitter_type ?? '1') == 1 ? 'selected' : '' }}>{{ __('messages.sa_st1') }}</option>
-                <option value="2" {{ old('sitter_level', $sitterProfile->sitter_type ?? '') == 2 ? 'selected' : '' }}>{{ __('messages.sa_st2') }}</option>
-                <option value="3" {{ old('sitter_level', $sitterProfile->sitter_type ?? '') == 3 ? 'selected' : '' }}>{{ __('messages.sa_st3') }}</option>
+                <option value="small_pets" {{ old('sitter_type', $sitterProfile->sitter_type ?? 'small_pets') == 'small_pets' ? 'selected' : '' }}>
+                    🐱 {{ __('messages.sa_st_small') }}
+                </option>
+                <option value="large_pets" {{ old('sitter_type', $sitterProfile->sitter_type ?? '') == 'large_pets' ? 'selected' : '' }}>
+                    🐕 {{ __('messages.sa_st_large') }}
+                </option>
+                <option value="exotic_pets" {{ old('sitter_type', $sitterProfile->sitter_type ?? '') == 'exotic_pets' ? 'selected' : '' }}>
+                    🦜 {{ __('messages.sa_st_exotic') }}
+                </option>
+                <option value="all_pets" {{ old('sitter_type', $sitterProfile->sitter_type ?? '') == 'all_pets' ? 'selected' : '' }}>
+                    🐾 {{ __('messages.sa_st_all') }}
+                </option>
             </select>
             <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_sitter_type_hint') }}</p>
-            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('sitter_level')" />
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('sitter_type')" />
         </div>
 
         {{-- 4. Base Rate --}}
@@ -204,7 +215,62 @@
             <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_capacity_hint') }}</p>
         </div>
 
-        {{-- 10. Certificates --}}
+        {{-- 10. ACCEPTED HEALTH CONDITIONS (H factor) --}}
+        <div class="pt-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('messages.sa_accepted_health') }}
+            </label>
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+                @foreach([
+                    'special_needs' => ['icon' => '💊', 'key' => 'sa_health_special'],
+                    'partial_vax'   => ['icon' => '💉', 'key' => 'sa_health_partial_vax'],
+                    'chronic'       => ['icon' => '🩺', 'key' => 'sa_health_chronic'],
+                    'recovering'    => ['icon' => '🏥', 'key' => 'sa_health_recovering'],
+                ] as $value => $opt)
+                    <label class="flex items-center p-2.5 sm:p-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 cursor-pointer hover:border-primary/50 transition">
+                        <input type="checkbox" name="accepted_health_conditions[]" value="{{ $value }}"
+                               class="sr-only peer"
+                               {{ in_array($value, old('accepted_health_conditions', $currentHealth)) ? 'checked' : '' }}>
+                        <div class="w-full text-center peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary rounded-lg p-2 border border-transparent transition">
+                            <span class="text-2xl block mb-1">{{ $opt['icon'] }}</span>
+                            <span class="text-xs font-bold">{{ __('messages.' . $opt['key']) }}</span>
+                        </div>
+                    </label>
+                @endforeach
+            </div>
+            <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_accepted_health_hint') }}</p>
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('accepted_health_conditions')" />
+        </div>
+
+        {{-- 11. ACCEPTED TEMPERAMENTS (T factor) --}}
+        <div class="pt-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-3">
+                {{ __('messages.sa_accepted_temperaments') }}
+            </label>
+            <div class="flex flex-wrap gap-2.5 sm:gap-3">
+                @foreach([
+                    'friendly'   => ['icon' => '😊', 'key' => 'sa_temp_friendly'],
+                    'playful'    => ['icon' => '🎾', 'key' => 'sa_temp_playful'],
+                    'shy'        => ['icon' => '🙈', 'key' => 'sa_temp_shy'],
+                    'aggressive' => ['icon' => '⚠️', 'key' => 'sa_temp_aggressive'],
+                    'anxious'    => ['icon' => '😰', 'key' => 'sa_temp_anxious'],
+                ] as $value => $opt)
+                    <label class="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 cursor-pointer hover:border-primary/50 transition">
+                        <input type="checkbox" name="accepted_temperaments[]" value="{{ $value }}"
+                               class="sr-only peer"
+                               {{ in_array($value, old('accepted_temperaments', $currentTemps)) ? 'checked' : '' }}>
+                        <span class="peer-checked:text-primary font-bold text-sm flex items-center gap-1.5">
+                            <span>{{ $opt['icon'] }}</span>
+                            {{ __('messages.' . $opt['key']) }}
+                        </span>
+                    </label>
+                @endforeach
+            </div>
+            <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_accepted_temperaments_hint') }}</p>
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('accepted_temperaments')" />
+        </div>
+
+        {{-- 12. Certificates --}}
         <div x-data="{
                 files: [],
                 handleFiles(e) {
@@ -293,7 +359,7 @@
             <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('certificates.*')" />
         </div>
 
-        {{-- 11. Submit --}}
+        {{-- 13. Submit --}}
         <div class="pt-4">
             <button type="submit"
                     class="w-full flex justify-center items-center px-4 py-3 sm:py-3.5 bg-primary hover:bg-primary-600 text-white text-sm font-black rounded-xl shadow-md hover:shadow-lg active:scale-[0.99] transition-all duration-150">

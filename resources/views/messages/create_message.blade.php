@@ -38,7 +38,7 @@
                 <div class="flex items-center gap-4 p-3 sm:p-5 border-b border-gray-100 dark:border-neutral-800 flex-shrink-0">
                     <div class="relative">
                         @if($otherUser->profile_photo && file_exists(public_path('storage/' . $otherUser->profile_photo)))
-                            <img src="{{ asset('storage/' . $otherUser->profile_photo) }}" 
+                            <img src="{{ $otherUser->profile_photo_url }}" 
                                  alt="{{ $otherFullName }}" 
                                  class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20">
                         @else

@@ -37,16 +37,8 @@
         ];
         [$statusClass, $statusLabel] = $statusMap[$visit->status] ?? $statusMap['pending'];
 
-        // Combine photo paths
-        $existingPhotos = $visit->photo_proof_paths ?? [];
-        if (!is_array($existingPhotos)) {
-            $existingPhotos = [];
-        }
-
-        // Include legacy single photo
-        if ($visit->photo_proof_path && !in_array($visit->photo_proof_path, $existingPhotos)) {
-            array_unshift($existingPhotos, $visit->photo_proof_path);
-        }
+        // Photo proof URLs — auto-resolved (Cloudinary or local)
+        $existingPhotos = $visit->photo_proof_urls;
     @endphp
 
     <div class="py-4 sm:py-6 bg-white dark:bg-neutral-950 min-h-screen antialiased text-neutral-800 dark:text-neutral-200">
@@ -323,12 +315,12 @@
             </p>
 
             <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                @foreach($existingPhotos as $idx => $path)
+                @foreach($existingPhotos as $idx => $url)
                     <button type="button"
-                            @click="openLightbox('{{ asset('storage/' . $path) }}')"
+                            @click="openLightbox('{{ $url }}')"
                             class="group relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 dark:border-neutral-700 hover:border-primary transition">
 
-                        <img src="{{ asset('storage/' . $path) }}"
+                        <img src="{{ $url }}"
                              alt="Visit photo {{ $idx + 1 }}"
                              class="w-full h-full object-cover group-hover:scale-105 transition">
 

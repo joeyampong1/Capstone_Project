@@ -233,7 +233,7 @@
                                     <td class="py-2.5 sm:py-3 px-2 sm:px-4">
                                         <div class="flex items-center gap-2 sm:gap-3">
                                             @if($user->profile_photo && file_exists(public_path('storage/' . $user->profile_photo)))
-                                                <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                                <img src="{{ $user->profile_photo_url }}"
                                                      alt="{{ $fullName }}"
                                                      class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-primary/20 shrink-0">
                                             @else

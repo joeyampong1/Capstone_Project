@@ -66,7 +66,7 @@
             <div class="relative h-52 sm:h-72 overflow-hidden">
                 @if($sitter->profile_photo && file_exists(public_path('storage/' . $sitter->profile_photo)))
                     <div class="absolute inset-0 bg-cover bg-center"
-                         style="background-image: url('{{ asset('storage/' . $sitter->profile_photo) }}');"></div>
+                         style="background-image: url('{{ $sitter->profile_photo_url }}');"></div>
                 @else
                     <div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/10"></div>
                 @endif
@@ -236,7 +236,7 @@
 
                             {{-- Reviewer avatar --}}
                             @if($review->reviewer && $review->reviewer->profile_photo && file_exists(public_path('storage/' . $review->reviewer->profile_photo)))
-                                <img src="{{ asset('storage/' . $review->reviewer->profile_photo) }}"
+                                <img src="{{ $review->reviewer->profile_photo_url }}"
                                      alt="{{ $reviewerName }}"
                                      class="w-8 h-8 rounded-full object-cover border border-primary/20 shrink-0">
                             @else

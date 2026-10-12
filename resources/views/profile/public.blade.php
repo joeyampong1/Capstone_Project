@@ -87,7 +87,7 @@
                         {{-- Avatar --}}
                         <div class="relative z-10 -mt-16 sm:-mt-20 shrink-0">
                             @if($user->profile_photo && file_exists(public_path('storage/' . $user->profile_photo)))
-                                <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                <img src="{{ $user->profile_photo_url }}"
                                     alt="{{ $fullName }}"
                                     class="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-lg">
                             @else
@@ -268,7 +268,7 @@
                                     <div class="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-800/30 rounded-xl border border-gray-100 dark:border-neutral-700">
                                         <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-xl overflow-hidden shrink-0">
                                             @if($pet->photo_path)
-                                                <img src="{{ asset('storage/' . $pet->photo_path) }}" alt="{{ $pet->name }}" class="w-full h-full object-cover">
+                                                <img src="{{ $pet->photo_url }}" alt="{{ $pet->name }}" class="w-full h-full object-cover">
                                             @else
                                                 🐾
                                             @endif
@@ -317,7 +317,7 @@
 
                                             {{-- Reviewer avatar --}}
                                             @if($review->reviewer && $review->reviewer->profile_photo && file_exists(public_path('storage/' . $review->reviewer->profile_photo)))
-                                                <img src="{{ asset('storage/' . $review->reviewer->profile_photo) }}"
+                                                <img src="{{ $review->reviewer->profile_photo_url }}"
                                                      alt="{{ $reviewerName }}"
                                                      class="w-8 h-8 rounded-full object-cover border border-primary/20 shrink-0">
                                             @else

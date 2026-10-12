@@ -193,11 +193,7 @@
                 <h3 class="font-bold text-sm text-[#1B3B36] dark:text-white mb-3">{{ __('messages.ovs_photo_proof') }}</h3>
 
                 @php
-                    $allPhotos = $visit->photo_proof_paths ?? [];
-                    if (!is_array($allPhotos)) $allPhotos = [];
-                    if ($visit->photo_proof_path && !in_array($visit->photo_proof_path, $allPhotos)) {
-                        array_unshift($allPhotos, $visit->photo_proof_path);
-                    }
+                    $allPhotos = $visit->photo_proof_urls;
                 @endphp
 
                 @if(count($allPhotos) > 0)
@@ -207,12 +203,12 @@
                         </p>
 
                         <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                            @foreach($allPhotos as $idx => $path)
+                            @foreach($allPhotos as $idx => $url)
                                 <button type="button"
-                                        @click="openLightbox('{{ asset('storage/' . $path) }}')"
+                                        @click="openLightbox('{{ $url }}')"
                                         class="group relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 dark:border-neutral-700 hover:border-primary transition cursor-pointer">
 
-                                    <img src="{{ asset('storage/' . $path) }}"
+                                    <img src="{{ $url }}"
                                         alt="Visit photo {{ $idx + 1 }}"
                                         class="w-full h-full object-cover group-hover:scale-105 transition">
 

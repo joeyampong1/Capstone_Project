@@ -70,7 +70,7 @@
                         {{-- Avatar --}}
                         <div class="shrink-0">
                             @if($user->profile_photo && file_exists(public_path('storage/' . $user->profile_photo)))
-                                <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                <img src="{{ $user->profile_photo_url }}"
                                      alt="{{ $fullName }}"
                                      class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-primary/20">
                             @else
@@ -346,7 +346,7 @@
                             <div class="flex items-center gap-2.5 p-2.5 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-gray-100 dark:border-neutral-700">
                                 <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-xl overflow-hidden shrink-0">
                                     @if($pet->photo_path && file_exists(public_path('storage/' . $pet->photo_path)))
-                                        <img src="{{ asset('storage/' . $pet->photo_path) }}"
+                                        <img src="{{ $pet->photo_url }}"
                                              alt="{{ $pet->name }}"
                                              class="w-full h-full object-cover">
                                     @else

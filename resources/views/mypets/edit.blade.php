@@ -49,7 +49,7 @@
                       enctype="multipart/form-data"
                       class="space-y-5 sm:space-y-6"
                       x-data="petPhotoUpload({
-                          existingPhoto: {{ $pet->photo_path ? Js::from(asset('storage/' . $pet->photo_path)) : 'null' }}
+                          existingPhoto: {{ $pet->photo_path ? Js::from($pet->photo_url) : 'null' }}
                       })">
                     @csrf
                     @method('PUT')
@@ -188,6 +188,7 @@
                                 <option value="small"  @selected(old('size', $pet->size) === 'small')>{{ __('messages.mp_size_small') }}</option>
                                 <option value="medium" @selected(old('size', $pet->size) === 'medium')>{{ __('messages.mp_size_medium') }}</option>
                                 <option value="large"  @selected(old('size', $pet->size) === 'large')>{{ __('messages.mp_size_large') }}</option>
+                                <option value="giant"  @selected(old('size', $pet->size) === 'giant')>{{ __('messages.mp_size_giant') }}</option>
                             </select>
                         </div>
 
@@ -199,12 +200,11 @@
                             <select id="temperament" name="temperament"
                                     class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
                                 <option value="">{{ __('messages.mp_select_temperament') }}</option>
-                                <option value="calm"        @selected(old('temperament', $pet->temperament) === 'calm')>{{ __('messages.mp_temp_calm') }}</option>
-                                <option value="friendly"    @selected(old('temperament', $pet->temperament) === 'friendly')>{{ __('messages.mp_temp_friendly') }}</option>
-                                <option value="playful"     @selected(old('temperament', $pet->temperament) === 'playful')>{{ __('messages.mp_temp_playful') }}</option>
-                                <option value="energetic"   @selected(old('temperament', $pet->temperament) === 'energetic')>{{ __('messages.mp_temp_energetic') }}</option>
-                                <option value="shy"         @selected(old('temperament', $pet->temperament) === 'shy')>{{ __('messages.mp_temp_shy') }}</option>
-                                <option value="independent" @selected(old('temperament', $pet->temperament) === 'independent')>{{ __('messages.mp_temp_independent') }}</option>
+                                <option value="friendly"   @selected(old('temperament', $pet->temperament) === 'friendly')>{{ __('messages.mp_temp_friendly') }}</option>
+                                <option value="playful"    @selected(old('temperament', $pet->temperament) === 'playful')>{{ __('messages.mp_temp_playful') }}</option>
+                                <option value="shy"        @selected(old('temperament', $pet->temperament) === 'shy')>{{ __('messages.mp_temp_shy') }}</option>
+                                <option value="aggressive" @selected(old('temperament', $pet->temperament) === 'aggressive')>{{ __('messages.mp_temp_aggressive') }}</option>
+                                <option value="anxious"    @selected(old('temperament', $pet->temperament) === 'anxious')>{{ __('messages.mp_temp_anxious') }}</option>
                             </select>
                         </div>
                     </div>
@@ -282,7 +282,7 @@
                     </div>
 
                     {{-- ========================================== --}}
-                    {{-- SPECIAL NEEDS / MEDICAL / DIETARY          --}}
+                    {{-- SPECIAL NEEDS / MEDICAL / DIETARY / VAX    --}}
                     {{-- ========================================== --}}
                     <div class="space-y-4">
                         <div>
@@ -315,6 +315,20 @@
                                 <option value="wet_food"     @selected(old('dietary_restrictions', $pet->dietary_restrictions) === 'wet_food')>{{ __('messages.mp_diet_wet') }}</option>
                                 <option value="raw"          @selected(old('dietary_restrictions', $pet->dietary_restrictions) === 'raw')>{{ __('messages.mp_diet_raw') }}</option>
                                 <option value="prescription" @selected(old('dietary_restrictions', $pet->dietary_restrictions) === 'prescription')>{{ __('messages.mp_diet_prescription') }}</option>
+                            </select>
+                        </div>
+
+                        {{-- Vaccination Status (H factor) --}}
+                        <div>
+                            <label for="vaccination_status" class="block text-sm font-bold text-[#1B3B36] dark:text-white mb-1.5">
+                                {{ __('messages.mp_vaccination') }} <span class="text-red-500">*</span>
+                            </label>
+                            <select id="vaccination_status" name="vaccination_status"
+                                    class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                                <option value="">{{ __('messages.mp_select_vaccination') }}</option>
+                                <option value="complete" @selected(old('vaccination_status', $pet->vaccination_status) === 'complete')>{{ __('messages.mp_vax_complete') }}</option>
+                                <option value="partial"  @selected(old('vaccination_status', $pet->vaccination_status) === 'partial')>{{ __('messages.mp_vax_partial') }}</option>
+                                <option value="none"     @selected(old('vaccination_status', $pet->vaccination_status) === 'none')>{{ __('messages.mp_vax_none') }}</option>
                             </select>
                         </div>
                     </div>
@@ -383,7 +397,6 @@
 
                 clearPhoto() {
                     // Reset sa existing photo kung naa (dili null)
-                    // Kay sa edit page, dili dapat ma-delete ang existing photo pinaagi lang sa X button
                     const existing = (config && config.existingPhoto) || null;
                     this.photoPreview = existing;
                     this.photoName = '';

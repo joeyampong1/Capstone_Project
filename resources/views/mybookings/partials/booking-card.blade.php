@@ -42,7 +42,7 @@
         <div class="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
             {{-- Avatar --}}
             @if($counterpart->profile_photo && file_exists(public_path('storage/' . $counterpart->profile_photo)))
-                <img src="{{ asset('storage/' . $counterpart->profile_photo) }}"
+                <img src="{{ $counterpart->profile_photo_url }}"
                      alt="{{ $cpName }}"
                      class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border border-neutral-200 dark:border-neutral-700 flex-shrink-0">
             @else

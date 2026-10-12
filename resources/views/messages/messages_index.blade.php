@@ -100,7 +100,7 @@
                                 <!-- AVATAR -->
                                 <div class="relative flex-shrink-0">
                                     @if($otherUser->profile_photo && file_exists(public_path('storage/' . $otherUser->profile_photo)))
-                                        <img src="{{ asset('storage/' . $otherUser->profile_photo) }}" 
+                                        <img src="{{ $otherUser->profile_photo_url }}" 
                                              alt="{{ $otherFullName }}" 
                                              class="w-12 h-12 rounded-full object-cover {{ $isArchived ? 'grayscale opacity-60' : '' }}">
                                     @else

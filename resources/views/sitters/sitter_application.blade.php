@@ -25,12 +25,14 @@
         <div class="w-full sm:max-w-3xl mx-auto px-2 sm:px-16 lg:px-24">
 
             @php
-                $sitterProfile = auth()->user()->sitterProfile ?? null;
-                $currentPetTypes = $sitterProfile->preferred_pet_types ?? [];
-                $currentPetSizes = $sitterProfile->preferred_pet_sizes ?? [];
-                $petTypes = \App\Models\PetType::all();
-                $status = auth()->user()->sitter_status;
-                $hasApplied = auth()->user()->sitter_applied_at !== null;
+                $sitterProfile    = auth()->user()->sitterProfile ?? null;
+                $currentPetTypes  = $sitterProfile->preferred_pet_types ?? [];
+                $currentPetSizes  = $sitterProfile->preferred_pet_sizes ?? [];
+                $currentHealth    = $sitterProfile->accepted_health_conditions ?? [];
+                $currentTemps     = $sitterProfile->accepted_temperaments ?? [];
+                $petTypes         = \App\Models\PetType::all();
+                $status           = auth()->user()->sitter_status;
+                $hasApplied       = auth()->user()->sitter_applied_at !== null;
             @endphp
 
             <!-- Back to Dashboard Link (TOP LEFT) -->
@@ -348,7 +350,7 @@
                         </div>
 
                         <!-- ========================================== -->
-                        <!-- STEP 3: PET TYPES + SIZES + CAPACITY        -->
+                        <!-- STEP 3: PET TYPES + SIZES + CAPACITY + HEALTH + TEMPERAMENT -->
                         <!-- ========================================== -->
                         <div x-show="step === 3" x-transition.opacity class="space-y-4 sm:space-y-6">
 
@@ -422,6 +424,61 @@
                                 </div>
                                 <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_capacity_hint') }}</p>
                             </div>
+
+                            <!-- 10. ACCEPTED HEALTH CONDITIONS (H factor) -->
+                            <div class="pt-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-3">
+                                    {{ __('messages.sa_accepted_health') }}
+                                </label>
+                                <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+                                    @foreach([
+                                        'special_needs' => ['icon' => '💊', 'key' => 'sa_health_special'],
+                                        'partial_vax'   => ['icon' => '💉', 'key' => 'sa_health_partial_vax'],
+                                        'chronic'       => ['icon' => '🩺', 'key' => 'sa_health_chronic'],
+                                        'recovering'    => ['icon' => '🏥', 'key' => 'sa_health_recovering'],
+                                    ] as $value => $opt)
+                                        <label class="flex items-center p-2.5 sm:p-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 cursor-pointer hover:border-primary/50 transition">
+                                            <input type="checkbox" name="accepted_health_conditions[]" value="{{ $value }}"
+                                                   class="sr-only peer"
+                                                   {{ in_array($value, old('accepted_health_conditions', $currentHealth)) ? 'checked' : '' }}>
+                                            <div class="w-full text-center peer-checked:bg-primary/10 peer-checked:border-primary peer-checked:text-primary rounded-lg p-2 border border-transparent transition">
+                                                <span class="text-2xl block mb-1">{{ $opt['icon'] }}</span>
+                                                <span class="text-xs font-bold">{{ __('messages.' . $opt['key']) }}</span>
+                                            </div>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_accepted_health_hint') }}</p>
+                                <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('accepted_health_conditions')" />
+                            </div>
+
+                            <!-- 11. ACCEPTED TEMPERAMENTS (T factor) -->
+                            <div class="pt-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-3">
+                                    {{ __('messages.sa_accepted_temperaments') }}
+                                </label>
+                                <div class="flex flex-wrap gap-2.5 sm:gap-3">
+                                    @foreach([
+                                        'friendly'   => ['icon' => '😊', 'key' => 'sa_temp_friendly'],
+                                        'playful'    => ['icon' => '🎾', 'key' => 'sa_temp_playful'],
+                                        'shy'        => ['icon' => '🙈', 'key' => 'sa_temp_shy'],
+                                        'aggressive' => ['icon' => '⚠️', 'key' => 'sa_temp_aggressive'],
+                                        'anxious'    => ['icon' => '😰', 'key' => 'sa_temp_anxious'],
+                                    ] as $value => $opt)
+                                        <label class="inline-flex items-center px-3 py-2 sm:px-4 sm:py-2 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 cursor-pointer hover:border-primary/50 transition">
+                                            <input type="checkbox" name="accepted_temperaments[]" value="{{ $value }}"
+                                                   class="sr-only peer"
+                                                   {{ in_array($value, old('accepted_temperaments', $currentTemps)) ? 'checked' : '' }}>
+                                            <span class="peer-checked:text-primary font-bold text-sm flex items-center gap-1.5">
+                                                <span>{{ $opt['icon'] }}</span>
+                                                {{ __('messages.' . $opt['key']) }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_accepted_temperaments_hint') }}</p>
+                                <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('accepted_temperaments')" />
+                            </div>
                         </div>
 
                         <!-- ========================================== -->
@@ -429,7 +486,7 @@
                         <!-- ========================================== -->
                         <div x-show="step === 4" x-transition.opacity class="space-y-4 sm:space-y-6">
 
-                            <!-- 10. UPLOAD CERTIFICATES (Multiple) -->
+                            <!-- 12. UPLOAD CERTIFICATES (Multiple) -->
                             <div x-data="{
                                     files: [],
                                     handleFiles(e) {
@@ -521,7 +578,7 @@
                         </div>
 
                         <!-- ========================================== -->
-                        <!-- 11. NAVIGATION BUTTONS (Next / Back / Submit) -->
+                        <!-- 13. NAVIGATION BUTTONS (Next / Back / Submit) -->
                         <!-- ========================================== -->
                         <div class="pt-4 flex items-center gap-3">
 

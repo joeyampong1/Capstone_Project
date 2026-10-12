@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sitter;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Visit;
+use App\Services\CloudinaryService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,10 @@ use Carbon\Carbon;
 
 class TaskController extends Controller
 {
+    public function __construct(
+        private CloudinaryService $cloudinary
+    ) {}
+
     // ==========================================
     // INDEX — List tanan visits sa sitter
     // ==========================================
@@ -23,19 +28,15 @@ class TaskController extends Controller
         $user   = Auth::user();
         $filter = $request->query('filter', 'all');
 
-        // Get BOOKINGS (not visits) — with visits loaded
         $bookingsQuery = Booking::with(['owner', 'pet.petType', 'visits'])
             ->where('sitter_id', $user->id)
             ->whereIn('status', ['accepted', 'completed']);
 
-        // Filter by booking status
         if ($filter === 'pending') {
-            // Bookings nga naay pending visits
             $bookingsQuery->whereHas('visits', fn($q) => $q->where('status', 'pending'));
         } elseif ($filter === 'in_progress') {
             $bookingsQuery->whereHas('visits', fn($q) => $q->where('status', 'in_progress'));
         } elseif ($filter === 'completed') {
-            // Bookings nga tanan visits completed na
             $bookingsQuery->whereDoesntHave('visits', fn($q) =>
                 $q->whereIn('status', ['pending', 'in_progress'])
             );
@@ -45,10 +46,9 @@ class TaskController extends Controller
 
         $bookings = $bookingsQuery->orderByDesc('created_at')->get();
 
-        // Stats (base sa visits)
         $allVisits = Visit::whereHas('booking', function ($q) use ($user) {
             $q->where('sitter_id', $user->id)
-            ->whereIn('status', ['accepted', 'completed']);
+              ->whereIn('status', ['accepted', 'completed']);
         })->get();
 
         $stats = [
@@ -63,12 +63,11 @@ class TaskController extends Controller
     }
 
     // ==========================================
-    // SHOW — View single visit details
+    // SHOW — View single booking details
     // ==========================================
 
     public function show(Booking $booking)
     {
-        // Verify sitter
         abort_if(
             $booking->sitter_id !== Auth::id(),
             403,
@@ -101,18 +100,15 @@ class TaskController extends Controller
         abort_if($visit->status !== 'pending', 400, 'This visit is not pending.');
         abort_if($visit->check_in !== null, 400, 'You have already checked in.');
 
-        // Compute lateness
         $scheduled = Carbon::parse($visit->scheduled_datetime);
         $now       = now();
         $lateness  = 0;
 
-        // Consider "on time" kung within 15 minutes before/after scheduled
         $graceMinutes = 15;
         if ($now->gt($scheduled->copy()->addMinutes($graceMinutes))) {
             $lateness = $now->diffInMinutes($scheduled);
         }
 
-        // Compute deduction (e.g., 1% per late minute, max 50%)
         $deductionPercent = min($lateness * 1, 50);
 
         $visit->update([
@@ -143,7 +139,6 @@ class TaskController extends Controller
         $visit->update([
             'check_out'        => $checkOut,
             'duration_minutes' => $duration,
-            // NOTE: dili pa i-mark as completed — sitter mo-click pa og "Complete"
         ]);
 
         return back()->with('status', 'Checked out. Review your tasks then click Complete.');
@@ -168,11 +163,8 @@ class TaskController extends Controller
             'You must check out first before completing.'
         );
 
-        $visit->update([
-            'status' => 'completed',
-        ]);
+        $visit->update(['status' => 'completed']);
 
-        // Notify owner
         NotificationService::send(
             userId:    $visit->booking->owner_id,
             type:      'visit_completed',
@@ -183,14 +175,13 @@ class TaskController extends Controller
             meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
         );
 
-        // Auto-complete booking kung tanan visits done na
         $this->checkBookingCompletion($visit->booking);
 
         return back()->with('status', 'Visit marked as completed!');
     }
 
     // ==========================================
-    // UPDATE TASKS — Mark tasks as completed
+    // UPDATE TASKS
     // ==========================================
 
     public function updateTasks(Request $request, Visit $visit)
@@ -211,7 +202,7 @@ class TaskController extends Controller
     }
 
     // ==========================================
-    // UPLOAD PHOTO — Proof of visit
+    // UPLOAD PHOTO — Proof of visit (Cloudinary)
     // ==========================================
 
     public function uploadPhoto(Request $request, Visit $visit)
@@ -223,22 +214,44 @@ class TaskController extends Controller
             'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        $existingPaths = $visit->photo_proof_paths ?? [];
+        $existingPaths     = $visit->photo_proof_paths ?? [];
+        $existingPublicIds = $visit->photo_proof_public_ids ?? [];
 
-        if (!is_array($existingPaths)) {
-            $existingPaths = [];
+        if (!is_array($existingPaths))     $existingPaths = [];
+        if (!is_array($existingPublicIds)) $existingPublicIds = [];
+
+        // Upload new photos to Cloudinary
+        $newPaths     = [];
+        $newPublicIds = [];
+
+        foreach ($request->file('photos') as $file) {
+            $upload = $this->cloudinary->upload($file, 'visit-photos', [
+                'transformation' => [
+                    'width'  => 1200,
+                    'height' => 1200,
+                    'crop'   => 'limit',
+                ],
+            ]);
+
+            if ($upload['success']) {
+                $newPaths[]     = $upload['url'];
+                $newPublicIds[] = $upload['public_id'];
+            } else {
+                \Log::error('Visit photo upload failed', [
+                    'visit_id' => $visit->id,
+                    'error'    => $upload['error'],
+                ]);
+            }
         }
 
-        $newPaths = [];
-        foreach ($request->file('photos') as $photo) {
-            $newPaths[] = $photo->store('visits/photos', 'public');
+        if (empty($newPaths)) {
+            return back()->withErrors(['photos' => 'Upload failed. Please try again.']);
         }
-
-        $allPaths = array_merge($existingPaths, $newPaths);
 
         $visit->update([
-            'photo_proof_paths' => $allPaths,
-            'photo_timestamp'   => now(),
+            'photo_proof_paths'      => array_merge($existingPaths, $newPaths),
+            'photo_proof_public_ids' => array_merge($existingPublicIds, $newPublicIds),
+            'photo_timestamp'        => now(),
         ]);
 
         $count = count($newPaths);
@@ -247,7 +260,7 @@ class TaskController extends Controller
     }
 
     // ==========================================
-    // ADD NOTE — Sitter notes during visit
+    // ADD NOTE
     // ==========================================
 
     public function addNote(Request $request, Visit $visit)
@@ -258,9 +271,7 @@ class TaskController extends Controller
             'notes' => 'required|string|max:2000',
         ]);
 
-        $visit->update([
-            'notes' => $validated['notes'],
-        ]);
+        $visit->update(['notes' => $validated['notes']]);
 
         return back()->with('status', 'Note added.');
     }
@@ -269,9 +280,6 @@ class TaskController extends Controller
     // PRIVATE HELPERS
     // ==========================================
 
-    /**
-     * Siguraduon nga ang visit kay iya sa currently logged-in sitter.
-     */
     protected function authorizeVisit(Visit $visit): void
     {
         $visit->loadMissing('booking');
@@ -289,10 +297,6 @@ class TaskController extends Controller
         );
     }
 
-    /**
-     * Kung tanan visits sa booking kay completed na,
-     * i-mark as 'completed' ang booking automatically.
-     */
     protected function checkBookingCompletion(Booking $booking): void
     {
         $remaining = $booking->visits()
@@ -328,30 +332,40 @@ class TaskController extends Controller
         $this->authorizeVisit($visit);
 
         $validated = $request->validate([
-            'path' => 'required|string',
+            'index' => 'required|integer|min:0',
         ]);
 
-        $existingPaths = $visit->photo_proof_paths ?? [];
+        $index = (int) $validated['index'];
 
-        if (!is_array($existingPaths)) {
-            $existingPaths = [];
-        }
+        $existingPaths     = $visit->photo_proof_paths ?? [];
+        $existingPublicIds = $visit->photo_proof_public_ids ?? [];
 
-        if (!in_array($validated['path'], $existingPaths)) {
+        if (!is_array($existingPaths))     $existingPaths = [];
+        if (!is_array($existingPublicIds)) $existingPublicIds = [];
+
+        if (!isset($existingPaths[$index])) {
             return back()->with('error', 'Photo not found.');
         }
 
-        Storage::disk('public')->delete($validated['path']);
+        $path     = $existingPaths[$index];
+        $publicId = $existingPublicIds[$index] ?? null;
 
-        $updatedPaths = array_values(
-            array_filter($existingPaths, fn($p) => $p !== $validated['path'])
-        );
+        // Delete from Cloudinary (o local)
+        if (str_starts_with($path, 'http') && $publicId) {
+            $this->cloudinary->delete($publicId);
+        } elseif (!str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+
+        // Remove from arrays
+        unset($existingPaths[$index]);
+        unset($existingPublicIds[$index]);
 
         $visit->update([
-            'photo_proof_paths' => $updatedPaths,
+            'photo_proof_paths'      => array_values($existingPaths),
+            'photo_proof_public_ids' => array_values($existingPublicIds),
         ]);
 
         return back()->with('status', 'Photo deleted successfully.');
     }
-
 }

@@ -112,7 +112,7 @@ return [
     'status_accepted'                    => 'Aceptada',
     'status_under_review_activity'       => 'En Revisión',
 
-        // ========================================== //
+    // ========================================== //
     // BOOKING MANAGEMENT (Admin)                  //
     // ========================================== //
     'booking_title'              => 'Gestión de Reservas',
@@ -204,7 +204,7 @@ return [
 
     'booking_visit_label'        => 'Visita :n',
 
-        // ========================================== //
+    // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
     'analytics_title'            => 'Panel de Analíticas',
@@ -265,7 +265,7 @@ return [
     'analytics_last_updated'     => 'Última Actualización:',
     'analytics_auto_refresh'     => 'Actualización automática cada 5 minutos',
 
-        // ========================================== //
+    // ========================================== //
     // COMPLAINTS MANAGEMENT (Admin)               //
     // ========================================== //
     'complaint_title'             => 'Gestión de Quejas',
@@ -351,7 +351,7 @@ return [
     'role_owner'                  => 'Dueño',
     'role_sitter'                 => 'Cuidador',
 
-        // ========================================== //
+    // ========================================== //
     // HELP & SUPPORT (Admin)                      //
     // ========================================== //
     'help_title'              => 'Ayuda y Soporte',
@@ -652,7 +652,7 @@ return [
     'msg_delete'               => 'Eliminar Mensaje',
     'msg_confirm_delete'       => '¿Eliminar este mensaje permanentemente? Esta acción no se puede deshacer.',
 
-        // ========================================== //
+    // ========================================== //
     // REPORTS (Admin)                             //
     // ========================================== //
     'reports_title'              => 'Reportes',
@@ -766,7 +766,7 @@ return [
     'report_pdf_empty'           => 'No se encontraron registros para los filtros seleccionados.',
     'report_pdf_footer'          => 'PetNanny Admin System · Reporte generado el :date',
 
-        // ========================================== //
+    // ========================================== //
     // SITTER VERIFICATION (Admin)                 //
     // ========================================== //
     'sv_title'                 => 'Verificación de Cuidadores',
@@ -1067,7 +1067,7 @@ return [
     'ah_action'             => 'Acción',
     'ah_all_clear'          => 'Todo claro',
 
-        // ========================================== //
+    // ========================================== //
     // NAVIGATION                                  //
     // ========================================== //
     'nav_search_placeholder'         => 'Buscar usuarios, reservas...',
@@ -1124,7 +1124,7 @@ return [
     'sb_task_monitor'          => 'Monitor de Tareas',
     'sb_settings'              => 'Ajustes',
 
-        // ========================================== //
+    // ========================================== //
     // COMPLAINTS (Owner/Sitter)                   //
     // ========================================== //
     // Create page
@@ -1232,7 +1232,7 @@ return [
     'cp_role_owner'                => 'Dueño',
     'cp_role_sitter'               => 'Cuidador',
 
-        // ========================================== //
+    // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
     // ========================================== //
     'od_title'                    => 'Inicio',
@@ -1494,7 +1494,7 @@ return [
     'mi_empty_archived_desc'      => 'Las conversaciones archivadas aparecerán aquí.',
     'mi_find_sitter'              => 'Buscar Cuidador',
 
-        'bc_location_not_set'         => 'Ubicación no establecida',
+    'bc_location_not_set'         => 'Ubicación no establecida',
     'bc_user_fallback'            => 'Usuario',
     'bc_ref_prefix'               => 'Ref:',
     'bc_visit_per_day'            => ':count visita(s)/día',
@@ -1655,7 +1655,8 @@ return [
     'sb_keep_booking'             => 'Mantener Reserva',
     'sb_yes_cancel'               => 'Sí, Cancelar',
 
-        'mp_add_title'         => 'Agregar Mascota',
+
+    'mp_add_title'         => 'Agregar Mascota',
     'mp_add_subtitle'      => 'Crear un nuevo perfil de mascota',
     'mp_edit_title'        => 'Editar Mascota',
     'mp_edit_subtitle'     => 'Actualizar detalles de la mascota',
@@ -1733,6 +1734,17 @@ return [
     'mp_delete_warning'    => 'Esta acción no se puede deshacer.',
     'mp_delete'            => 'Eliminar',
 
+    // Vaccination Status
+    'mp_vaccination'         => 'Estado de Vacunación',
+    'mp_select_vaccination'  => 'Selecciona el estado de vacunación',
+    'mp_vax_complete'        => 'Completo (todas las vacunas al día)',
+    'mp_vax_partial'         => 'Parcial (solo algunas vacunas)',
+    'mp_vax_none'            => 'Ninguna / No vacunado',
+
+    // Temperament (additional options)
+    'mp_temp_aggressive'     => 'Agresivo',
+    'mp_temp_anxious'        => 'Ansioso',
+
     'notif_title'             => 'Notificaciones',
     'notif_subtitle'          => 'Mantente actualizado con tu actividad más reciente',
     'notif_unread'            => 'sin leer',
@@ -1755,7 +1767,7 @@ return [
     'notif_close'             => 'Cerrar',
     'notif_view_details_full' => 'Ver Detalles',
 
-        // ========================================== //
+    // ========================================== //
     // FIND SITTER                                  //
     // ========================================== //
     'fs_title'                => 'Buscar un Cuidador',
@@ -1796,6 +1808,13 @@ return [
     'fs_food_not_set'         => 'Arreglo de comida no establecido',
     'fs_no_sitters_title'     => 'Aún no hay cuidadores disponibles',
     'fs_no_sitters_desc'      => 'Vuelve más tarde para ver cuidadores disponibles en tu área.',
+    'fs_no_pets_title'        => 'Aún no tienes mascotas',
+    'fs_no_pets_desc'         => 'Agrega una mascota primero para que podamos emparejarte con los mejores cuidadores.',
+    'fs_add_pet'              => 'Agregar Mascota',
+    'fs_all_pets'             => 'Todas las Mascotas',
+    'fs_service_location_ph'   => 'Ubicación del servicio (ej., tu dirección)',
+    'fs_service_location_tip'  => '¿Dónde debería el cuidador proporcionar el servicio?',
+    'fs_service_location_hint' => 'Escribe una dirección diferente si quieres que el cuidador visite otra ubicación.',
 
     // ========================================== //
     // SITTER PROFILE (Owner viewing)              //
@@ -2174,7 +2193,24 @@ return [
     'sa_status_rejected_title' => 'Tu solicitud fue rechazada.',
     'sa_status_rejected_desc'  => 'Por favor actualiza tu información y vuelve a postularte.',
 
-        'sav_title'                 => 'Disponibilidad',
+    // ── Accepted Health Conditions (H factor) ──
+    'sa_accepted_health'             => 'Condiciones de Salud que Puedes Manejar',
+    'sa_accepted_health_hint'        => 'Selecciona las condiciones de salud que puedes cuidar cómodamente.',
+    'sa_health_special'              => 'Necesidades Especiales',
+    'sa_health_partial_vax'          => 'Vacunación Parcial',
+    'sa_health_chronic'              => 'Enfermedad Crónica',
+    'sa_health_recovering'           => 'Recuperándose',
+
+    // ── Accepted Temperaments (T factor) ──
+    'sa_accepted_temperaments'       => 'Temperamentos que Puedes Manejar',
+    'sa_accepted_temperaments_hint'  => 'Selecciona los temperamentos que puedes manejar de forma segura.',
+    'sa_temp_friendly'               => 'Amigable',
+    'sa_temp_playful'                => 'Juguetón',
+    'sa_temp_shy'                    => 'Tímido',
+    'sa_temp_aggressive'             => 'Agresivo',
+    'sa_temp_anxious'                => 'Ansioso',
+
+    'sav_title'                 => 'Disponibilidad',
     'sav_subtitle'              => 'Gestiona tu horario y sigue las reservas',
 
     'sav_total_slots'           => 'Total de Horarios',
@@ -2497,7 +2533,7 @@ return [
     'otb_late_by'               => 'Tarde por :min min',
     'otb_tasks_progress'        => 'Progreso de Tareas',
     'otb_overdue'               => 'Vencido — programado :time',
-    'otb_view_details'          => 'Ver detalles de la visita →',
+    'otb_view_details'          => 'View visit details →',
 
     // Onboarding profile completeness
     "onboard_profile_incomplete_title" => "Perfil incompleto",
@@ -2513,6 +2549,10 @@ return [
     'sa_st_large'  => 'Mascotas Grandes - Perros grandes, perros de cualquier tamaño',
     'sa_st_exotic' => 'Mascotas Exóticas - Aves, reptiles, peces',
     'sa_st_all'    => 'Todas las Mascotas - Cualquier tamaño, cualquier tipo',
+    'sa_st_small_short'      => 'Mascotas Pequeñas',
+    'sa_st_large_short'      => 'Mascotas Grandes',
+    'sa_st_exotic_short'     => 'Mascotas Exóticas',
+    'sa_st_all_short'        => 'Todas las Mascotas',
     'sa_pending_title'     => 'Solicitud en Revisión',
     'sa_pending_desc'      => 'Nuestro equipo está revisando tu solicitud.',
     'sa_pending_applied'   => 'Solicitado el:',

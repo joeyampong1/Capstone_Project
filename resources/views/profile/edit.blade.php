@@ -30,8 +30,8 @@
                 <div class="relative h-40 sm:h-52 bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 group">
 
                     <!-- Cover Image (if uploaded) -->
-                    @if(auth()->user()->cover_photo)
-                        <img src="{{ asset('storage/' . auth()->user()->cover_photo) }}"
+                    @if(auth()->user()->cover_photo_url)
+                        <img src="{{ auth()->user()->cover_photo_url }}"
                             alt="Cover Photo"
                             class="w-full h-full object-cover">
                     @endif
@@ -154,6 +154,7 @@
 
     <!-- Script for photo upload -->
     <script>
+        // Profile photo upload
         document.getElementById('profile_photo')?.addEventListener('change', function(e) {
             const file = this.files[0];
             if (!file) return;
@@ -161,13 +162,34 @@
             formData.append('profile_photo', file);
             fetch('{{ route('profile.photo') }}', {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                 body: formData
-            }).then(res => res.json()).then(data => {
+            })
+            .then(res => res.json())
+            .then(data => {
                 if (data.success) location.reload();
-            }).catch(() => alert(@js(__('messages.pe_upload_failed'))));
+                else alert('Upload failed: ' + (data.error || 'Unknown error'));
+            })
+            .catch(() => alert(@js(__('messages.pe_upload_failed'))));
+        });
+
+        // Cover photo upload
+        document.getElementById('cover_photo')?.addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('cover_photo', file);
+            fetch('{{ route('profile.cover') }}', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert('Upload failed: ' + (data.error || 'Unknown error'));
+            })
+            .catch(() => alert(@js(__('messages.pe_upload_failed'))));
         });
     </script>
 </x-app-layout>

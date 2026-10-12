@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::post('/profile/cover', [ProfileController::class, 'updateCover'])->name('profile.cover');
     Route::patch('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location');
     Route::post('/profile/id', [ProfileController::class, 'updateId'])->name('profile.id');
 
