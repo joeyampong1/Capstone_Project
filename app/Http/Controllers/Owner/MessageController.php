@@ -9,12 +9,17 @@ use App\Models\ChatDelete;
 use App\Models\ChatReport;
 use App\Models\MessageReaction;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
+    public function __construct(
+        private CloudinaryService $cloudinary
+    ) {}
+
     public function index($id)
     {
         $currentUser = Auth::user();
@@ -41,76 +46,107 @@ class MessageController extends Controller
         return view('messages.create_message', compact('otherUser', 'messages', 'roomId', 'messagesJson'));
     }
 
-        public function store(Request $request, $id)
-        {
-            $request->validate([
-                'message' => 'nullable|string|max:5000',
-                'reply_to_id' => 'nullable|exists:chat_messages,id',
-                'attachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf,doc,docx|max:20480',
-            ]);
+    public function store(Request $request, $id)
+    {
+        $request->validate([
+            'message' => 'nullable|string|max:5000',
+            'reply_to_id' => 'nullable|exists:chat_messages,id',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf,doc,docx|max:20480',
+        ]);
 
-            $currentUser = Auth::user();
-            $otherUser = User::findOrFail($id);
-            $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
+        $currentUser = Auth::user();
+        $otherUser = User::findOrFail($id);
+        $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-            $messageText = trim((string) $request->input('message', ''));
-            $attachmentPath = null;
-            $messageType = 'text';
+        $messageText = trim((string) $request->input('message', ''));
+        $attachmentPath = null;
+        $attachmentPublicId = null;
+        $messageType = 'text';
 
-            if ($request->hasFile('attachment')) {
-                $file = $request->file('attachment');
-                $attachmentPath = $file->store('chat_attachments', 'public');
-                $messageType = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png', 'gif'], true)
-                    ? 'image'
-                    : 'text';
-            }
+        // ============================================
+        // UPLOAD ATTACHMENT TO CLOUDINARY
+        // ============================================
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $extension = strtolower($file->getClientOriginalExtension());
+            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif'], true);
 
-            if ($messageText === '' && $attachmentPath === null) {
+            $upload = $this->cloudinary->upload(
+                $file,
+                $isImage ? 'chat-images' : 'chat-documents',
+                [
+                    'resource_type' => $isImage ? 'image' : 'raw',
+                    'transformation' => $isImage ? [
+                        'width'  => 1600,
+                        'height' => 1600,
+                        'crop'   => 'limit',
+                    ] : [],
+                ]
+            );
+
+            if ($upload['success']) {
+                $attachmentPath = $upload['url'];
+                $attachmentPublicId = $upload['public_id'];
+                $messageType = $isImage ? 'image' : 'document';
+            } else {
+                \Log::error('Chat attachment upload failed', [
+                    'sender_id' => $currentUser->id,
+                    'error'     => $upload['error'],
+                ]);
+
                 return response()->json([
                     'success' => false,
-                    'message' => 'Please enter a message or choose an attachment.',
-                ], 422);
+                    'message' => 'Upload failed: ' . ($upload['error'] ?? 'Unknown error'),
+                ], 500);
             }
-
-            $msg = ChatMessage::create([
-                'room_id' => $roomId,
-                'sender_id' => $currentUser->id,
-                'receiver_id' => $otherUser->id,
-                'message' => $messageText !== '' ? $messageText : 'Attachment',
-                'message_type' => $messageType,
-                'reply_to_id' => $request->reply_to_id,
-                'attachment_path' => $attachmentPath,
-                'is_read' => false,
-            ]);
-
-            $msg->load(['replyTo.sender', 'reactions']);
-
-            // ============================================
-            // INSERT NOTIFICATION 
-            // ============================================
-            if ($otherUser->id !== $currentUser->id) {
-                // Preview text — kung attachment lang walay text
-                $preview = $messageText !== ''
-                    ? $messageText
-                    : ($messageType === 'image' ? '📷 Sent a photo' : '📎 Sent an attachment');
-
-                NotificationService::newMessage(
-                    recipient: $otherUser,
-                    sender: $currentUser,
-                    preview: $preview,
-                );
-            }
-            // ============================================
-
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $this->formatSingleMessage($msg, $currentUser),
-                ]);
-            }
-
-            return redirect()->route('owner.messages', $id);
         }
+
+        if ($messageText === '' && $attachmentPath === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please enter a message or choose an attachment.',
+            ], 422);
+        }
+
+        $msg = ChatMessage::create([
+            'room_id' => $roomId,
+            'sender_id' => $currentUser->id,
+            'receiver_id' => $otherUser->id,
+            'message' => $messageText !== '' ? $messageText : 'Attachment',
+            'message_type' => $messageType,
+            'reply_to_id' => $request->reply_to_id,
+            'attachment_path' => $attachmentPath,
+            'attachment_public_id' => $attachmentPublicId,
+            'is_read' => false,
+        ]);
+
+        $msg->load(['replyTo.sender', 'reactions']);
+
+        // ============================================
+        // INSERT NOTIFICATION
+        // ============================================
+        if ($otherUser->id !== $currentUser->id) {
+            $preview = $messageText !== ''
+                ? $messageText
+                : ($messageType === 'image' ? '📷 Sent a photo' : '📎 Sent an attachment');
+
+            NotificationService::newMessage(
+                recipient: $otherUser,
+                sender: $currentUser,
+                preview: $preview,
+            );
+        }
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $this->formatSingleMessage($msg, $currentUser),
+            ]);
+        }
+
+        return redirect()->route('owner.messages', $id);
+    }
+
     public function fetch(Request $request, $id)
     {
         $currentUser = Auth::user();
@@ -173,9 +209,6 @@ class MessageController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-    // ============================================================
-    // ✅ NEW: Mark all messages in room as read
-    // ============================================================
     public function markAsRead($id)
     {
         $currentUser = Auth::user();
@@ -190,33 +223,26 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'message' => 'Marked as read.']);
     }
 
-    // ============================================================
-    // ✅ NEW: Archive conversation
-    // ============================================================
     public function archive($id)
     {
         $currentUser = Auth::user();
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        // Check kung naka-archive na
         $existing = ChatArchive::where('user_id', $currentUser->id)
             ->where('room_id', $roomId)
             ->first();
 
         if ($existing) {
-            // Toggle off – unarchive
             $existing->delete();
             return response()->json(['success' => true, 'message' => 'Conversation unarchived.', 'action' => 'unarchived']);
         }
 
-        // Archive
         ChatArchive::create([
             'user_id' => $currentUser->id,
             'room_id' => $roomId,
         ]);
 
-        // Remove from deleted kung naa
         ChatDelete::where('user_id', $currentUser->id)
             ->where('room_id', $roomId)
             ->delete();
@@ -224,20 +250,19 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'message' => 'Conversation archived.', 'action' => 'archived']);
     }
 
-    // ============================================================
-    // ✅ NEW: Delete conversation (hide for user only)
-    // ============================================================
     public function deleteConversation($id)
     {
         $currentUser = Auth::user();
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
+        // NOTE: This hides the conversation from the user only.
+        // We do NOT delete the actual chat_messages records or Cloudinary files,
+        // because the other user may still need them.
         ChatDelete::updateOrCreate(
             ['user_id' => $currentUser->id, 'room_id' => $roomId]
         );
 
-        // Remove archive kung naa
         ChatArchive::where('user_id', $currentUser->id)
             ->where('room_id', $roomId)
             ->delete();
@@ -245,9 +270,6 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'message' => 'Conversation deleted.']);
     }
 
-    // ============================================================
-    // ✅ NEW: Report user
-    // ============================================================
     public function report(Request $request, $id)
     {
         $request->validate([
@@ -259,7 +281,6 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        // Check kung na-report na ni
         $alreadyReported = ChatReport::where('reporter_id', $currentUser->id)
             ->where('reported_id', $otherUser->id)
             ->where('status', 'pending')
@@ -300,7 +321,7 @@ class MessageController extends Controller
             'message' => $m->message,
             'message_type' => $m->message_type,
             'attachment_path' => $m->attachment_path,
-            'attachment_url' => $m->attachment_path ? asset('storage/' . $m->attachment_path) : null,
+            'attachment_url' => $m->attachment_url,   // ← Cloudinary-aware accessor
             'created_at' => $m->created_at->format('g:i A'),
             'created_at_full' => $m->created_at->toISOString(),
             'is_mine' => $m->sender_id === $currentUser->id,
@@ -319,24 +340,18 @@ class MessageController extends Controller
         ];
     }
 
-    /**
-     * Show inbox – list of all conversations (excluding deleted)
-     */
     public function inbox()
     {
         $currentUser = Auth::user();
 
-        // Get deleted room IDs
         $deletedRooms = ChatDelete::where('user_id', $currentUser->id)
             ->pluck('room_id')
             ->toArray();
 
-        // Get archived room IDs
         $archivedRooms = ChatArchive::where('user_id', $currentUser->id)
             ->pluck('room_id')
             ->toArray();
 
-        // Get all room_ids (excluding deleted)
         $roomIds = ChatMessage::where(function ($q) use ($currentUser) {
                 $q->where('sender_id', $currentUser->id)
                   ->orWhere('receiver_id', $currentUser->id);
@@ -374,7 +389,6 @@ class MessageController extends Controller
             ];
         }
 
-        // Sort by last message time (newest first)
         usort($conversations, function ($a, $b) {
             return $b['last_message']->created_at <=> $a['last_message']->created_at;
         });

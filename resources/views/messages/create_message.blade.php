@@ -1,7 +1,7 @@
 <x-app-layout>
 <x-slot name="header">
     <div class="flex items-center gap-3">
-        <a href="{{ url()->previous() }}" 
+        <a href="{{ url()->previous() }}"
            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -37,10 +37,10 @@
                 <!-- CHAT HEADER -->
                 <div class="flex items-center gap-4 p-3 sm:p-5 border-b border-gray-100 dark:border-neutral-800 flex-shrink-0">
                     <div class="relative">
-                        @if($otherUser->profile_photo && file_exists(public_path('storage/' . $otherUser->profile_photo)))
-                            <img src="{{ $otherUser->profile_photo_url }}" 
-                                 alt="{{ $otherFullName }}" 
-                                 class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20">
+                        @if($otherUser->profile_photo)
+                            <img src="{{ $otherUser->profile_photo_url }}"
+                                alt="{{ $otherFullName }}"
+                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20">
                         @else
                             <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center text-white font-black">
                                 {{ $otherInitial }}
@@ -58,7 +58,7 @@
                 </div>
 
                 <!-- MESSAGES THREAD -->
-                <div x-ref="thread" 
+                <div x-ref="thread"
                      class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0">
 
                     <!-- No messages yet -->
@@ -77,8 +77,8 @@
 
                     <!-- Message loop -->
                     <template x-for="(msg, index) in messages" :key="msg.id">
-                        <div class="group/message relative" 
-                            @mouseenter="hoveredId = msg.id" 
+                        <div class="group/message relative"
+                            @mouseenter="hoveredId = msg.id"
                             @mouseleave="hoveredId = null">
 
                             <!-- Reply Preview -->
@@ -95,27 +95,27 @@
                             </template>
 
                             <!-- Message Row -->
-                            <div :class="msg.is_mine 
-                                    ? 'flex items-end gap-2 ml-auto flex-row-reverse max-w-[90%] sm:max-w-[85%]' 
+                            <div :class="msg.is_mine
+                                    ? 'flex items-end gap-2 ml-auto flex-row-reverse max-w-[90%] sm:max-w-[85%]'
                                     : 'flex items-end gap-2 max-w-[90%] sm:max-w-[85%]'">
 
                                 <!-- Avatar -->
-                                <div :class="msg.is_mine 
-                                        ? 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-[10px] sm:text-xs font-bold text-white shrink-0 mb-5' 
+                                <div :class="msg.is_mine
+                                        ? 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-[10px] sm:text-xs font-bold text-white shrink-0 mb-5'
                                         : 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] sm:text-xs font-bold text-primary shrink-0 mb-5'">
                                     <span x-text="msg.is_mine ? '{{ $myInitial }}' : '{{ $otherInitial }}'"></span>
                                 </div>
 
                                 <!-- Bubble + Timestamp + Reactions -->
                                 <div class="min-w-0">
-                                    <div :class="msg.is_mine 
-                                        ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm' 
+                                    <div :class="msg.is_mine
+                                        ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm'
                                         : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm border border-gray-100 dark:border-neutral-700'">
 
                                         <!-- Image Attachment -->
                                         <template x-if="msg.attachment_url && msg.message_type === 'image'">
-                                            <img :src="msg.attachment_url" 
-                                                :alt="'Attachment'" 
+                                            <img :src="msg.attachment_url"
+                                                :alt="'Attachment'"
                                                 class="max-w-full rounded-lg mb-1.5 cursor-pointer hover:opacity-90 transition"
                                                 style="max-height: 240px;"
                                                 @click="window.open(msg.attachment_url, '_blank')">
@@ -123,7 +123,7 @@
 
                                         <!-- Document Attachment -->
                                         <template x-if="msg.attachment_url && msg.message_type !== 'image'">
-                                            <a :href="msg.attachment_url" 
+                                            <a :href="msg.attachment_url"
                                             target="_blank"
                                             class="flex items-center gap-2 px-3 py-2 rounded-lg mb-1.5 text-xs font-bold hover:underline">
                                                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,8 +134,8 @@
                                         </template>
 
                                         <!-- Text -->
-                                        <p x-show="msg.message" 
-                                        :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'" 
+                                        <p x-show="msg.message"
+                                        :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'"
                                         x-text="msg.message"></p>
                                     </div>
 
@@ -147,8 +147,8 @@
                                             <template x-for="(reaction, rIdx) in msg.reactions" :key="rIdx">
                                                 <button type="button"
                                                         @click="toggleReaction(msg.id, reaction.emoji)"
-                                                        :class="reaction.user_reacted 
-                                                            ? 'bg-primary/20 border-primary text-primary' 
+                                                        :class="reaction.user_reacted
+                                                            ? 'bg-primary/20 border-primary text-primary'
                                                             : 'bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'"
                                                         class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs hover:scale-110 transition">
                                                     <span x-text="reaction.emoji"></span>
@@ -160,7 +160,7 @@
                                 </div>
 
                                 <!-- Hover Actions -->
-                                <div x-show="hoveredId === msg.id" 
+                                <div x-show="hoveredId === msg.id"
                                     x-cloak
                                     x-transition:enter="transition ease-out duration-150"
                                     x-transition:enter-start="opacity-0 scale-90"
@@ -189,7 +189,7 @@
                                         </button>
 
                                         <!-- Emoji Picker -->
-                                        <div x-show="emojiPickerOpen" 
+                                        <div x-show="emojiPickerOpen"
                                             @click.away="emojiPickerOpen = false"
                                             x-cloak
                                             x-transition:enter="transition ease-out duration-150"
@@ -209,7 +209,7 @@
                             </div>
                         </div>
                     </template>
-                    
+
                     <div class="h-2"></div>
                 </div>
 
@@ -226,7 +226,7 @@
                                 <p class="text-xs font-bold text-primary" x-text="'{{ __('messages.msg_replying_to') }} ' + replyTo.sender_name"></p>
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate" x-text="replyTo.message"></p>
                             </div>
-                            <button type="button" @click="cancelReply()" 
+                            <button type="button" @click="cancelReply()"
                                     class="w-6 h-6 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 flex items-center justify-center text-neutral-400 hover:text-red-500 transition">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -240,7 +240,7 @@
                         <div class="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-primary/5 border border-primary/20">
                             <!-- Image thumbnail -->
                             <template x-if="pendingAttachment.isImage">
-                                <img :src="pendingAttachment.preview" 
+                                <img :src="pendingAttachment.preview"
                                      alt="Preview"
                                      class="w-14 h-14 rounded-lg object-cover border border-primary/20 shrink-0">
                             </template>
@@ -261,7 +261,7 @@
                             </div>
 
                             <!-- Remove button -->
-                            <button type="button" 
+                            <button type="button"
                                     @click="clearAttachment()"
                                     class="w-8 h-8 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 flex items-center justify-center text-neutral-400 hover:text-red-500 transition shrink-0"
                                     title="{{ __('messages.msg_remove_attachment') }}">
@@ -275,7 +275,7 @@
                     <form @submit.prevent="sendMessage" class="flex gap-2 sm:gap-3 items-center">
                         <!-- Plus Icon with Options -->
                         <div class="relative" x-data="{ attachOpen: false }">
-                            <button type="button" 
+                            <button type="button"
                                     @click="attachOpen = !attachOpen"
                                     class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-primary/10 hover:text-primary transition flex items-center justify-center flex-shrink-0 cursor-pointer">
                                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +284,7 @@
                             </button>
 
                             <!-- Attachment options -->
-                            <div x-show="attachOpen" 
+                            <div x-show="attachOpen"
                                  @click.away="attachOpen = false"
                                  x-cloak
                                  x-transition:enter="transition ease-out duration-150"
@@ -321,9 +321,9 @@
                         </div>
 
                         <!-- File Input -->
-                        <input type="file" 
-                               id="fileInput" 
-                               class="hidden" 
+                        <input type="file"
+                               id="fileInput"
+                               class="hidden"
                                accept="image/*,.pdf,.doc,.docx"
                                @change="handleFileSelect($event)">
 
@@ -337,7 +337,7 @@
                                   style="height: 44px;"
                         ></textarea>
 
-                        <button type="submit" 
+                        <button type="submit"
                                 :disabled="sending"
                                 class="bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm px-4 py-2 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,7 +364,7 @@
             isTyping: false,
             hoveredId: null,
             replyTo: null,
-            pendingAttachment: null,        
+            pendingAttachment: null,
             lastId: config.lastId || 0,
             otherId: config.otherId,
             myId: config.myId,
@@ -414,8 +414,8 @@
                 const isImage = file.type.startsWith('image/');
                 const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
                 const sizeInKB = (file.size / 1024).toFixed(2);
-                const displaySize = file.size > 1024 * 1024 
-                    ? sizeInMB + ' MB' 
+                const displaySize = file.size > 1024 * 1024
+                    ? sizeInMB + ' MB'
                     : sizeInKB + ' KB';
 
                 const attachment = {

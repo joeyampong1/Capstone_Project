@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="sticky top-0 z-10 bg-white dark:bg-neutral-900 flex items-center gap-3">
-            <a href="{{ route('find.sitter') }}" 
+            <a href="{{ route('find.sitter') }}"
                class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -19,7 +19,7 @@
     </x-slot>
 
     <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100vh-140px)] sm:h-[calc(100vh-170px)] lg:h-[calc(100vh-180px)] flex flex-col"
-         x-data="{ 
+         x-data="{
              tab: 'active',
              activeCount: {{ collect($conversations)->where('is_archived', false)->count() }},
              archivedCount: {{ collect($conversations)->where('is_archived', true)->count() }}
@@ -34,14 +34,14 @@
                     <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <input type="text" 
-                           placeholder="{{ __('messages.mi_search_ph') }}" 
+                    <input type="text"
+                           placeholder="{{ __('messages.mi_search_ph') }}"
                            class="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
                 </div>
 
                 <!-- Active / Archived Icons (Top Right) -->
                 <div class="flex items-center justify-end gap-4">
-                    
+
                     <!-- Active Tab Icon -->
                     <button type="button"
                             @click="tab = 'active'"
@@ -90,19 +90,19 @@
                         @endphp
 
                         <!-- CONVERSATION ITEM -->
-                        <div class="relative group/conv" 
+                        <div class="relative group/conv"
                              x-data="{ menuOpen: false }"
                              x-show="(tab === 'active' && {{ $isArchived ? 'false' : 'true' }}) || (tab === 'archived' && {{ $isArchived ? 'true' : 'false' }})">
 
-                            <a href="{{ route('owner.messages', ['id' => $otherUser->id]) }}" 
+                            <a href="{{ route('owner.messages', ['id' => $otherUser->id]) }}"
                                class="flex items-center gap-4 p-4 sm:p-5 pr-14 sm:pr-16 hover:bg-primary/5 dark:hover:bg-neutral-800/50 transition">
 
                                 <!-- AVATAR -->
                                 <div class="relative flex-shrink-0">
-                                    @if($otherUser->profile_photo && file_exists(public_path('storage/' . $otherUser->profile_photo)))
-                                        <img src="{{ $otherUser->profile_photo_url }}" 
-                                             alt="{{ $otherFullName }}" 
-                                             class="w-12 h-12 rounded-full object-cover {{ $isArchived ? 'grayscale opacity-60' : '' }}">
+                                    @if($otherUser->profile_photo)
+                                        <img src="{{ $otherUser->profile_photo_url }}"
+                                            alt="{{ $otherFullName }}"
+                                            class="w-12 h-12 rounded-full object-cover {{ $isArchived ? 'grayscale opacity-60' : '' }}">
                                     @else
                                         <div class="w-12 h-12 rounded-full bg-primary {{ $isArchived ? 'opacity-60' : '' }} flex items-center justify-center text-white font-black text-lg">
                                             {{ $otherInitial }}
@@ -168,10 +168,10 @@
                             <button type="button"
                                     @click.prevent.stop="menuOpen = !menuOpen"
                                     :class="menuOpen ? 'opacity-100' : 'opacity-0 group-hover/conv:opacity-100'"
-                                    class="absolute top-1/2 -translate-y-1/2 right-3 w-8 h-8 rounded-full 
+                                    class="absolute top-1/2 -translate-y-1/2 right-3 w-8 h-8 rounded-full
                                            flex items-center justify-center
                                            bg-white dark:bg-neutral-800 shadow-md border border-gray-200 dark:border-neutral-700
-                                           text-neutral-500 hover:text-primary hover:border-primary 
+                                           text-neutral-500 hover:text-primary hover:border-primary
                                            transition-all duration-150">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
@@ -179,14 +179,14 @@
                             </button>
 
                             <!-- DROPDOWN MENU -->
-                            <div x-show="menuOpen" 
+                            <div x-show="menuOpen"
                                  @click.away="menuOpen = false"
                                  x-cloak
                                  x-transition:enter="transition ease-out duration-150"
                                  x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
                                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                                  class="absolute right-3 top-16 z-30 w-56
-                                        bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl 
+                                        bg-white dark:bg-neutral-800 rounded-2xl shadow-2xl
                                         border border-gray-200 dark:border-neutral-700 py-1.5">
 
                                 @if(!$isArchived)
@@ -252,12 +252,12 @@
                     <svg class="w-16 h-16 mx-auto text-neutral-300 dark:text-neutral-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
-                    <h3 class="text-xl font-black text-[#1B3B36] dark:text-white" 
+                    <h3 class="text-xl font-black text-[#1B3B36] dark:text-white"
                         x-text="tab === 'active' ? @js(__('messages.mi_empty_active_title')) : @js(__('messages.mi_empty_archived_title'))"></h3>
                     <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1"
                        x-text="tab === 'active' ? @js(__('messages.mi_empty_active_desc')) : @js(__('messages.mi_empty_archived_desc'))"></p>
                     <a x-show="tab === 'active'"
-                       href="{{ route('find.sitter') }}" 
+                       href="{{ route('find.sitter') }}"
                        class="inline-block mt-4 px-6 py-3 bg-primary text-white font-bold text-sm rounded-xl hover:bg-primary-600 transition">
                         {{ __('messages.mi_find_sitter') }}
                     </a>

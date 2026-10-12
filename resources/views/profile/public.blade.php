@@ -78,7 +78,13 @@
             <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden">
 
                 {{-- Cover Photo --}}
-                <div class="relative h-40 sm:h-56 bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30"></div>
+                <div class="relative h-40 sm:h-56 bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 overflow-hidden">
+                    @if($user->cover_photo)
+                        <img src="{{ $user->cover_photo_url }}"
+                            alt="{{ $fullName }}'s Cover"
+                            class="w-full h-full object-cover">
+                    @endif
+                </div>
 
                 {{-- Avatar + Name Row --}}
                 <div class="px-4 sm:px-8">
@@ -86,7 +92,7 @@
 
                         {{-- Avatar --}}
                         <div class="relative z-10 -mt-16 sm:-mt-20 shrink-0">
-                            @if($user->profile_photo && file_exists(public_path('storage/' . $user->profile_photo)))
+                            @if($user->profile_photo)
                                 <img src="{{ $user->profile_photo_url }}"
                                     alt="{{ $fullName }}"
                                     class="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-lg">
@@ -198,7 +204,7 @@
                     <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-800 p-4 sm:p-6">
                         <h3 class="text-sm font-black text-[#1B3B36] dark:text-white uppercase tracking-wider">{{ __('messages.pf_about') }}</h3>
                         <p class="mt-3 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                            {{ $user->bio ?? $sitterProfile->bio ?? __('messages.pf_no_bio') }}
+                            {{ $sitterProfile?->bio ?: __('messages.pf_no_bio') }}
                         </p>
                     </div>
 

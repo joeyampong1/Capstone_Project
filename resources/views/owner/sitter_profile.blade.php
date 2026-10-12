@@ -64,9 +64,9 @@
 
             {{-- Hero image --}}
             <div class="relative h-52 sm:h-72 overflow-hidden">
-                @if($sitter->profile_photo && file_exists(public_path('storage/' . $sitter->profile_photo)))
+                @if($sitter->profile_photo)
                     <div class="absolute inset-0 bg-cover bg-center"
-                         style="background-image: url('{{ $sitter->profile_photo_url }}');"></div>
+                        style="background-image: url('{{ $sitter->profile_photo_url }}');"></div>
                 @else
                     <div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-primary/10"></div>
                 @endif
@@ -235,11 +235,11 @@
                         <div class="flex items-center gap-2.5 min-w-0">
 
                             {{-- Reviewer avatar --}}
-                            @if($review->reviewer && $review->reviewer->profile_photo && file_exists(public_path('storage/' . $review->reviewer->profile_photo)))
-                                <img src="{{ $review->reviewer->profile_photo_url }}"
-                                     alt="{{ $reviewerName }}"
-                                     class="w-8 h-8 rounded-full object-cover border border-primary/20 shrink-0">
-                            @else
+                                @if($review->reviewer && $review->reviewer->profile_photo)
+                                    <img src="{{ $review->reviewer->profile_photo_url }}"
+                                        alt="{{ $reviewerName }}"
+                                        class="w-8 h-8 rounded-full object-cover border border-primary/20 shrink-0">
+                                @else
                                 <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                                     {{ strtoupper(substr(optional($review->reviewer)->f_name ?? 'U', 0, 1)) }}
                                 </div>
@@ -308,8 +308,14 @@
                     x-data="{ hasText: false }">
                     @csrf
                     <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 mt-0.5">
-                            {{ strtoupper(substr(auth()->user()->f_name ?? 'U', 0, 1)) }}
+                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 mt-0.5 overflow-hidden">
+                            @if(auth()->user()->profile_photo)
+                                <img src="{{ auth()->user()->profile_photo_url }}"
+                                    alt="{{ auth()->user()->f_name }}"
+                                    class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr(auth()->user()->f_name ?? 'U', 0, 1)) }}
+                            @endif
                         </div>
                         <div class="flex-1 min-w-0">
                             <textarea name="body"
@@ -349,9 +355,15 @@
                 @forelse(($sitter->comments ?? collect()) as $comment)
                     <div class="flex items-start gap-2.5" x-data="{ replyOpen: false }">
                         <a href="{{ route('public.profile', ['id' => $comment->user_id]) }}"
-                        class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 mt-0.5 hover:bg-primary/20 transition"
+                        class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0 mt-0.5 hover:bg-primary/20 transition overflow-hidden"
                         title="View {{ trim(($comment->user->f_name ?? '') . ' ' . ($comment->user->l_name ?? '')) ?: 'User' }}'s profile">
-                            {{ strtoupper(substr(optional($comment->user)->f_name ?? 'U', 0, 1)) }}
+                            @if($comment->user && $comment->user->profile_photo)
+                                <img src="{{ $comment->user->profile_photo_url }}"
+                                    alt="{{ $comment->user->f_name }}"
+                                    class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr(optional($comment->user)->f_name ?? 'U', 0, 1)) }}
+                            @endif
                         </a>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-baseline justify-between gap-2">
@@ -383,8 +395,14 @@
                                     @csrf
                                     <input type="hidden" name="parent_id" value="{{ $comment->id }}">
                                     <div class="flex items-start gap-2">
-                                        <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary shrink-0">
-                                            {{ strtoupper(substr(auth()->user()->f_name ?? 'U', 0, 1)) }}
+                                        <div class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 overflow-hidden">
+                                            @if(auth()->user()->profile_photo)
+                                                <img src="{{ auth()->user()->profile_photo_url }}"
+                                                    alt="{{ auth()->user()->f_name }}"
+                                                    class="w-full h-full object-cover">
+                                            @else
+                                                {{ strtoupper(substr(auth()->user()->f_name ?? 'U', 0, 1)) }}
+                                            @endif
                                         </div>
                                         <div class="flex-1">
                                             <textarea name="body"
@@ -407,9 +425,15 @@
                                     @foreach($comment->replies as $reply)
                                         <div class="flex items-start gap-2.5">
                                             <a href="{{ route('public.profile', ['id' => $reply->user_id]) }}"
-                                            class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-0.5 hover:bg-primary/20 transition"
+                                            class="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary shrink-0 mt-0.5 hover:bg-primary/20 transition overflow-hidden"
                                             title="View {{ trim(($reply->user->f_name ?? '') . ' ' . ($reply->user->l_name ?? '')) ?: 'User' }}'s profile">
-                                                {{ strtoupper(substr(optional($reply->user)->f_name ?? 'U', 0, 1)) }}
+                                                @if($reply->user && $reply->user->profile_photo)
+                                                    <img src="{{ $reply->user->profile_photo_url }}"
+                                                        alt="{{ $reply->user->f_name }}"
+                                                        class="w-full h-full object-cover">
+                                                @else
+                                                    {{ strtoupper(substr(optional($reply->user)->f_name ?? 'U', 0, 1)) }}
+                                                @endif
                                             </a>
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-baseline justify-between gap-2">

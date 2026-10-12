@@ -21,6 +21,7 @@ class ChatMessage extends Model
         'message_type',
         'reply_to_id',
         'attachment_path',
+        'attachment_public_id',
         'is_read',
         'read_at',
     ];
@@ -60,11 +61,24 @@ class ChatMessage extends Model
         return 'room_' . $ids[0] . '_' . $ids[1];
     }
 
+    /**
+     * Attachment URL — auto-detects Cloudinary vs local.
+     */
     public function getAttachmentUrlAttribute(): ?string
     {
-        return $this->attachment_path 
-            ? asset('storage/' . $this->attachment_path) 
-            : null;
+        if (!$this->attachment_path) return null;
+
+        // Cloudinary or external URL
+        if (str_starts_with($this->attachment_path, 'http://') || str_starts_with($this->attachment_path, 'https://')) {
+            return $this->attachment_path;
+        }
+
+        // Local storage fallback
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->attachment_path)) {
+            return asset('storage/' . $this->attachment_path);
+        }
+
+        return null;
     }
 
     public function isImage(): bool
@@ -80,4 +94,6 @@ class ChatMessage extends Model
             ->get()
             ->toArray();
     }
+
+
 }

@@ -273,7 +273,7 @@
                                 <div>
                                     <div class="relative h-[220px] rounded-xl sm:rounded-[1.5rem] overflow-hidden bg-neutral-100 dark:bg-neutral-800 mb-4">
                                         {{-- Profile Photo --}}
-                                        @if($sitter->profile_photo && file_exists(public_path('storage/' . $sitter->profile_photo)))
+                                        @if($sitter->profile_photo)
                                             <img src="{{ $sitter->profile_photo_url }}"
                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 alt="{{ $fullName }}">
