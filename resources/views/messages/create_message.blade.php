@@ -29,6 +29,7 @@
                     otherId: {{ $otherUser->id }},
                     lastId: {{ $lastMessageId }},
                     myId: {{ auth()->id() }},
+                    roomId: "{{ $roomId }}",
                     csrfToken: "{{ csrf_token() }}",
                     initialMessages: @json($messagesJson ?? [])
                 })'
@@ -46,13 +47,21 @@
                                 {{ $otherInitial }}
                             </div>
                         @endif
-                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full border-2 border-white dark:border-neutral-900"></span>
+                        <span :class="otherOnline ? 'bg-green-500' : 'bg-neutral-400'"
+                            class="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-neutral-900 transition-colors"></span>
                     </div>
                     <div>
                         <h2 class="font-black text-[#1B3B36] dark:text-white text-sm sm:text-base">{{ $otherFullName }}</h2>
-                        <p class="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400">
-                            <span x-show="!isTyping">{{ __('messages.msg_online_status') }}</span>
-                            <span x-show="isTyping" x-cloak class="text-primary font-semibold">{{ __('messages.msg_typing') }}</span>
+                        <p class="text-[10px] sm:text-xs">
+                            <span x-show="otherTyping" x-cloak class="text-primary font-semibold italic">
+                                {{ __('messages.msg_typing') }}...
+                            </span>
+                            <span x-show="!otherTyping && otherOnline" x-cloak class="text-green-600 font-semibold">
+                                ● {{ __('messages.msg_online') }}
+                            </span>
+                            <span x-show="!otherTyping && !otherOnline" x-cloak class="text-neutral-500 dark:text-neutral-400">
+                                {{ __('messages.msg_last_seen') }} <span x-text="formatLastSeen(otherLastSeen)">{{ __('messages.msg_recently') }}</span>
+                            </span>
                         </p>
                     </div>
                 </div>
@@ -108,55 +117,65 @@
 
                                 <!-- Bubble + Timestamp + Reactions -->
                                 <div class="min-w-0">
-                                    <div :class="msg.is_mine
-                                        ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm'
-                                        : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm border border-gray-100 dark:border-neutral-700'">
+                                    <!-- ✅ Wrapper: -->
+                                    <div class="relative inline-block max-w-full">
 
-                                        <!-- Image Attachment -->
-                                        <template x-if="msg.attachment_url && msg.message_type === 'image'">
-                                            <img :src="msg.attachment_url"
-                                                :alt="'Attachment'"
-                                                class="max-w-full rounded-lg mb-1.5 cursor-pointer hover:opacity-90 transition"
-                                                style="max-height: 240px;"
-                                                @click="window.open(msg.attachment_url, '_blank')">
-                                        </template>
+                                        <!-- Bubble  -->
+                                        <div :class="msg.is_mine
+                                            ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm'
+                                            : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm border border-gray-100 dark:border-neutral-700'">
 
-                                        <!-- Document Attachment -->
-                                        <template x-if="msg.attachment_url && msg.message_type !== 'image'">
-                                            <a :href="msg.attachment_url"
-                                            target="_blank"
-                                            class="flex items-center gap-2 px-3 py-2 rounded-lg mb-1.5 text-xs font-bold hover:underline">
-                                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                                </svg>
-                                                {{ __('messages.msg_view_document') }}
-                                            </a>
-                                        </template>
-
-                                        <!-- Text -->
-                                        <p x-show="msg.message"
-                                        :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'"
-                                        x-text="msg.message"></p>
-                                    </div>
-
-                                    <span :class="msg.is_mine ? 'text-[9px] sm:text-[10px] text-neutral-400 mt-0.5 block text-right' : 'text-[9px] sm:text-[10px] text-neutral-400 mt-0.5 block'" x-text="msg.created_at"></span>
-
-                                    <!-- Reactions Display -->
-                                    <template x-if="msg.reactions && msg.reactions.length > 0">
-                                        <div :class="msg.is_mine ? 'flex flex-wrap gap-1 mt-1 justify-end' : 'flex flex-wrap gap-1 mt-1'">
-                                            <template x-for="(reaction, rIdx) in msg.reactions" :key="rIdx">
-                                                <button type="button"
-                                                        @click="toggleReaction(msg.id, reaction.emoji)"
-                                                        :class="reaction.user_reacted
-                                                            ? 'bg-primary/20 border-primary text-primary'
-                                                            : 'bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400'"
-                                                        class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs hover:scale-110 transition">
-                                                    <span x-text="reaction.emoji"></span>
-                                                    <span class="font-bold text-[10px]" x-text="reaction.count"></span>
-                                                </button>
+                                            <!-- Image Attachment -->
+                                            <template x-if="msg.attachment_url && msg.message_type === 'image'">
+                                                <img :src="msg.attachment_url"
+                                                    :alt="'Attachment'"
+                                                    class="max-w-full rounded-lg mb-1.5 cursor-pointer hover:opacity-90 transition"
+                                                    style="max-height: 240px;"
+                                                    @click="window.open(msg.attachment_url, '_blank')">
                                             </template>
+
+                                            <!-- Document Attachment -->
+                                            <template x-if="msg.attachment_url && msg.message_type !== 'image'">
+                                                <a :href="msg.attachment_url"
+                                                target="_blank"
+                                                class="flex items-center gap-2 px-3 py-2 rounded-lg mb-1.5 text-xs font-bold hover:underline">
+                                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                                    </svg>
+                                                    {{ __('messages.msg_view_document') }}
+                                                </a>
+                                            </template>
+
+                                            <!-- Text -->
+                                            <p x-show="msg.message"
+                                            :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'"
+                                            x-text="msg.message"></p>
                                         </div>
-                                    </template>
+
+                                        <!-- ✅ Reactions: overlap bottom edge  -->
+                                        <template x-if="msg.reactions && msg.reactions.length > 0">
+                                            <div :class="msg.is_mine
+                                                ? 'absolute bottom-0 right-2 translate-y-1/2 flex flex-wrap gap-1 z-20'
+                                                : 'absolute bottom-0 left-2 translate-y-1/2 flex flex-wrap gap-1 z-20'">
+                                                <template x-for="(reaction, rIdx) in msg.reactions" :key="rIdx">
+                                                    <div :class="reaction.user_reacted
+                                                            ? 'bg-white dark:bg-neutral-700 border-primary text-primary'
+                                                            : 'bg-white dark:bg-neutral-700 border-neutral-200 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400'"
+                                                        class="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-full border shadow-md text-xs cursor-default">
+                                                        <span x-text="reaction.emoji" class="text-[13px] leading-none"></span>
+                                                        <span class="font-bold text-[10px] leading-none" x-text="reaction.count"></span>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <!-- ✅ Closing wrapper -->
+
+                                    <!-- ✅ Timestamp:  -->
+                                <span :class="msg.is_mine
+                                    ? 'text-[9px] sm:text-[10px] text-neutral-400 mt-4 block text-right pr-1'
+                                    : 'text-[9px] sm:text-[10px] text-neutral-400 mt-4 block pl-1'"
+                                    x-text="msg.created_at"></span>
                                 </div>
 
                                 <!-- Hover Actions -->
@@ -355,155 +374,279 @@
     </div>
 
    @push('scripts')
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
     <script>
+    const firebaseConfig = {
+        apiKey:            "{{ config('firebase.web.api_key') }}",
+        authDomain:        "{{ config('firebase.web.auth_domain') }}",
+        projectId:         "{{ config('firebase.web.project_id') }}",
+        storageBucket:     "{{ config('firebase.web.storage_bucket') }}",
+        messagingSenderId: "{{ config('firebase.web.messaging_sender_id') }}",
+        appId:             "{{ config('firebase.web.app_id') }}",
+        databaseURL:       "{{ config('firebase.web.database_url') }}",
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db   = firebase.firestore();
+    const rtdb = firebase.database();
+
     window.chatApp = function(config) {
         return {
             messages: [],
             newMessage: '',
             sending: false,
-            isTyping: false,
+            otherTyping: false,
+            otherOnline: false,
+            otherLastSeen: null,
             hoveredId: null,
             replyTo: null,
             pendingAttachment: null,
             lastId: config.lastId || 0,
             otherId: config.otherId,
             myId: config.myId,
+            roomId: config.roomId,
             csrfToken: config.csrfToken || '',
-            pollInterval: null,
+            typingTimeout: null,
+            typingDebounce: null,
+            typingRef: null,
+            otherTypingRef: null,
+            firestoreUnsubscribe: null,
 
             init() {
-                console.log('[chatApp] init started', {
-                    otherId: this.otherId,
-                    messageCount: (config.initialMessages || []).length
-                });
-
+                console.log('[chatApp] init', { roomId: this.roomId });
                 this.messages = config.initialMessages || [];
-
                 this.$nextTick(() => this.scrollToBottom());
 
+                this.setupPresence();
+                this.setupFirestoreListener();
+                this.setupTypingListener();
+                this.markAsRead();
+
+                // Polling fallback every 3s
                 this.pollInterval = setInterval(() => this.pollNewMessages(), 3000);
             },
 
-            startReply(msg) {
-                this.replyTo = {
-                    id: msg.id,
-                    message: msg.message,
-                    sender_name: msg.is_mine ? '{{ __('messages.msg_you') }}' : '{{ $otherFullName }}',
-                };
-                this.$refs.input.focus();
+            // ===== PRESENCE (Realtime DB) =====
+            setupPresence() {
+                const myRef = rtdb.ref('presence/' + this.myId);
+
+                myRef.set({
+                    status: 'online',
+                    last_seen: firebase.database.ServerValue.TIMESTAMP,
+                });
+                myRef.onDisconnect().set({
+                    status: 'offline',
+                    last_seen: firebase.database.ServerValue.TIMESTAMP,
+                });
+
+                rtdb.ref('presence/' + this.otherId).on('value', (snap) => {
+                    const data = snap.val();
+                    if (!data || !data.last_seen) {
+                        this.otherOnline = false;
+                        this.otherLastSeen = null;
+                        return;
+                    }
+                    const isOnline = data.status === 'online'
+                        && (Date.now() - data.last_seen) < 60000;
+                    this.otherOnline = isOnline;
+                    this.otherLastSeen = data.last_seen;
+                });
+
+                setInterval(() => {
+                    myRef.update({
+                        status: 'online',
+                        last_seen: firebase.database.ServerValue.TIMESTAMP,
+                    });
+                }, 30000);
+
+                window.addEventListener('beforeunload', () => {
+                    myRef.set({
+                        status: 'offline',
+                        last_seen: firebase.database.ServerValue.TIMESTAMP,
+                    });
+                });
             },
 
-            cancelReply() {
-                this.replyTo = null;
+            // ===== TYPING (Realtime DB) =====
+            setupTypingListener() {
+                this.typingRef = rtdb.ref('typing/' + this.roomId + '/' + this.myId);
+                this.otherTypingRef = rtdb.ref('typing/' + this.roomId + '/' + this.otherId);
+
+                this.typingRef.onDisconnect().set({
+                    is_typing: false,
+                    updated_at: firebase.database.ServerValue.TIMESTAMP,
+                });
+
+                this.otherTypingRef.on('value', (snap) => {
+                    const data = snap.val();
+                    if (!data || !data.is_typing) {
+                        this.otherTyping = false;
+                        return;
+                    }
+                    if (data.updated_at && (Date.now() - data.updated_at) < 5000) {
+                        this.otherTyping = true;
+                        clearTimeout(this.typingTimeout);
+                        this.typingTimeout = setTimeout(() => {
+                            this.otherTyping = false;
+                        }, 5000);
+                    } else {
+                        this.otherTyping = false;
+                    }
+                });
             },
 
-            handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (!file) {
-                    this.pendingAttachment = null;
-                    return;
-                }
-
-                if (file.size > 20 * 1024 * 1024) {
-                    alert('{{ __('messages.msg_file_too_large') }}');
-                    event.target.value = '';
-                    this.pendingAttachment = null;
-                    return;
-                }
-
-                const isImage = file.type.startsWith('image/');
-                const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-                const sizeInKB = (file.size / 1024).toFixed(2);
-                const displaySize = file.size > 1024 * 1024
-                    ? sizeInMB + ' MB'
-                    : sizeInKB + ' KB';
-
-                const attachment = {
-                    name: file.name,
-                    size: displaySize,
-                    isImage: isImage,
-                    preview: null,
-                };
-
-                if (isImage) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        this.pendingAttachment = { ...attachment, preview: e.target.result };
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    this.pendingAttachment = attachment;
-                }
+            setMyTyping(v) {
+                if (!this.typingRef) return;
+                this.typingRef.set({
+                    is_typing: v,
+                    updated_at: firebase.database.ServerValue.TIMESTAMP,
+                });
             },
 
-            clearAttachment() {
-                this.pendingAttachment = null;
-                const fileInput = document.getElementById('fileInput');
-                if (fileInput) fileInput.value = '';
+            // ===== FIRESTORE REAL-TIME MESSAGES =====
+            setupFirestoreListener() {
+                const col = db.collection('chats').doc(this.roomId).collection('messages').orderBy('id', 'asc');
+
+                this.firestoreUnsubscribe = col.onSnapshot((snap) => {
+                    snap.docChanges().forEach((change) => {
+                        if (change.type === 'added') {
+                            const data = change.doc.data();
+                            if (!this.messages.find(m => m.id === data.id)) {
+                                if (data.is_mine === undefined) data.is_mine = data.sender_id === this.myId;
+                                this.messages.push(data);
+                                this.lastId = Math.max(this.lastId, data.id);
+                                this.$nextTick(() => this.scrollToBottom());
+                            }
+                        } else if (change.type === 'modified') {
+                            const data = change.doc.data();
+                            const idx = this.messages.findIndex(m => m.id === data.id);
+                            if (idx !== -1) {
+                                if (data.is_mine === undefined) data.is_mine = data.sender_id === this.myId;
+                                this.messages[idx] = { ...this.messages[idx], ...data };
+                            }
+                        }
+                    });
+                });
             },
 
+            // ===== SEND MESSAGE =====
             async sendMessage() {
                 const text = this.newMessage.trim();
-                const fileInput = document.getElementById('fileInput');
-                const file = fileInput && fileInput.files && fileInput.files.length > 0
-                    ? fileInput.files[0]
-                    : null;
+                const fi = document.getElementById('fileInput');
+                const file = fi && fi.files && fi.files.length > 0 ? fi.files[0] : null;
 
                 if ((!text && !file) || this.sending) return;
-
                 this.sending = true;
+                this.setMyTyping(false);
 
                 try {
-                    const formData = new FormData();
-                    formData.append('_token', this.csrfToken);
-                    formData.append('message', text);
-
-                    if (this.replyTo) {
-                        formData.append('reply_to_id', this.replyTo.id);
-                    }
-
-                    if (file) {
-                        formData.append('attachment', file);
-                    }
+                    const fd = new FormData();
+                    fd.append('_token', this.csrfToken);
+                    fd.append('message', text);
+                    if (this.replyTo) fd.append('reply_to_id', this.replyTo.id);
+                    if (file) fd.append('attachment', file);
 
                     const res = await fetch(`/messages/${this.otherId}`, {
                         method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': this.csrfToken,
-                        },
-                        body: formData,
+                        headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': this.csrfToken },
+                        body: fd,
                     });
 
-                    if (!res.ok) {
-                        alert('{{ __('messages.msg_send_failed_status', ['status' => '']) }}'.replace(':status', res.status));
-                        return;
-                    }
+                    if (!res.ok) return;
 
                     const data = await res.json();
-
                     if (data.success) {
-                        this.messages.push(data.message);
-                        this.lastId = data.message.id;
+                        // ✅ Optimistic UI:
+                        if (data.message && !this.messages.find(m => m.id === data.message.id)) {
+                            data.message.is_mine = true;
+                            this.messages.push(data.message);
+                            this.lastId = Math.max(this.lastId, data.message.id);
+                            this.$nextTick(() => this.scrollToBottom());
+                        }
+
                         this.newMessage = '';
                         this.replyTo = null;
                         this.pendingAttachment = null;
+                        if (fi) fi.value = '';
+                    }
+                } catch (e) { /* silent */ }
+                finally { this.sending = false; }
+            },
 
-                        if (fileInput) {
-                            fileInput.value = '';
-                        }
+            async pollNewMessages() {
+                try {
+                    const res = await fetch(`/messages/${this.otherId}/fetch?last_id=${this.lastId}`, {
+                        headers: { 'Accept': 'application/json' },
+                    });
+                    const data = await res.json();
 
+                    if (data.messages && data.messages.length > 0) {
+                        data.messages.forEach(m => {
+                            if (!this.messages.find(x => x.id === m.id)) {
+                                this.messages.push(m);
+                                this.lastId = Math.max(this.lastId, m.id);
+                            }
+                        });
                         this.$nextTick(() => this.scrollToBottom());
                     }
-                } catch (e) {
-                    alert('{{ __('messages.msg_send_failed_error', ['error' => '']) }}'.replace(':error', e.message));
-                } finally {
-                    this.sending = false;
-                }
+                } catch (e) { /* silent */ }
             },
 
             async toggleReaction(messageId, emoji) {
                 try {
+                    // 1. Optimistic update (mirror sa backend logic)
+                    const idx = this.messages.findIndex(m => m.id === messageId);
+                    if (idx !== -1) {
+                        const msg = this.messages[idx];
+                        if (!msg.reactions) msg.reactions = [];
+
+                        // Find if user already reacted with this SAME emoji
+                        const sameEmoji = msg.reactions.find(r => r.emoji === emoji && r.user_reacted);
+
+                        // Find if user reacted with ANY emoji (para tangtangon)
+                        const myPreviousReaction = msg.reactions.find(r => r.user_reacted);
+
+                        if (sameEmoji) {
+                            // ✅ User clicked SAME emoji → REMOVE reaction
+                            sameEmoji.count -= 1;
+                            sameEmoji.user_reacted = false;
+                            if (sameEmoji.count <= 0) {
+                                msg.reactions = msg.reactions.filter(r => r.emoji !== emoji);
+                            }
+                        } else {
+                            // ✅ User clicked DIFFERENT emoji → REMOVE previous, ADD new
+                            if (myPreviousReaction) {
+                                myPreviousReaction.count -= 1;
+                                myPreviousReaction.user_reacted = false;
+                                if (myPreviousReaction.count <= 0) {
+                                    msg.reactions = msg.reactions.filter(r => r.emoji !== myPreviousReaction.emoji);
+                                }
+                            }
+
+                            // Add the new emoji
+                            const existing = msg.reactions.find(r => r.emoji === emoji);
+                            if (existing) {
+                                existing.count += 1;
+                                existing.user_reacted = true;
+                            } else {
+                                msg.reactions.push({
+                                    emoji: emoji,
+                                    count: 1,
+                                    user_reacted: true,
+                                });
+                            }
+                        }
+
+                        // Force Alpine re-render
+                        this.messages = [...this.messages];
+                    }
+
+                    // 2. Send to backend
                     const res = await fetch(`/messages/${this.otherId}/react`, {
                         method: 'POST',
                         headers: {
@@ -514,13 +657,12 @@
                         body: JSON.stringify({ message_id: messageId, emoji: emoji }),
                     });
 
-                    const data = await res.json();
-
-                    if (data.success) {
+                    // 3. If backend fails, reload from server
+                    if (!res.ok) {
                         await this.reloadAllMessages();
                     }
                 } catch (e) {
-                    // silent
+                    await this.reloadAllMessages();
                 }
             },
 
@@ -533,31 +675,49 @@
                     if (data.messages && data.messages.length > 0) {
                         this.messages = data.messages;
                         this.lastId = Math.max(...data.messages.map(m => m.id));
+                        this.$nextTick(() => this.scrollToBottom());
                     }
-                } catch (e) {
-                    // silent
+                } catch (e) { /* silent */ }
+            },
+
+            startReply(msg) {
+                this.replyTo = {
+                    id: msg.id,
+                    message: msg.message,
+                    sender_name: msg.is_mine ? '{{ __('messages.msg_you') }}' : '{{ $otherFullName }}',
+                };
+                this.$refs.input.focus();
+            },
+
+            cancelReply() { this.replyTo = null; },
+
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) { this.pendingAttachment = null; return; }
+                if (file.size > 20 * 1024 * 1024) {
+                    alert('{{ __('messages.msg_file_too_large') }}');
+                    event.target.value = '';
+                    this.pendingAttachment = null;
+                    return;
+                }
+                const isImage = file.type.startsWith('image/');
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                const sizeKB = (file.size / 1024).toFixed(2);
+                const displaySize = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
+                const att = { name: file.name, size: displaySize, isImage, preview: null };
+                if (isImage) {
+                    const r = new FileReader();
+                    r.onload = (e) => { this.pendingAttachment = { ...att, preview: e.target.result }; };
+                    r.readAsDataURL(file);
+                } else {
+                    this.pendingAttachment = att;
                 }
             },
 
-            async pollNewMessages() {
-                try {
-                    const res = await fetch(`/messages/${this.otherId}/fetch?last_id=${this.lastId}`, {
-                        headers: { 'Accept': 'application/json' },
-                    });
-                    const data = await res.json();
-
-                    if (data.count > 0) {
-                        data.messages.forEach(m => {
-                            if (!this.messages.find(x => x.id === m.id)) {
-                                this.messages.push(m);
-                                this.lastId = Math.max(this.lastId, m.id);
-                            }
-                        });
-                        this.$nextTick(() => this.scrollToBottom());
-                    }
-                } catch (e) {
-                    // silent
-                }
+            clearAttachment() {
+                this.pendingAttachment = null;
+                const fi = document.getElementById('fileInput');
+                if (fi) fi.value = '';
             },
 
             onInput() {
@@ -566,16 +726,29 @@
                     el.style.height = 'auto';
                     el.style.height = Math.min(el.scrollHeight, 128) + 'px';
                 }
+                this.setMyTyping(true);
+                clearTimeout(this.typingDebounce);
+                this.typingDebounce = setTimeout(() => this.setMyTyping(false), 2000);
             },
 
             scrollToBottom() {
                 const el = this.$refs.thread;
-                if (el) {
-                    el.scrollTop = el.scrollHeight;
-                }
-            }
+                if (el) el.scrollTop = el.scrollHeight;
+            },
+
+            formatLastSeen(ts) {
+                const t = window.chatTranslations || {};
+                if (!ts) return t.recently || 'recently';
+                const sec = Math.floor((Date.now() - ts) / 1000);
+                if (sec < 60) return t.justNow || 'just now';
+                const min = Math.floor(sec / 60);
+                if (min < 60) return (t.minutesAgo || ':countm ago').replace(':count', min);
+                const hr = Math.floor(min / 60);
+                if (hr < 24) return (t.hoursAgo || ':counth ago').replace(':count', hr);
+                return (t.daysAgo || ':countd ago').replace(':count', Math.floor(hr / 24));
+            },
         };
     };
     </script>
-    @endpush
+  @endpush
 </x-app-layout>

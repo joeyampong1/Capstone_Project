@@ -33,5 +33,7 @@ login.html
 login_response.html
 messages_page.html
 test_ocr.php 
+# Firebase / sensitive
+/storage/app/firebase_credentials.json
  
  

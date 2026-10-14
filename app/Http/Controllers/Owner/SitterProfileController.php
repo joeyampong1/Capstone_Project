@@ -12,19 +12,22 @@ class SitterProfileController extends Controller
 {
     public function show($id)
     {
-        $sitter = User::with([
-                'sitterProfile',
-                'pets',
-                'comments.user',
-                'comments.replies.user',
-            ])
-            ->findOrFail($id);
+        $sitter = User::with(['sitterProfile', 'pets'])->findOrFail($id);
 
         if (!$sitter->sitterProfile) {
             abort(404, 'This user does not have a sitter profile.');
         }
 
         $profile = $sitter->sitterProfile;
+
+        // ✅ Load comments using SitterProfile ID (not User ID)
+        $comments = \App\Models\Comment::with(['user', 'replies.user'])
+            ->where('sitter_id', $profile->id)
+            ->whereNull('parent_id')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $sitter->setRelation('comments', $comments);
 
         // Pet types
         $petTypeIds = $profile->preferred_pet_types ?? [];

@@ -393,7 +393,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/{id}', [MessageController::class, 'index'])->name('owner.messages');
     Route::post('/messages/{id}/react', [MessageController::class, 'react'])->name('messages.react');
     Route::get('/messages', [MessageController::class, 'inbox'])->name('messages.index');
-    Route::post('/messages/{id}/mark-read', [MessageController::class, 'markAsRead'])->name('messages.markRead');
+    Route::post('/messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.markRead');
     Route::post('/messages/{id}/archive', [MessageController::class, 'archive'])->name('messages.archive');
     Route::delete('/messages/{id}/delete', [MessageController::class, 'deleteConversation'])->name('messages.deleteConversation');
     Route::post('/messages/{id}/report', [MessageController::class, 'report'])->name('messages.report');

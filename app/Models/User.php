@@ -426,10 +426,17 @@ class User extends Authenticatable
      */
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'sitter_id')
-                    ->whereNull('parent_id')
-                    ->with('replies.user', 'user')
-                    ->orderBy('created_at', 'desc');
+        return $this->hasManyThrough(
+            Comment::class,           // Final model
+            SitterProfile::class,     // Intermediate model
+            'user_id',                // FK on sitter_profiles (references users.id)
+            'sitter_id',              // FK on comments (references sitter_profiles.id)
+            'id',                     // Local key on users
+            'id'                      // Local key on sitter_profiles
+        )
+        ->whereNull('comments.parent_id')
+        ->with(['replies.user', 'user'])
+        ->orderBy('comments.created_at', 'desc');
     }
 
 

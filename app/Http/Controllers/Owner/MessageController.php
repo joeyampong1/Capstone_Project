@@ -10,14 +10,18 @@ use App\Models\ChatReport;
 use App\Models\MessageReaction;
 use App\Models\User;
 use App\Services\CloudinaryService;
+use App\Services\FirestoreService;
 use App\Services\NotificationService;
+use App\Services\PresenceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
     public function __construct(
-        private CloudinaryService $cloudinary
+        private CloudinaryService $cloudinary,
+        private FirestoreService $firestore,
+        private PresenceService $presence,
     ) {}
 
     public function index($id)
@@ -41,9 +45,21 @@ class MessageController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true, 'read_at' => now()]);
 
+        // // ✅ Firebase: mark as read in Firestore too
+        // $this->firestore->markMessagesRead($roomId, $currentUser->id);
+
+        // // ✅ Firebase: get other user's presence
+        // $otherUserPresence = $this->presence->getUserPresence($otherUser->id);
+        // $isOtherUserOnline = $this->presence->isOnline($otherUserPresence);
+
         $messagesJson = $this->formatMessages($messages, $currentUser);
 
-        return view('messages.create_message', compact('otherUser', 'messages', 'roomId', 'messagesJson'));
+        return view('messages.create_message', compact(
+            'otherUser',
+            'messages',
+            'roomId',
+            'messagesJson'
+        ));
     }
 
     public function store(Request $request, $id)
@@ -122,6 +138,23 @@ class MessageController extends Controller
 
         $msg->load(['replyTo.sender', 'reactions']);
 
+        $formattedMessage = $this->formatSingleMessage($msg, $currentUser);
+
+        // ✅ Firebase: push message to Firestore for real-time delivery
+        // $this->firestore->sendMessage($roomId, [
+        //     'id'              => $formattedMessage['id'],
+        //     'sender_id'       => $formattedMessage['sender_id'],
+        //     'receiver_id'     => $formattedMessage['receiver_id'],
+        //     'message'         => $formattedMessage['message'],
+        //     'message_type'    => $formattedMessage['message_type'],
+        //     'attachment_url'  => $formattedMessage['attachment_url'],
+        //     'reply_to'        => $formattedMessage['reply_to'],
+        //     'reactions'       => $formattedMessage['reactions'],
+        //     'is_read'         => false,
+        //     'created_at'      => $formattedMessage['created_at'],
+        //     'created_at_full' => $formattedMessage['created_at_full'],
+        // ]);
+
         // ============================================
         // INSERT NOTIFICATION
         // ============================================
@@ -140,7 +173,7 @@ class MessageController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => $this->formatSingleMessage($msg, $currentUser),
+                'message' => $formattedMessage,
             ]);
         }
 
@@ -166,6 +199,11 @@ class MessageController extends Controller
             ->where('is_read', false)
             ->update(['is_read' => true, 'read_at' => now()]);
 
+        // ✅ Firebase: sync read status
+        if ($newMessages->isNotEmpty()) {
+            $this->firestore->markMessagesRead($roomId, $currentUser->id);
+        }
+
         return response()->json([
             'messages' => $this->formatMessages($newMessages, $currentUser),
             'count' => $newMessages->count(),
@@ -180,6 +218,8 @@ class MessageController extends Controller
         ]);
 
         $currentUser = Auth::user();
+        $otherUser = User::findOrFail($id);
+        $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
         $existing = MessageReaction::where('message_id', $request->message_id)
             ->where('user_id', $currentUser->id)
@@ -187,11 +227,13 @@ class MessageController extends Controller
 
         if ($existing && $existing->emoji === $request->emoji) {
             $existing->delete();
+            // $this->syncReactionsToFirestore($roomId, $request->message_id, $currentUser);
             return response()->json(['success' => true, 'action' => 'removed']);
         }
 
         if ($existing) {
             $existing->update(['emoji' => $request->emoji]);
+            // $this->syncReactionsToFirestore($roomId, $request->message_id, $currentUser);
             return response()->json(['success' => true, 'action' => 'updated']);
         }
 
@@ -201,11 +243,23 @@ class MessageController extends Controller
             'emoji' => $request->emoji,
         ]);
 
+        // $this->syncReactionsToFirestore($roomId, $request->message_id, $currentUser);
         return response()->json(['success' => true, 'action' => 'added']);
     }
 
     public function typing(Request $request, $id)
     {
+        $request->validate([
+            'is_typing' => 'required|boolean',
+        ]);
+
+        $currentUser = Auth::user();
+        $otherUser = User::findOrFail($id);
+        $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
+
+        // ✅ Firebase: real typing indicator via Realtime DB
+        $this->presence->setTyping($roomId, $currentUser->id, (bool) $request->is_typing);
+
         return response()->json(['status' => 'ok']);
     }
 
@@ -219,6 +273,9 @@ class MessageController extends Controller
             ->where('receiver_id', $currentUser->id)
             ->where('is_read', false)
             ->update(['is_read' => true, 'read_at' => now()]);
+
+        // ✅ Firebase: sync read status
+        $this->firestore->markMessagesRead($roomId, $currentUser->id);
 
         return response()->json(['success' => true, 'message' => 'Marked as read.']);
     }
@@ -256,9 +313,6 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        // NOTE: This hides the conversation from the user only.
-        // We do NOT delete the actual chat_messages records or Cloudinary files,
-        // because the other user may still need them.
         ChatDelete::updateOrCreate(
             ['user_id' => $currentUser->id, 'room_id' => $roomId]
         );
@@ -305,6 +359,32 @@ class MessageController extends Controller
         return response()->json(['success' => true, 'message' => 'Report submitted. Thank you.']);
     }
 
+    // ============================================
+    // HELPER METHODS
+    // ============================================
+
+    /**
+     * Sync the current reactions of a message to Firestore.
+     */
+    private function syncReactionsToFirestore(string $roomId, int $messageId, $currentUser): void
+    {
+        $message = ChatMessage::with('reactions')->find($messageId);
+
+        if (!$message) {
+            return;
+        }
+
+        $reactions = $message->reactions->groupBy('emoji')->map(function ($group, $emoji) use ($currentUser) {
+            return [
+                'emoji'        => $emoji,
+                'count'        => $group->count(),
+                'user_reacted' => $group->contains('user_id', $currentUser->id),
+            ];
+        })->values()->toArray();
+
+        $this->firestore->updateMessageReactions($roomId, $messageId, $reactions);
+    }
+
     private function formatMessages($messages, $currentUser)
     {
         return $messages->map(function ($m) use ($currentUser) {
@@ -321,7 +401,7 @@ class MessageController extends Controller
             'message' => $m->message,
             'message_type' => $m->message_type,
             'attachment_path' => $m->attachment_path,
-            'attachment_url' => $m->attachment_url,   // ← Cloudinary-aware accessor
+            'attachment_url' => $m->attachment_url,
             'created_at' => $m->created_at->format('g:i A'),
             'created_at_full' => $m->created_at->toISOString(),
             'is_mine' => $m->sender_id === $currentUser->id,
@@ -361,6 +441,7 @@ class MessageController extends Controller
             ->unique();
 
         $conversations = [];
+        $otherUserIds = [];
 
         foreach ($roomIds as $roomId) {
             $lastMessage = ChatMessage::where('room_id', $roomId)
@@ -375,6 +456,8 @@ class MessageController extends Controller
 
             $otherUser = User::find($otherUserId);
             if (!$otherUser) continue;
+
+            $otherUserIds[] = $otherUserId;
 
             $unreadCount = ChatMessage::where('room_id', $roomId)
                 ->where('receiver_id', $currentUser->id)
@@ -393,6 +476,14 @@ class MessageController extends Controller
             return $b['last_message']->created_at <=> $a['last_message']->created_at;
         });
 
-        return view('messages.messages_index', compact('conversations'));
+        // ✅ Firebase: get presence for all conversation partners
+        $presenceMap = $this->presence->getMultipleUserPresence($otherUserIds);
+
+        $onlineMap = [];
+        foreach ($presenceMap as $userId => $presence) {
+            $onlineMap[$userId] = $this->presence->isOnline($presence);
+        }
+
+        return view('messages.messages_index', compact('conversations', 'onlineMap'));
     }
 }

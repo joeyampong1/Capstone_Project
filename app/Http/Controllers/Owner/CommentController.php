@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
+use App\Models\SitterProfile;
 use App\Models\User;
-use App\Services\NotificationService;  // ← ADD
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,11 +22,20 @@ class CommentController extends Controller
             'parent_id' => 'nullable|exists:comments,id',
         ]);
 
-        // Save comment first
+        // ✅ Resolve the SitterProfile from User ID
+        $sitterProfile = SitterProfile::where('user_id', $sitterId)->first();
+
+        if (!$sitterProfile) {
+            return back()->withErrors([
+                'body' => 'This user does not have a sitter profile yet.',
+            ]);
+        }
+
+        // Save comment using the SitterProfile ID (not the User ID)
         $comment = Comment::create([
-            'sitter_id' => $sitterId,
-            'user_id' => Auth::id(),
-            'body' => $request->body,
+            'sitter_id' => $sitterProfile->id,   // ← FK to sitter_profiles.id
+            'user_id'   => Auth::id(),
+            'body'      => $request->body,
             'parent_id' => $request->parent_id,
         ]);
 
@@ -63,13 +73,12 @@ class CommentController extends Controller
                 );
             }
         }
-        // ============================================
 
         return redirect()->route('owner.sitter.profile', $sitterId);
     }
 
     /**
-     * Delete a comment (only owner can delete their own)
+     * Delete a comment (only author can delete their own)
      */
     public function destroy($id)
     {
@@ -80,10 +89,17 @@ class CommentController extends Controller
             abort(403);
         }
 
-        $sitterId = $comment->sitter_id;
+        // ✅ Resolve the User ID from the comment's SitterProfile ID
+        $sitterProfile = SitterProfile::find($comment->sitter_id);
+        $sitterUserId = $sitterProfile ? $sitterProfile->user_id : null;
+
         $comment->delete();
 
-        return redirect()->route('owner.sitter.profile', $sitterId)
-            ->with('status', 'Comment deleted.');
+        if ($sitterUserId) {
+            return redirect()->route('owner.sitter.profile', $sitterUserId)
+                ->with('status', 'Comment deleted.');
+        }
+
+        return back()->with('status', 'Comment deleted.');
     }
 }

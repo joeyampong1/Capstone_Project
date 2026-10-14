@@ -114,7 +114,8 @@
                                             {{ $unread }}
                                         </span>
                                     @elseif(!$isArchived)
-                                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-neutral-900"></span>
+                                        <span data-presence-dot="{{ $otherUser->id }}"
+                                            class="absolute bottom-0 right-0 w-3 h-3 bg-neutral-400 rounded-full border-2 border-white dark:border-neutral-900 transition-colors"></span>
                                     @endif
                                 </div>
 
@@ -266,4 +267,42 @@
 
         </div>
     </div>
+    @push('scripts')
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script>
+    const firebaseConfig = {
+        apiKey:            "{{ config('firebase.web.api_key') }}",
+        authDomain:        "{{ config('firebase.web.auth_domain') }}",
+        projectId:         "{{ config('firebase.web.project_id') }}",
+        storageBucket:     "{{ config('firebase.web.storage_bucket') }}",
+        messagingSenderId: "{{ config('firebase.web.messaging_sender_id') }}",
+        appId:             "{{ config('firebase.web.app_id') }}",
+        databaseURL:       "{{ config('firebase.web.database_url') }}",
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const rtdb = firebase.database();
+
+    const userIds = @json(collect($conversations)->pluck('other_user.id')->values());
+
+    userIds.forEach(userId => {
+        rtdb.ref('presence/' + userId).on('value', (snap) => {
+            const data = snap.val();
+            const isOnline = data
+                && data.status === 'online'
+                && data.last_seen
+                && (Date.now() - data.last_seen) < 60000;
+
+            const dot = document.querySelector(`[data-presence-dot="${userId}"]`);
+            if (dot) {
+                dot.classList.toggle('bg-green-500', isOnline);
+                dot.classList.toggle('bg-neutral-400', !isOnline);
+            }
+        });
+    });
+    </script>
+    @endpush
 </x-app-layout>
