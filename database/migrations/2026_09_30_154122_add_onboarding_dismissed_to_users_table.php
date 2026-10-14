@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->boolean('onboarding_dismissed')->default(false)->after('id_validation_status');
-        });
+        if (!Schema::hasColumn('users', 'onboarding_dismissed')) {
+            Schema::table('users', function (Blueprint $table) {
+                $table->boolean('onboarding_dismissed')->default(false)->after('id_validation_status');
+            });
+        }
     }
 
     public function down(): void
