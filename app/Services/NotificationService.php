@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification as FcmNotification;
 
 class NotificationService
 {
@@ -18,9 +21,12 @@ class NotificationService
         string $message,
         ?string $actionUrl = null,
         ?int $actorId = null,
-        array $meta = []
+        array $meta = [],
+        bool $sendEmail = true // <--- BAG-O NGA PARAMETER
     ): Notification {
-        return Notification::create([
+
+        // 1. SAVE TO DATABASE (Bell Icon)
+        $notification = Notification::create([
             'user_id' => $userId,
             'type'    => $type,
             'title'   => $title,
@@ -31,6 +37,126 @@ class NotificationService
             ]),
             'is_read' => false,
         ]);
+
+        // 2. EXTRA FEATURES: Email & Push
+        $user = User::find($userId);
+
+        if ($user) {
+            try {
+                // Send Email (Brevo) - ONLY IF $sendEmail is TRUE
+                if ($sendEmail && $user->email_notifications_enabled) {
+                    self::sendEmail($user, $title, $message, $actionUrl);
+                }
+
+                // Send Push (FCM) - Always send if enabled
+                if ($user->push_notifications_enabled && $user->fcm_token) {
+                    self::sendPush($user, $title, $message, $actionUrl);
+                }
+            } catch (\Throwable $e) {
+                \Log::error("Notification Extra (Email/Push) Failed for User {$userId}: " . $e->getMessage());
+            }
+        }
+
+        // 3. RETURN PARA SA BELL ICON
+        return $notification;
+    }
+
+    // ==========================================
+    // HELPER: Send Email via Brevo
+    // ==========================================
+    private static function sendEmail(User $user, string $title, string $message, ?string $actionUrl): void
+    {
+        $primaryColor = '#f07a3a';
+        $darkText     = '#1b3b36';
+        $year         = date('Y');
+        $btnHtml      = '';
+
+        if ($actionUrl) {
+            $btnHtml = "
+                <div style='text-align: center; margin-top: 32px;'>
+                    <a href='{$actionUrl}' style='background-color: {$primaryColor}; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 15px; display: inline-block;'>
+                        View Details
+                    </a>
+                </div>
+            ";
+        }
+
+        $html = <<<HTML
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f6f8; padding: 40px 20px;">
+                <tr>
+                    <td align="center">
+                        <!-- Main Card -->
+                        <table width="100%" max-width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+
+                            <!-- Header / Logo area -->
+                            <tr>
+                                <td align="center" style="background-color: {$primaryColor}; padding: 24px;">
+                                    <h1 style="margin: 0; color: #ffffff; font-size: 26px; font-weight: 900; letter-spacing: -0.5px;">
+                                        PetNanny
+                                    </h1>
+                                </td>
+                            </tr>
+
+                            <!-- Content area -->
+                            <tr>
+                                <td style="padding: 40px 30px;">
+                                    <h2 style="margin-top: 0; margin-bottom: 16px; color: {$darkText}; font-size: 22px; font-weight: 800;">
+                                        {$title}
+                                    </h2>
+                                    <p style="margin: 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                                        {$message}
+                                    </p>
+
+                                    {$btnHtml}
+                                </td>
+                            </tr>
+
+                            <!-- Footer area -->
+                            <tr>
+                                <td align="center" style="background-color: #f9fafb; padding: 24px 20px; border-top: 1px solid #e5e7eb;">
+                                    <p style="margin: 0; color: #9ca3af; font-size: 13px; line-height: 1.5;">
+                                        This is an automated message from PetNanny.<br>Please do not reply directly to this email.
+                                    </p>
+                                    <p style="margin: 8px 0 0 0; color: #d1d5db; font-size: 11px;">
+                                        &copy; {$year} PetNanny. All rights reserved.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        HTML;
+
+        Mail::html($html, function ($msg) use ($user, $title) {
+            $msg->to($user->email)
+                ->subject("PetNanny: {$title}");
+        });
+    }
+
+    // ==========================================
+    // HELPER: Send Push Notification via FCM
+    // ==========================================
+    private static function sendPush(User $user, string $title, string $message, ?string $actionUrl): void
+    {
+        $messaging = app('firebase.messaging');
+
+        $cloudMessage = CloudMessage::withTarget('token', $user->fcm_token)
+            ->withNotification(FcmNotification::create($title, $message))
+            ->withData([
+                'url' => $actionUrl ?? route('dashboard'),
+            ]);
+
+        $messaging->send($cloudMessage);
     }
 
     // ==========================================
@@ -69,7 +195,7 @@ class NotificationService
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Booking
+    // DOMAIN EVENTS — Booking (NAA EMAIL)
     // ==========================================
 
     public static function bookingCreated(User $owner, User $sitter, $booking): void
@@ -125,12 +251,9 @@ class NotificationService
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Visits (BAG-O)
+    // DOMAIN EVENTS — Visits (PUSH RA / NO EMAIL)
     // ==========================================
 
-    /**
-     * Sitter checked in for a visit → notify owner
-     */
     public static function visitCheckIn(User $sitter, User $owner, $visit): void
     {
         self::send(
@@ -140,22 +263,14 @@ class NotificationService
             message:   "{$sitter->f_name} started Visit #{$visit->visit_number} for " . ($visit->booking->pet->name ?? 'your pet') . ".",
             actionUrl: route('task.monitor.visit', $visit->id),
             actorId:   $sitter->id,
-            meta:      [
-                'visit_id'   => $visit->id,
-                'booking_id' => $visit->booking_id,
-            ],
+            meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
+            sendEmail: false, // <--- DISABLE EMAIL
         );
     }
 
-    /**
-     * Sitter checked out for a visit → notify owner
-     */
     public static function visitCheckOut(User $sitter, User $owner, $visit): void
     {
-        $duration = $visit->duration_minutes
-            ? " ({$visit->duration_minutes} min)"
-            : '';
-
+        $duration = $visit->duration_minutes ? " ({$visit->duration_minutes} min)" : '';
         self::send(
             userId:    $owner->id,
             type:      'visit_checked_out',
@@ -163,16 +278,11 @@ class NotificationService
             message:   "{$sitter->f_name} finished Visit #{$visit->visit_number} for " . ($visit->booking->pet->name ?? 'your pet') . "{$duration}.",
             actionUrl: route('task.monitor.visit', $visit->id),
             actorId:   $sitter->id,
-            meta:      [
-                'visit_id'   => $visit->id,
-                'booking_id' => $visit->booking_id,
-            ],
+            meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
+            sendEmail: false, // <--- DISABLE EMAIL
         );
     }
 
-    /**
-     * Visit completed → notify owner
-     */
     public static function visitCompleted(User $sitter, User $owner, $visit): void
     {
         self::send(
@@ -182,16 +292,11 @@ class NotificationService
             message:   "{$sitter->f_name} completed Visit #{$visit->visit_number} for " . ($visit->booking->pet->name ?? 'your pet') . ".",
             actionUrl: route('task.monitor.visit', $visit->id),
             actorId:   $sitter->id,
-            meta:      [
-                'visit_id'   => $visit->id,
-                'booking_id' => $visit->booking_id,
-            ],
+            meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
+            sendEmail: false, // <--- DISABLE EMAIL
         );
     }
 
-    /**
-     * All visits completed → owner is ready to rate the sitter
-     */
     public static function bookingReadyForReview(User $owner, $booking, User $sitter): void
     {
         self::send(
@@ -201,15 +306,13 @@ class NotificationService
             message:   "Tanang visits ni {$sitter->f_name} sa booking {$booking->booking_reference} kay complete na. Leave a review!",
             actionUrl: route('tasks.monitor'),
             actorId:   $sitter->id,
-            meta:      [
-                'booking_id' => $booking->id,
-                'sitter_id'  => $sitter->id,
-            ],
+            meta:      ['booking_id' => $booking->id, 'sitter_id' => $sitter->id],
+            sendEmail: true, // Pwede nimo i-true kay importante ni para sa owner
         );
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Messaging
+    // DOMAIN EVENTS — Messaging (PUSH RA / NO EMAIL)
     // ==========================================
 
     public static function newMessage(User $recipient, User $sender, string $preview): void
@@ -221,6 +324,7 @@ class NotificationService
             message:   mb_strimwidth($preview, 0, 80, '…'),
             actionUrl: route('messages.index'),
             actorId:   $sender->id,
+            sendEmail: false, // <--- DISABLE EMAIL (Spam prevention)
         );
     }
 
@@ -238,6 +342,7 @@ class NotificationService
             actionUrl: route('public.profile', ['id' => $sitter->id]),
             actorId:   $reviewer->id,
             meta:      ['rating' => $rating],
+            sendEmail: true,
         );
     }
 
@@ -250,11 +355,12 @@ class NotificationService
             message:   mb_strimwidth($comment, 0, 80, '…'),
             actionUrl: route('owner.sitter.profile', ['id' => $sitterId]),
             actorId:   $commenter->id,
+            sendEmail: false, // <--- DISABLE EMAIL
         );
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Applications & Verification
+    // DOMAIN EVENTS — Applications & Verification (NAA EMAIL)
     // ==========================================
 
     public static function sitterApplicationSubmitted(User $applicant): void
@@ -276,6 +382,7 @@ class NotificationService
             title:     'You are now a Pet Sitter!',
             message:   'Your application has been approved. You can now accept bookings.',
             actionUrl: route('sitter.dashboard'),
+            sendEmail: true,
         );
     }
 
@@ -287,6 +394,7 @@ class NotificationService
             title:     'Application rejected',
             message:   $reason ?: 'Your application was rejected. Please review and reapply.',
             actionUrl: route('sitter.application'),
+            sendEmail: true,
         );
     }
 
@@ -309,6 +417,7 @@ class NotificationService
             title:     'Identity Verified ✅',
             message:   'Your ID has been verified. You can now post and apply for bookings.',
             actionUrl: route('profile.edit'),
+            sendEmail: true,
         );
     }
 
@@ -320,35 +429,7 @@ class NotificationService
             title:     'ID verification failed',
             message:   $reason ?: 'Please upload a clear selfie holding your valid ID.',
             actionUrl: route('profile.edit'),
-        );
-    }
-
-    // ==========================================
-    // DOMAIN EVENTS — Payments
-    // ==========================================
-
-    public static function paymentPaid(User $sitter, User $owner, float $amount): void
-    {
-        self::send(
-            userId:    $sitter->id,
-            type:      Notification::TYPE_PAYMENT_PAID,
-            title:     'Payment received',
-            message:   "{$owner->f_name} paid ₱" . number_format($amount, 2),
-            actionUrl: route('payments.index'),
-            actorId:   $owner->id,
-            meta:      ['amount' => $amount],
-        );
-    }
-
-    public static function paymentReleased(User $sitter, float $amount): void
-    {
-        self::send(
-            userId:    $sitter->id,
-            type:      Notification::TYPE_PAYMENT_RELEASED,
-            title:     'Payout released',
-            message:   '₱' . number_format($amount, 2) . ' has been released to you.',
-            actionUrl: route('payments.index'),
-            meta:      ['amount' => $amount],
+            sendEmail: true,
         );
     }
 
@@ -366,6 +447,7 @@ class NotificationService
             actionUrl: route('complaints.index'),
             actorId:   $complainant->id,
             meta:      ['complaint_type' => $type],
+            sendEmail: true,
         );
     }
 
@@ -377,41 +459,44 @@ class NotificationService
             title:     'Complaint resolved',
             message:   $resolution,
             actionUrl: route('complaints.index'),
+            sendEmail: true,
         );
     }
 
-    public static function claimFiled(User $claimant, string $type): void
-    {
-        self::notifyAdmins(
-            type:      Notification::TYPE_CLAIM_FILED,
-            title:     'New protection claim',
-            message:   "{$claimant->f_name} submitted a claim ({$type})",
-            actionUrl: route('admin.claims'),
-        );
-    }
+    // public static function claimFiled(User $claimant, string $type): void
+    // {
+    //     self::notifyAdmins(
+    //         type:      Notification::TYPE_CLAIM_FILED,
+    //         title:     'New protection claim',
+    //         message:   "{$claimant->f_name} submitted a claim ({$type})",
+    //         actionUrl: route('admin.claims'),
+    //     );
+    // }
 
-    public static function claimApproved(User $claimant, float $amount): void
-    {
-        self::send(
-            userId:    $claimant->id,
-            type:      Notification::TYPE_CLAIM_APPROVED,
-            title:     'Claim approved ✅',
-            message:   'Your protection claim was approved for ₱' . number_format($amount, 2),
-            actionUrl: route('complaints.index'),
-            meta:      ['amount' => $amount],
-        );
-    }
+    // public static function claimApproved(User $claimant, float $amount): void
+    // {
+    //     self::send(
+    //         userId:    $claimant->id,
+    //         type:      Notification::TYPE_CLAIM_APPROVED,
+    //         title:     'Claim approved ✅',
+    //         message:   'Your protection claim was approved for ₱' . number_format($amount, 2),
+    //         actionUrl: route('complaints.index'),
+    //         meta:      ['amount' => $amount],
+    //         sendEmail: true,
+    //     );
+    // }
 
-    public static function claimRejected(User $claimant, string $reason = ''): void
-    {
-        self::send(
-            userId:    $claimant->id,
-            type:      Notification::TYPE_CLAIM_REJECTED,
-            title:     'Claim rejected',
-            message:   $reason ?: 'Your protection claim was rejected.',
-            actionUrl: route('complaints.index'),
-        );
-    }
+    // public static function claimRejected(User $claimant, string $reason = ''): void
+    // {
+    //     self::send(
+    //         userId:    $claimant->id,
+    //         type:      Notification::TYPE_CLAIM_REJECTED,
+    //         title:     'Claim rejected',
+    //         message:   $reason ?: 'Your protection claim was rejected.',
+    //         actionUrl: route('complaints.index'),
+    //         sendEmail: true,
+    //     );
+    // }
 
     // ==========================================
     // SYSTEM
@@ -422,19 +507,12 @@ class NotificationService
         self::send($userId, Notification::TYPE_SYSTEM, $title, $message, $actionUrl);
     }
 
-        // ==========================================
+    // ==========================================
     // DOMAIN EVENTS — Help & Support Messages
     // ==========================================
 
-    /**
-     * Admin replied to a user's support message.
-     * Called from Admin\SupportInboxController@reply
-     */
-    public static function supportMessageReplied(
-        User $recipient,
-        User $admin,
-        $supportMessage
-    ): void {
+    public static function supportMessageReplied(User $recipient, User $admin, $supportMessage): void
+    {
         $isResolved = $supportMessage->status === 'resolved';
 
         self::send(
@@ -449,17 +527,12 @@ class NotificationService
                 'support_id'   => $supportMessage->id,
                 'status'       => $supportMessage->status,
             ],
+            sendEmail: true,
         );
     }
 
-    /**
-     * User submitted a new support message (contact or report).
-     * Called from UserHelpSupportController@storeContact / storeReport
-     */
-    public static function supportMessageSubmitted(
-        User $user,
-        $supportMessage
-    ): void {
+    public static function supportMessageSubmitted(User $user, $supportMessage): void
+    {
         $typeLabel = $supportMessage->type === 'report' ? 'Problem Report' : 'Contact Message';
 
         self::notifyAdmins(
@@ -475,5 +548,4 @@ class NotificationService
             ],
         );
     }
-
 }

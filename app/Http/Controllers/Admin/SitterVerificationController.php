@@ -213,11 +213,10 @@ class SitterVerificationController extends Controller
 
             $user->update($updateData);
 
-            if (method_exists(NotificationService::class, 'sitterApproved')) {
-                NotificationService::sitterApproved($user);
-            }
-
             DB::commit();
+
+            // ✅ Send notification AFTER DB is committed
+            NotificationService::sitterApproved($user);
 
             return back()->with('status', "Approved! {$user->f_name} is now a verified sitter.");
         } catch (\Exception $e) {
@@ -253,11 +252,10 @@ class SitterVerificationController extends Controller
                 $user->update(['admin_notes' => $reason]);
             }
 
-            if (method_exists(NotificationService::class, 'sitterRejected')) {
-                NotificationService::sitterRejected($user, $reason);
-            }
-
             DB::commit();
+
+            // ✅ Send notification AFTER DB is committed
+            NotificationService::sitterRejected($user, $reason);
 
             return back()->with('status', "Rejected. {$user->f_name} has been notified.");
         } catch (\Exception $e) {

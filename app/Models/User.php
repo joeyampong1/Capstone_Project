@@ -27,6 +27,7 @@ class User extends Authenticatable
         'm_name',
         'l_name',
         'email',
+        'google_id',
         'date_of_birth',
         'gender',
         'contact_number',
@@ -87,6 +88,11 @@ class User extends Authenticatable
         'pet_count',
         'status',
         'last_active_at',
+
+        // For push notifications:
+        'fcm_token',
+        'push_notifications_enabled',
+        'email_notifications_enabled',
     ];
 
     /**
@@ -122,6 +128,8 @@ class User extends Authenticatable
             'face_detected_on_id' => 'boolean',
             'face_detected_on_selfie' => 'boolean',
             'onboarding_dismissed' => 'boolean',
+            'push_notifications_enabled' => 'boolean',
+            'email_notifications_enabled' => 'boolean',
         ];
     }
 

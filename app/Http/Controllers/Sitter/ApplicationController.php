@@ -9,6 +9,7 @@ use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use App\Services\NotificationService;
 
 class ApplicationController extends Controller
 {
@@ -117,6 +118,8 @@ class ApplicationController extends Controller
             $user->sitter_applied_at = Carbon::now();
             $user->save();
 
+            NotificationService::sitterApplicationSubmitted($user);
+
             return redirect()
                 ->route('profile.edit')
                 ->with('status', 'Application submitted successfully!');
@@ -198,6 +201,8 @@ class ApplicationController extends Controller
                 $user->sitter_status     = 'pending';
                 $user->sitter_applied_at = Carbon::now();
                 $user->save();
+
+                NotificationService::sitterApplicationSubmitted($user);
             }
 
             return redirect()

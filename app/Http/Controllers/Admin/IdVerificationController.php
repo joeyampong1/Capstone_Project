@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\NotificationService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +46,8 @@ class IdVerificationController extends Controller
             'id_reviewed_at'       => now(),
         ]);
 
+        NotificationService::idVerified($user);
+
         Log::info('User ID verification approved', [
             'user_id'  => $user->id,
             'admin_id' => auth()->id(),
@@ -69,6 +72,8 @@ class IdVerificationController extends Controller
             'id_reviewed_by'       => auth()->id(),
             'id_reviewed_at'       => now(),
         ]);
+
+         NotificationService::idRejected($user, $request->input('admin_notes') ?? '');
 
         Log::info('User ID verification rejected', [
             'user_id'  => $user->id,

@@ -310,5 +310,67 @@
         </script>
         @endauth
 
+            <!-- ========================================== -->
+            <!-- FIREBASE CLOUD MESSAGING (FCM) SETUP       -->
+            <!-- ========================================== -->
+            @auth
+            <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+            <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+            <script>
+                const firebaseConfig = {
+                    apiKey: "{{ config('firebase.web.api_key') }}",
+                    authDomain: "{{ config('firebase.web.auth_domain') }}",
+                    projectId: "{{ config('firebase.web.project_id') }}",
+                    storageBucket: "{{ config('firebase.web.storage_bucket') }}",
+                    messagingSenderId: "{{ config('firebase.web.messaging_sender_id') }}",
+                    appId: "{{ config('firebase.web.app_id') }}",
+                };
+
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+
+                const messaging = firebase.messaging();
+
+                async function setupFCM() {
+                    try {
+                        const permission = await Notification.requestPermission();
+                        if (permission === 'granted') {
+                            console.log('Notification permission granted.');
+
+                            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+
+                            const currentToken = await messaging.getToken({
+                                vapidKey: "{{ config('firebase.web.vapid_key') }}",
+                                serviceWorkerRegistration: registration
+                            });
+
+                            if (currentToken) {
+                                console.log('FCM Token:', currentToken);
+
+                                fetch('{{ route("fcm.token") }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify({ token: currentToken })
+                                });
+                            } else {
+                                console.log('No registration token available.');
+                            }
+                        } else {
+                            console.log('Unable to get permission to notify.');
+                        }
+                    } catch (err) {
+                        console.log('An error occurred while retrieving token. ', err);
+                    }
+                }
+
+                // Run setup
+                setupFCM();
+            </script>
+            @endauth
+
     </body>
 </html>

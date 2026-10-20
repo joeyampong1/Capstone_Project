@@ -287,10 +287,9 @@
                     <h2 class="text-sm font-black text-[#1B3B36] dark:text-white uppercase tracking-wider mb-4 sm:mb-6">
                         {{ __('messages.ss_preferences') }}
                     </h2>
-
                     <!-- Push Notifications -->
                     <div x-data="{
-                            enabled: {{ auth()->user()->setting->push_notifications ? 'true' : 'false' }},
+                            enabled: {{ auth()->user()->push_notifications_enabled ? 'true' : 'false' }},
                             toggle() {
                                 this.enabled = !this.enabled;
                                 fetch('{{ route('settings.ui-preferences') }}', {
@@ -300,7 +299,7 @@
                                         'Content-Type': 'application/json',
                                         'Accept': 'application/json',
                                     },
-                                    body: JSON.stringify({ push_notifications: this.enabled }),
+                                    body: JSON.stringify({ push_notifications_enabled: this.enabled }),
                                 });
                             }
                          }"
@@ -317,7 +316,7 @@
 
                     <!-- Email Notifications -->
                     <div x-data="{
-                            enabled: {{ auth()->user()->setting->email_notifications ? 'true' : 'false' }},
+                            enabled: {{ auth()->user()->email_notifications_enabled ? 'true' : 'false' }},
                             toggle() {
                                 this.enabled = !this.enabled;
                                 fetch('{{ route('settings.ui-preferences') }}', {
@@ -327,7 +326,7 @@
                                         'Content-Type': 'application/json',
                                         'Accept': 'application/json',
                                     },
-                                    body: JSON.stringify({ email_notifications: this.enabled }),
+                                    body: JSON.stringify({ email_notifications_enabled: this.enabled }),
                                 });
                             }
                          }"
@@ -342,30 +341,16 @@
                         </label>
                     </div>
 
-                    <!-- SMS Notifications -->
-                    <div x-data="{
-                            enabled: {{ auth()->user()->setting->sms_notifications ? 'true' : 'false' }},
-                            toggle() {
-                                this.enabled = !this.enabled;
-                                fetch('{{ route('settings.ui-preferences') }}', {
-                                    method: 'PATCH',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Content-Type': 'application/json',
-                                        'Accept': 'application/json',
-                                    },
-                                    body: JSON.stringify({ sms_notifications: this.enabled }),
-                                });
-                            }
-                         }"
-                         class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+                    <!-- SMS Notifications (Disabled) -->
+                    <div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_sms_notifications') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_sms_desc') }}</p>
                         </div>
-                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                            <input type="checkbox" class="sr-only peer" :checked="enabled" @change="toggle()">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        <label class="relative inline-flex items-center cursor-not-allowed shrink-0">
+
+                            <input type="checkbox" class="sr-only peer" disabled {{ auth()->user()->setting->sms_notifications ? 'checked' : '' }}>
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary opacity-50"></div>
                         </label>
                     </div>
 

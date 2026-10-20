@@ -118,6 +118,12 @@ class TaskController extends Controller
             'late_deduction_percentage' => $deductionPercent,
         ]);
 
+        NotificationService::visitCheckIn(
+            sitter: Auth::user(),
+            owner: $visit->booking->owner,
+            visit: $visit
+        );
+
         return back()->with('status', 'Checked in successfully. Have a great visit!');
     }
 
@@ -140,6 +146,12 @@ class TaskController extends Controller
             'check_out'        => $checkOut,
             'duration_minutes' => $duration,
         ]);
+
+        NotificationService::visitCheckOut(
+            sitter: Auth::user(),
+            owner: $visit->booking->owner,
+            visit: $visit
+        );
 
         return back()->with('status', 'Checked out. Review your tasks then click Complete.');
     }
@@ -165,14 +177,22 @@ class TaskController extends Controller
 
         $visit->update(['status' => 'completed']);
 
-        NotificationService::send(
-            userId:    $visit->booking->owner_id,
-            type:      'visit_completed',
-            title:     'Visit completed',
-            message:   "Visit #{$visit->visit_number} for {$visit->booking->pet->name} has been completed.",
-            actionUrl: route('task.monitor', $visit->booking_id),
-            actorId:   Auth::id(),
-            meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
+        // NotificationService::send(
+        //     userId:    $visit->booking->owner_id,
+        //     type:      'visit_completed',
+        //     title:     'Visit completed',
+        //     message:   "Visit #{$visit->visit_number} for {$visit->booking->pet->name} has been completed.",
+        //     actionUrl: route('task.monitor', $visit->booking_id),
+        //     actorId:   Auth::id(),
+        //     meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
+
+        // );
+
+        NotificationService::visitCompleted(
+            sitter: Auth::user(),
+            owner: $visit->booking->owner,
+            visit: $visit
+
         );
 
         $this->checkBookingCompletion($visit->booking);

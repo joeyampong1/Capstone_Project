@@ -105,6 +105,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/notifications', [NotificationController::class, 'clearAll'])
         ->name('notifications.clearAll');
 
+    Route::post('/fcm-token', [App\Http\Controllers\NotificationController::class, 'saveFcmToken'])->name('fcm.token');
+
     // ============================================================
     // ONBOARDING (All authenticated users)
     // ============================================================

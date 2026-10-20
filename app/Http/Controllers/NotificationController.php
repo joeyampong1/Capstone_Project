@@ -151,4 +151,20 @@ class NotificationController extends Controller
             'unread_count' => 0,
         ]);
     }
+
+
+    // ==========================================
+    // Push all notifications
+    // ==========================================
+    public function saveFcmToken(Request $request)
+    {
+        $request->validate(['token' => 'required|string']);
+
+        if (auth()->check()) {
+            auth()->user()->update(['fcm_token' => $request->token]);
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false], 401);
+    }
 }
