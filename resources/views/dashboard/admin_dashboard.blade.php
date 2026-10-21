@@ -13,9 +13,12 @@
                 <span class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">{{ __('messages.admin_filter_label') }}</span>
                 <select x-model="selectedMonth"
                         class="rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-xs sm:text-sm font-medium text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary">
-                    @for($i = 0; $i < 8; $i++)
+                    {{-- Loop gikan January kutob sa KASAMTANGAN nga bulan --}}
+                    @for($i = 0; $i < now()->month; $i++)
                         @php $month = now()->startOfYear()->addMonths($i); @endphp
-                        <option @selected($month->isSameMonth(now()))>{{ $month->format('F Y') }}</option>
+                        <option value="{{ $month->format('F Y') }}" @selected($month->isSameMonth(now()))>
+                            {{ $month->format('F Y') }}
+                        </option>
                     @endfor
                 </select>
             </div>

@@ -1104,6 +1104,8 @@ return [
     'nav_time_5h'                    => 'hace 5 horas',
     'nav_time_1d'                    => 'hace 1 día',
     'nav_time_2d'                    => 'hace 2 días',
+    'nav_recent'                     => 'recientes',
+    'nav_no_notifications'           => 'No hay nuevas notificaciones.',
 
     // ========================================== //
     // SIDEBAR                                     //

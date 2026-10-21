@@ -6,17 +6,55 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\PetType;
 use App\Models\Availability;
+use App\Models\Booking; // <--- IDUGANG KINI
 use Illuminate\Support\Facades\Auth;
 
 class SitterProfileController extends Controller
 {
     public function show($id)
     {
-        $sitter = User::with(['sitterProfile', 'pets'])->findOrFail($id);
+        // Eager load 'setting' relationship
+        $sitter = User::with(['sitterProfile', 'pets', 'setting'])->findOrFail($id);
 
         if (!$sitter->sitterProfile) {
             abort(404, 'This user does not have a sitter profile.');
         }
+
+        // ==========================================
+        // PRIVACY CHECK
+        // ==========================================
+        $viewer = auth()->user();
+        $visibility = $sitter->setting->profile_visibility ?? 'public';
+
+        // If the viewer is NOT the owner AND NOT an admin
+        if ($viewer && $viewer->id !== $sitter->id && !$viewer->isAdmin()) {
+
+            // 1. HIDDEN: Total block
+            if ($visibility === 'hidden') {
+                abort(403, 'This sitter profile is hidden by the user.');
+            }
+
+            // 2. PRIVATE: Only existing clients (with a booking history) can view
+            if ($visibility === 'private') {
+                $hasBookedBefore = Booking::where('owner_id', $viewer->id)
+                    ->where('sitter_id', $sitter->id)
+                    ->exists();
+
+                if (!$hasBookedBefore) {
+                    abort(403, 'This sitter profile is private. Only existing clients can view it.');
+                }
+            }
+        }
+        // If the user is not logged in at all, block them if it's private or hidden
+        elseif (!$viewer) {
+            if (in_array($visibility, ['private', 'hidden'])) {
+                abort(403, 'You must be logged in to view this profile.');
+            }
+        }
+
+        // ==========================================
+        // END OF PRIVACY CHECK
+        // ==========================================
 
         $profile = $sitter->sitterProfile;
 

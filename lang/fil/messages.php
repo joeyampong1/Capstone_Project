@@ -923,6 +923,8 @@ return [
     'nav_time_5h'                    => '5 oras ang nakalipas',
     'nav_time_1d'                    => '1 araw ang nakalipas',
     'nav_time_2d'                    => '2 araw ang nakalipas',
+    'nav_recent'                     => 'kamakailan',
+    'nav_no_notifications'           => 'Walang bagong notification.',
     // ========================================== //
     // SIDEBAR                                     //
     // ========================================== //

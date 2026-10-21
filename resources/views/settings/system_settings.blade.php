@@ -489,7 +489,7 @@
                     </h2>
 
                     <!-- Profile Visibility -->
-                    <div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+                    <div x-data class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_profile_visibility') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_profile_visibility_desc') }}</p>
@@ -525,8 +525,8 @@
                                     body: JSON.stringify({ show_email: this.enabled }),
                                 });
                             }
-                         }"
-                         class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+                        }"
+                        class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_show_email') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_show_email_desc') }}</p>
@@ -543,7 +543,7 @@
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_2fa') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_2fa_desc') }}</p>
                         </div>
-                        <button class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold bg-primary text-white rounded-lg hover:bg-primary-600 transition min-w-[90px] sm:min-w-[100px] shrink-0">
+                        <button @click="alert('Two-Factor Authentication is coming soon!')" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold bg-primary text-white rounded-lg hover:bg-primary-600 transition min-w-[90px] sm:min-w-[100px] shrink-0">
                             {{ __('messages.ss_enable') }}
                         </button>
                     </div>
@@ -554,7 +554,7 @@
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_active_sessions') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_active_sessions_desc') }}</p>
                         </div>
-                        <button class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
+                        <button @click="alert('Active Sessions feature is coming soon!')" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
                             {{ __('messages.ss_view_all') }}
                         </button>
                     </div>
@@ -574,9 +574,9 @@
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_email_address') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ auth()->user()->email }}</p>
                         </div>
-                        <button class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
+                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
                             {{ __('messages.ss_change') }}
-                        </button>
+                        </a>
                     </div>
 
                     <!-- Password -->

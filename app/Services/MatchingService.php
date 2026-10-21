@@ -89,6 +89,10 @@ class MatchingService
             ->where('is_sitter', true)
             ->where('sitter_status', 'approved')
             ->with('sitterProfile')
+            // PRIVACY FILTER: Only include sitters whose profile visibility is 'public'
+            ->whereHas('setting', function ($query) {
+                $query->where('profile_visibility', 'public');
+            })
             ->get()
             ->filter(fn ($u) => $u->sitterProfile !== null)
             ->values();

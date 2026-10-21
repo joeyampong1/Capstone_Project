@@ -967,6 +967,8 @@ return [
     'nav_time_5h'                    => '5 hours ago',
     'nav_time_1d'                    => '1 day ago',
     'nav_time_2d'                    => '2 days ago',
+    'nav_recent'                     => 'recent',
+    'nav_no_notifications'           => 'No new notifications.',
     // ========================================== //
     // SIDEBAR                                     //
     // ========================================== //

@@ -17,7 +17,18 @@
                 </h2>
                 <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
                     @if($user->is_sitter)
-                        {{ __('messages.pf_role_sitter_level', ['level' => $user->sitterProfile->sitter_type ?? $user->sitter_level ?? 1]) }}
+                        {{-- FIXED: Dynamic translation for sitter type --}}
+                        @php
+                            $sitterTypeRaw = $user->sitterProfile->sitter_type ?? '';
+                            $typeLabel = match($sitterTypeRaw) {
+                                'small_pets'  => __('messages.sa_st_small_short') ?? 'Small Pets',
+                                'large_pets'  => __('messages.sa_st_large_short') ?? 'Large Pets',
+                                'exotic_pets' => __('messages.sa_st_exotic_short') ?? 'Exotic Pets',
+                                'all_pets'    => __('messages.sa_st_all_short') ?? 'All Pets',
+                                default       => 'Level ' . ($user->sitter_level ?? 1),
+                            };
+                        @endphp
+                        {{ __('messages.pf_role_sitter_level', ['level' => $typeLabel]) }}
                     @else
                         {{ __('messages.pf_role_owner') }}
                     @endif
@@ -140,8 +151,18 @@
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent dark:bg-accent/20">
                                     {{ __('messages.pf_badge_sitter') }}
                                 </span>
+                                {{-- FIXED LEVEL BADGE --}}
+                                @php
+                                    $typeLabel = match($sitterProfile->sitter_type ?? '') {
+                                        'small_pets'  => __('messages.sa_st_small_short') ?? 'Small Pets',
+                                        'large_pets'  => __('messages.sa_st_large_short') ?? 'Large Pets',
+                                        'exotic_pets' => __('messages.sa_st_exotic_short') ?? 'Exotic Pets',
+                                        'all_pets'    => __('messages.sa_st_all_short') ?? 'All Pets',
+                                        default       => 'Level ' . ($user->sitter_level ?? 1),
+                                    };
+                                @endphp
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                                    {{ __('messages.pf_badge_level', ['level' => $sitterProfile->sitter_type ?? $user->sitter_level ?? 1]) }}
+                                    {{ __('messages.pf_badge_level', ['level' => $typeLabel]) }}
                                 </span>
                             @else
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary/30 text-neutral-600 dark:bg-neutral-800/30 dark:text-neutral-400">
@@ -432,12 +453,14 @@
                             </div>
                             @endif
 
+                            @if($user->setting->show_email ?? true)
                             <div class="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
                                 <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                 </svg>
                                 <span class="break-all min-w-0">{{ $user->email }}</span>
                             </div>
+                            @endif
                         </div>
                     </div>
                 </div>
