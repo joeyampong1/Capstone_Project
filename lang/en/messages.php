@@ -1852,6 +1852,17 @@ return [
     'pf_id_camera_title'     => 'Capture Your ID',
     'pf_selfie_camera_title' => 'Take a Selfie with ID',
     'pf_capture_photo'       => 'Capture',
+        // ===== PROFILE INCOMPLETE WARNING =====
+    'pf_profile_incomplete_title' => 'Profile Incomplete',
+    'pf_profile_incomplete_desc' => 'Please complete the following details before submitting your ID for verification:',
+    'pf_missing_field' => 'Missing field',
+    'pf_complete_profile_btn' => 'Complete Profile',
+    'pf_first_name' => 'First Name',
+    'pf_last_name' => 'Last Name',
+    'pf_dob' => 'Date of Birth',
+    'pf_gender' => 'Gender',
+    'pf_contact_number' => 'Contact Number',
+    'pf_address' => 'Address',
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -2272,6 +2283,12 @@ return [
     'std_confirm_checkin'       => 'Check in for this visit?',
     'std_confirm_checkout'      => 'Check out for this visit?',
     'std_confirm_complete'      => 'Mark this visit as COMPLETED?',
+
+    'std_location_title' => 'Service Location',
+    'std_get_directions' => 'Get Directions',
+    'std_address_not_set' => 'Address not provided.',
+    'std_coords_not_set' => 'Location coordinates not set by owner.',
+
     // ========================================== //
     // OWNER TASK MONITOR                           //
     // ========================================== //

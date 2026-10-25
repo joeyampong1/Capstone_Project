@@ -2132,6 +2132,11 @@ return [
     'std_confirm_checkin'       => 'Mag-check in para sa bisitang ito?',
     'std_confirm_checkout'      => 'Mag-check out para sa bisitang ito?',
     'std_confirm_complete'      => 'Markahan ang bisitang ito bilang TAPOS NA?',
+    'std_location_title'        => 'Lokasyon ng Serbisyo',
+    'std_get_directions'        => 'Kunin ang Direksyon',
+    'std_address_not_set'       => 'Walang ibinigay na address.',
+    'std_coords_not_set'        => 'Walang naka-set na coordinates ang may-ari.',
+
     // ========================================== //
     // OWNER TASK MONITOR                           //
     // ========================================== //
@@ -2241,5 +2246,11 @@ return [
     'pf_profile_incomplete_desc'  => 'Bago mag-submit para sa ID verification, pakikompleto ang impormasyon ng iyong profile.',
     'pf_missing_field'            => 'Kulang',
     'pf_complete_profile_btn'     => 'Kumpletuhin ang Profile',
+    'pf_first_name' => 'Pangalan',
+    'pf_last_name' => 'Apelyido',
+    'pf_dob' => 'Petsa ng Kapanganakan',
+    'pf_gender' => 'Kasarian',
+    'pf_contact_number' => 'Numero ng Telepono',
+    'pf_address' => 'Tirahan',
 
     ];

@@ -1853,6 +1853,17 @@ return [
     'pf_id_camera_title'     => 'Capture Your ID',
     'pf_selfie_camera_title' => 'Take a Selfie with ID',
     'pf_capture_photo'       => 'Capture',
+        // ===== PROFILE INCOMPLETE WARNING =====
+    'pf_profile_incomplete_title' => 'Profil Incomplet',
+    'pf_profile_incomplete_desc' => 'Veuillez compléter les détails suivants avant de soumettre votre pièce d\'identité pour vérification :',
+    'pf_missing_field' => 'Champ manquant',
+    'pf_complete_profile_btn' => 'Compléter le profil',
+    'pf_first_name' => 'Prénom',
+    'pf_last_name' => 'Nom',
+    'pf_dob' => 'Date de naissance',
+    'pf_gender' => 'Genre',
+    'pf_contact_number' => 'Numéro de contact',
+    'pf_address' => 'Adresse',
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -2274,6 +2285,8 @@ return [
     'std_confirm_checkin'       => 'Check in for this visit?',
     'std_confirm_checkout'      => 'Check out for this visit?',
     'std_confirm_complete'      => 'Mark this visit as COMPLETED?',
+
+
     // ========================================== //
     // OWNER TASK MONITOR                           //
     // ========================================== //

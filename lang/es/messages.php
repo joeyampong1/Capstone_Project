@@ -1866,7 +1866,7 @@ return [
     'sp_pets_not_specified'   => 'No especificado',
     'sp_sitter_fallback'      => 'Cuidador',
 
-        'pf_title'                 => 'Perfil',
+    'pf_title'                 => 'Perfil',
     'pf_role_sitter_level'     => 'Cuidador • Nivel :level',
     'pf_role_owner'            => 'Dueño de Mascota',
     'pf_location_not_set'      => 'Ubicación no establecida',
@@ -2030,7 +2030,13 @@ return [
     'pf_profile_incomplete_desc'  => 'Antes de enviar para la verificación de identidad, complete la información de su perfil.',
     'pf_complete_profile_btn'     => 'Completar perfil',
     'pf_missing_field'            => 'Faltante',
-
+    'pf_complete_profile_btn' => 'Compléter le profil',
+    'pf_first_name' => 'Nombre',
+    'pf_last_name' => 'Apellido',
+    'pf_dob' => 'Fecha de Nacimiento',
+    'pf_gender' => 'Género',
+    'pf_contact_number' => 'Número de Contacto',
+    'pf_address' => 'Dirección',
 
     'ss_title'                 => 'Ajustes del Sistema',
     'ss_subtitle'              => 'Gestiona tus preferencias de cuenta y configuraciones del sistema',
@@ -2378,7 +2384,7 @@ return [
 
     'sti_no_bookings'           => 'Aún no tienes reservas activas asignadas.',
 
-        'std_title'                 => 'Tareas Pendientes',
+    'std_title'                 => 'Tareas Pendientes',
     'std_subtitle'              => 'Completa tus tareas asignadas para esta visita',
 
     'std_status_pending'        => 'Pendiente',
@@ -2437,6 +2443,11 @@ return [
     'std_confirm_checkin'       => '¿Registrar entrada para esta visita?',
     'std_confirm_checkout'      => '¿Registrar salida para esta visita?',
     'std_confirm_complete'      => '¿Marcar esta visita como COMPLETADA?',
+
+    'std_location_title' => 'Ubicación del servicio',
+    'std_get_directions' => 'Obtener direcciones',
+    'std_address_not_set' => 'Dirección no proporcionada.',
+    'std_coords_not_set' => 'El propietario no ha establecido las coordenadas.',
 
     'otm_title'                 => 'Monitor de Tareas',
     'otm_subtitle'              => 'Monitorea las visitas completadas y tareas asignadas de tu cuidador',

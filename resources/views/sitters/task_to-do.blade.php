@@ -124,6 +124,107 @@
                 @endif
             </div>
 
+                        {{-- ========================================== --}}
+            {{-- LOCATION MAP                               --}}
+            {{-- ========================================== --}}
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-6 mb-4 sm:mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-bold text-base sm:text-lg text-[#1B3B36] dark:text-white">
+                        {{ __('messages.std_location_title') ?? 'Service Location' }}
+                    </h2>
+                    @if($owner->latitude && $owner->longitude)
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ $owner->latitude }},{{ $owner->longitude }}"
+                           target="_blank"
+                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 rounded-lg text-xs font-bold transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Get Directions
+                        </a>
+                    @endif
+                </div>
+
+                @if($owner->latitude && $owner->longitude)
+                    {{-- Map Container --}}
+                    <div id="sitter-map" class="w-full h-64 sm:h-80 rounded-xl border border-gray-200 dark:border-neutral-700 z-0"></div>
+
+                    <div class="mt-3 flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        <span>{{ $owner->address ?? $owner->location ?? 'Address not provided.' }}</span>
+                    </div>
+
+                    @push('scripts')
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            console.log('DOM loaded, initializing map...');
+
+                            if (typeof L === 'undefined') {
+                                console.error('Leaflet library (L) is not loaded! Check app.blade.php');
+                                return;
+                            }
+
+                            var mapContainer = document.getElementById('sitter-map');
+                            if (!mapContainer) {
+                                console.error('Map container #sitter-map not found!');
+                                return;
+                            }
+
+                            // Ensure coordinates are parsed as floats
+                            var lat = parseFloat({{ $owner->latitude ?? 'null' }});
+                            var lng = parseFloat({{ $owner->longitude ?? 'null' }});
+
+                            if (isNaN(lat) || isNaN(lng)) {
+                                console.error('Invalid coordinates', lat, lng);
+                                return;
+                            }
+
+                            var address = @json($owner->address ?? $owner->location ?? 'Pet Location');
+
+                            try {
+                                // Initialize map
+                                var map = L.map('sitter-map', {
+                                    zoomControl: true,
+                                    scrollWheelZoom: false // Prevents accidental zooming while scrolling
+                                }).setView([lat, lng], 16);
+
+                                // Add OpenStreetMap tiles
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    maxZoom: 19,
+                                    attribution: '© OpenStreetMap contributors'
+                                }).addTo(map);
+
+                                // Add marker
+                                var marker = L.marker([lat, lng]).addTo(map);
+                                marker.bindPopup("<b>Pet's Location</b><br>" + address).openPopup();
+
+                                // FIX: Force Leaflet to recalculate size (crucial for Alpine/Tailwind layouts)
+                                setTimeout(function() {
+                                    map.invalidateSize();
+                                    console.log('Map size invalidated and refreshed.');
+                                }, 500);
+
+                            } catch (error) {
+                                console.error('Error initializing map:', error);
+                            }
+                        });
+                    </script>
+                    @endpush
+
+                    @else
+                        {{-- Fallback if no coordinates --}}
+                        <div class="w-full h-32 rounded-xl bg-neutral-50 dark:bg-neutral-800/50 border border-dashed border-gray-300 dark:border-neutral-700 flex flex-col items-center justify-center text-neutral-400">
+                            <svg class="w-8 h-8 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <p class="text-sm font-medium">Location coordinates not set by owner.</p>
+                        </div>
+                    @endif
+                </div>
+
             {{-- ========================================== --}}
             {{-- TIME LOG                                   --}}
             {{-- ========================================== --}}
