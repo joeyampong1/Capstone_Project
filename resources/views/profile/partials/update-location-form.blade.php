@@ -3,13 +3,32 @@
         @csrf
         @method('patch')
 
+        <!-- GLOBAL ERROR SUMMARY -->
+        @if($errors->any())
+            <div class="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-red-700 dark:text-red-400">Please fix the following errors:</p>
+                        <ul class="list-disc list-inside text-xs text-red-600 dark:text-red-400 mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- City / Address -->
         <div>
             <label for="location" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.pf_city_municipality') }}
             </label>
-            <input id="location" name="location" type="text" 
-                   value="{{ old('location', $user->location) }}" 
+            <input id="location" name="location" type="text" required
+                   value="{{ old('location', $user->location) }}"
                    placeholder="{{ __('messages.pf_city_ph') }}"
                    class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
             <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ __('messages.pf_city_hint') }}</p>
@@ -22,8 +41,8 @@
                 <label for="latitude" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                     {{ __('messages.pf_latitude') }}
                 </label>
-                <input id="latitude" name="latitude" type="number" step="any" 
-                       value="{{ old('latitude', $user->latitude) }}" 
+                <input id="latitude" name="latitude" type="number" step="any" min="-90" max="90"
+                       value="{{ old('latitude', $user->latitude) }}"
                        placeholder="{{ __('messages.pf_latitude_ph') }}"
                        class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
                 <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ __('messages.pf_optional_geo') }}</p>
@@ -34,8 +53,8 @@
                 <label for="longitude" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                     {{ __('messages.pf_longitude') }}
                 </label>
-                <input id="longitude" name="longitude" type="number" step="any" 
-                       value="{{ old('longitude', $user->longitude) }}" 
+                <input id="longitude" name="longitude" type="number" step="any" min="-180" max="180"
+                       value="{{ old('longitude', $user->longitude) }}"
                        placeholder="{{ __('messages.pf_longitude_ph') }}"
                        class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
                 <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ __('messages.pf_optional_geo') }}</p>
@@ -45,8 +64,8 @@
 
         <!-- Detect Location Button -->
         <div>
-            <button type="button" id="detect-location" 
-                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-bold 
+            <button type="button" id="detect-location"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-bold
                            text-primary hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300
                            bg-primary/5 hover:bg-primary/10 border border-primary/20
                            px-4 py-2.5 sm:py-2 rounded-xl transition">
@@ -59,9 +78,9 @@
         </div>
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2">
-            <button type="submit" 
-                    class="w-full sm:w-auto bg-primary hover:bg-primary-600 text-white font-bold text-sm 
-                           px-6 py-2.5 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition 
+            <button type="submit"
+                    class="w-full sm:w-auto bg-primary hover:bg-primary-600 text-white font-bold text-sm
+                           px-6 py-2.5 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition
                            transform hover:-translate-y-0.5">
                 {{ __('messages.pf_update_location') }}
             </button>

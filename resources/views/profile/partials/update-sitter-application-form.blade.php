@@ -53,12 +53,31 @@
             @method('PUT')
         @endif
 
+        {{-- ✅ IDUGANG KINI: GLOBAL ERROR SUMMARY --}}
+        @if($errors->any())
+            <div class="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-red-700 dark:text-red-400">Please fix the following errors:</p>
+                        <ul class="list-disc list-inside text-xs text-red-600 dark:text-red-400 mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         {{-- 1. Bio --}}
         <div>
             <label for="bio" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.sa_about_you') }}
             </label>
-            <textarea id="bio" name="bio" rows="4"
+            <textarea id="bio" name="bio" rows="4" required
                 placeholder="{{ __('messages.sa_about_placeholder') }}"
                 class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">{{ old('bio', $sitterProfile->bio ?? '') }}</textarea>
             <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_about_hint') }}</p>
@@ -70,7 +89,7 @@
             <label for="years_experience" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.sa_years_exp') }}
             </label>
-            <input id="years_experience" name="years_experience" type="number" step="0.5" min="0" max="50"
+            <input id="years_experience" name="years_experience" type="number" step="0.5" min="0" max="50" required
                 value="{{ old('years_experience', $sitterProfile->experience_years ?? '') }}"
                 placeholder="{{ __('messages.sa_years_placeholder') }}"
                 class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
@@ -83,7 +102,7 @@
             <label for="sitter_type" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.sa_sitter_type') }}
             </label>
-            <select id="sitter_type" name="sitter_type"
+            <select id="sitter_type" name="sitter_type" required
                 class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
                 <option value="small_pets" {{ old('sitter_type', $sitterProfile->sitter_type ?? 'small_pets') == 'small_pets' ? 'selected' : '' }}>
                     🐱 {{ __('messages.sa_st_small') }}
@@ -107,7 +126,7 @@
             <label for="rate_per_visit" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.sa_rate_per_visit') }}
             </label>
-            <input id="rate_per_visit" name="rate_per_visit" type="number" step="0.01" min="0"
+            <input id="rate_per_visit" name="rate_per_visit" type="number" step="0.01" min="0" required
                 value="{{ old('rate_per_visit', $sitterProfile->base_rate ?? '') }}"
                 placeholder="{{ __('messages.sa_rate_placeholder') }}"
                 class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
@@ -120,7 +139,7 @@
             <label for="food_preference" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.sa_food_arrangement') }}
             </label>
-            <select id="food_preference" name="food_preference"
+            <select id="food_preference" name="food_preference" required
                 class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
                 <option value="owner_provides" {{ old('food_preference', $sitterProfile->food_preference ?? '') == 'owner_provides' ? 'selected' : '' }}>{{ __('messages.sa_food_owner') }}</option>
                 <option value="sitter_provides" {{ old('food_preference', $sitterProfile->food_preference ?? '') == 'sitter_provides' ? 'selected' : '' }}>{{ __('messages.sa_food_sitter') }}</option>
@@ -163,6 +182,9 @@
                 @endforeach
             </div>
             <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_pet_types_hint') }}</p>
+            {{-- ✅ GIDUGANGAN OG ERROR PARA SA ARRAY --}}
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('preferred_pet_types')" />
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('preferred_pet_types.*')" />
         </div>
 
         {{-- 8. Pet Sizes --}}
@@ -183,6 +205,9 @@
                 @endforeach
             </div>
             <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_pet_sizes_hint') }}</p>
+            {{-- ✅ GIDUGANGAN OG ERROR PARA SA ARRAY --}}
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('preferred_pet_sizes')" />
+            <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('preferred_pet_sizes.*')" />
         </div>
 
         {{-- 9. Pet Capacity --}}

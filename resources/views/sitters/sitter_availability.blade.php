@@ -4,7 +4,7 @@
     <!-- ========================================== -->
     <x-slot name="header">
         <div class="flex items-center gap-3">
-            <a href="{{ route('sitter.dashboard') }}" 
+            <a href="{{ route('sitter.dashboard') }}"
                class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -101,9 +101,9 @@
 
                 <div class="space-y-2">
                     @forelse($todaySlots as $slot)
-                        <div class="flex items-center justify-between gap-3 p-3 rounded-xl 
-                            {{ $slot->is_available 
-                                ? 'bg-primary/5 border border-primary/20' 
+                        <div class="flex items-center justify-between gap-3 p-3 rounded-xl
+                            {{ $slot->is_available
+                                ? 'bg-primary/5 border border-primary/20'
                                 : 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/50' }}">
                             <div class="flex flex-wrap items-center gap-2 sm:gap-4 min-w-0">
                                 <span class="text-sm font-bold text-neutral-500 dark:text-neutral-400">
@@ -117,8 +117,8 @@
                                 </span>
                             </div>
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0
-                                {{ $slot->is_available 
-                                    ? 'bg-primary/10 text-primary' 
+                                {{ $slot->is_available
+                                    ? 'bg-primary/10 text-primary'
                                     : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }}">
                                 {{ $slot->is_available ? __('messages.sav_available') : __('messages.sav_unavailable') }}
                             </span>
@@ -171,10 +171,11 @@
                             <label for="date" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">
                                 {{ __('messages.sav_date') }}
                             </label>
-                            <input type="date" id="date" name="date" 
+                            <input type="date" id="date" name="date"
                                    value="{{ old('date', date('Y-m-d')) }}"
-                                   min="{{ date('Y-m-d') }}"
+                                   min="{{ date('Y-m-d') }}" required
                                    class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium">
+                            <x-input-error :messages="$errors->get('date')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <!-- Start Time -->
@@ -182,9 +183,10 @@
                             <label for="start_time" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">
                                 {{ __('messages.sav_start') }}
                             </label>
-                            <input type="time" id="start_time" name="start_time" 
-                                   value="{{ old('start_time', '08:00') }}"
+                            <input type="time" id="start_time" name="start_time"
+                                   value="{{ old('start_time', '08:00') }}" required
                                    class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium">
+                            <x-input-error :messages="$errors->get('start_time')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <!-- End Time -->
@@ -192,9 +194,10 @@
                             <label for="end_time" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">
                                 {{ __('messages.sav_end') }}
                             </label>
-                            <input type="time" id="end_time" name="end_time" 
-                                   value="{{ old('end_time', '17:00') }}"
+                            <input type="time" id="end_time" name="end_time"
+                                   value="{{ old('end_time', '17:00') }}" required
                                    class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium">
+                            <x-input-error :messages="$errors->get('end_time')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <!-- Status -->
@@ -202,17 +205,18 @@
                             <label for="status" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1">
                                 {{ __('messages.sav_status') }}
                             </label>
-                            <select id="status" name="status"
+                            <select id="status" name="status" required
                                     class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium">
                                 <option value="available" {{ old('status') == 'available' ? 'selected' : '' }}>{{ __('messages.sav_available') }}</option>
                                 <option value="unavailable" {{ old('status') == 'unavailable' ? 'selected' : '' }}>{{ __('messages.sav_unavailable') }}</option>
                             </select>
+                            <x-input-error :messages="$errors->get('status')" class="text-xs text-red-500 mt-1" />
                         </div>
                     </div>
 
                     <!-- Save Button -->
                     <div class="pt-2">
-                        <button type="submit" 
+                        <button type="submit"
                                 class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -237,9 +241,9 @@
 
                 <div class="space-y-2">
                     @forelse($allSlots->take(10) as $slot)
-                        <div class="flex items-center gap-3 sm:gap-4 p-3 rounded-xl 
-                            {{ $slot->is_available 
-                                ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/50' 
+                        <div class="flex items-center gap-3 sm:gap-4 p-3 rounded-xl
+                            {{ $slot->is_available
+                                ? 'bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/50'
                                 : 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800/50' }}">
                             <span class="text-sm font-bold text-neutral-500 dark:text-neutral-400 shrink-0">
                                 {{ \Carbon\Carbon::parse($slot->start_time)->format('g:i A') }}
@@ -299,16 +303,16 @@
             <!-- ⑥ AVAILABILITY SCHEDULE                   -->
             <!-- ========================================== -->
             <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-6 mb-4 sm:mb-6"
-                x-data="{ 
-                    showModal: false, 
-                    slotId: null, 
-                    slotDate: '', 
-                    slotTime: '' 
+                x-data="{
+                    showModal: false,
+                    slotId: null,
+                    slotDate: '',
+                    slotTime: ''
                 }"
                 @open-delete-modal.window="
-                    showModal = true; 
-                    slotId = $event.detail.id; 
-                    slotDate = $event.detail.date; 
+                    showModal = true;
+                    slotId = $event.detail.id;
+                    slotDate = $event.detail.date;
                     slotTime = $event.detail.time;
                 ">
                 <div class="flex items-center justify-between mb-4">
@@ -326,8 +330,8 @@
                         <div class="flex items-center justify-between gap-3 p-3 sm:p-4 rounded-xl border border-gray-100 dark:border-neutral-800 hover:shadow-md transition">
                             <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                                 <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0
-                                    {{ $slot->is_available 
-                                        ? 'bg-primary/10 text-primary' 
+                                    {{ $slot->is_available
+                                        ? 'bg-primary/10 text-primary'
                                         : 'bg-red-100/20 text-red-600' }}">
                                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -343,9 +347,9 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                                <span class="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold 
-                                    {{ $slot->is_available 
-                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                                <span class="inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold
+                                    {{ $slot->is_available
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                                         : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' }}">
                                     {{ $slot->is_available ? __('messages.sav_available') : __('messages.sav_unavailable') }}
                                 </span>
@@ -374,7 +378,7 @@
                 <!-- ========================================== -->
                 <!-- DELETE CONFIRMATION MODAL                  -->
                 <!-- ========================================== -->
-                <div x-show="showModal" 
+                <div x-show="showModal"
                     x-cloak
                     class="fixed inset-0 z-50 flex items-center justify-center p-4">
 

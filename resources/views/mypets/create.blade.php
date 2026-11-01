@@ -131,8 +131,9 @@
                                 {{ __('messages.mp_name') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="name" name="name" placeholder="{{ __('messages.mp_name_ph') }}"
-                                   value="{{ old('name') }}"
+                                   value="{{ old('name') }}" required
                                    class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                            <x-input-error :messages="$errors->get('name')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         {{-- Type --}}
@@ -149,6 +150,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <x-input-error :messages="$errors->get('pet_type_id')" class="text-xs text-red-500 mt-1" />
                         </div>
                     </div>
 
@@ -160,6 +162,7 @@
                         <input type="text" id="breed" name="breed" placeholder="{{ __('messages.mp_breed_ph') }}"
                                value="{{ old('breed') }}"
                                class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                        <x-input-error :messages="$errors->get('breed')" class="text-xs text-red-500 mt-1" />
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -169,8 +172,9 @@
                                 {{ __('messages.mp_age') }} <span class="text-red-500">*</span>
                             </label>
                             <input type="number" id="age" name="age" placeholder="{{ __('messages.mp_age_ph') }}" min="0" max="30"
-                                   value="{{ old('age') }}"
+                                   value="{{ old('age') }}" required
                                    class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                            <x-input-error :messages="$errors->get('age')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         {{-- Size --}}
@@ -178,13 +182,14 @@
                             <label for="size" class="block text-sm font-bold text-[#1B3B36] dark:text-white mb-1.5">
                                 {{ __('messages.mp_size') }} <span class="text-red-500">*</span>
                             </label>
-                            <select id="size" name="size"
+                            <select id="size" name="size" required
                                     class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
                                 <option value="">{{ __('messages.mp_select_size') }}</option>
                                 <option value="small"  @selected(old('size') === 'small')>{{ __('messages.mp_size_small') }}</option>
                                 <option value="medium" @selected(old('size') === 'medium')>{{ __('messages.mp_size_medium') }}</option>
                                 <option value="large"  @selected(old('size') === 'large')>{{ __('messages.mp_size_large') }}</option>
                             </select>
+                            <x-input-error :messages="$errors->get('size')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         {{-- Temperament --}}
@@ -192,7 +197,7 @@
                             <label for="temperament" class="block text-sm font-bold text-[#1B3B36] dark:text-white mb-1.5">
                                 {{ __('messages.mp_temperament') }} <span class="text-red-500">*</span>
                             </label>
-                            <select id="temperament" name="temperament"
+                            <select id="temperament" name="temperament" required
                                     class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
                                 <option value="">{{ __('messages.mp_select_temperament') }}</option>
                                 <option value="friendly"   @selected(old('temperament') === 'friendly')>{{ __('messages.mp_temp_friendly') }}</option>
@@ -201,6 +206,7 @@
                                 <option value="aggressive" @selected(old('temperament') === 'aggressive')>{{ __('messages.mp_temp_aggressive') }}</option>
                                 <option value="anxious"    @selected(old('temperament') === 'anxious')>{{ __('messages.mp_temp_anxious') }}</option>
                             </select>
+                            <x-input-error :messages="$errors->get('temperament')" class="text-xs text-red-500 mt-1" />
                         </div>
                     </div>
 
@@ -222,6 +228,7 @@
                                     <option value="lbs" @selected(old('weight_unit') === 'lbs')>lbs</option>
                                 </select>
                             </div>
+                            <x-input-error :messages="$errors->get('weight')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         {{-- Height --}}
@@ -239,6 +246,7 @@
                                     <option value="cm" @selected(old('height_unit') === 'cm')>cm</option>
                                 </select>
                             </div>
+                            <x-input-error :messages="$errors->get('height')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         {{-- Length --}}
@@ -256,6 +264,7 @@
                                     <option value="cm" @selected(old('length_unit') === 'cm')>cm</option>
                                 </select>
                             </div>
+                            <x-input-error :messages="$errors->get('length')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         {{-- Width --}}
@@ -273,6 +282,7 @@
                                     <option value="cm" @selected(old('width_unit') === 'cm')>cm</option>
                                 </select>
                             </div>
+                            <x-input-error :messages="$errors->get('width')" class="text-xs text-red-500 mt-1" />
                         </div>
                     </div>
 
@@ -287,6 +297,7 @@
                             <textarea id="special_needs" name="special_needs" rows="2"
                                       placeholder="{{ __('messages.mp_special_needs_ph') }}"
                                       class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none">{{ old('special_needs') }}</textarea>
+                            <x-input-error :messages="$errors->get('special_needs')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <div>
@@ -296,6 +307,7 @@
                             <textarea id="medical_conditions" name="medical_conditions" rows="2"
                                       placeholder="{{ __('messages.mp_medical_ph') }}"
                                       class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition resize-none">{{ old('medical_conditions') }}</textarea>
+                            <x-input-error :messages="$errors->get('medical_conditions')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <div>
@@ -311,19 +323,21 @@
                                 <option value="raw"          @selected(old('dietary_restrictions') === 'raw')>{{ __('messages.mp_diet_raw') }}</option>
                                 <option value="prescription" @selected(old('dietary_restrictions') === 'prescription')>{{ __('messages.mp_diet_prescription') }}</option>
                             </select>
+                            <x-input-error :messages="$errors->get('dietary_restrictions')" class="text-xs text-red-500 mt-1" />
                         </div>
 
                         <div>
                             <label for="vaccination_status" class="block text-sm font-bold text-[#1B3B36] dark:text-white mb-1.5">
                                 {{ __('messages.mp_vaccination') }} <span class="text-red-500">*</span>
                             </label>
-                            <select id="vaccination_status" name="vaccination_status"
+                            <select id="vaccination_status" name="vaccination_status" required
                                     class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
                                 <option value="">{{ __('messages.mp_select_vaccination') }}</option>
                                 <option value="complete" @selected(old('vaccination_status') === 'complete')>{{ __('messages.mp_vax_complete') }}</option>
                                 <option value="partial"  @selected(old('vaccination_status') === 'partial')>{{ __('messages.mp_vax_partial') }}</option>
                                 <option value="none"     @selected(old('vaccination_status') === 'none')>{{ __('messages.mp_vax_none') }}</option>
                             </select>
+                            <x-input-error :messages="$errors->get('vaccination_status')" class="text-xs text-red-500 mt-1" />
                         </div>
                     </div>
 

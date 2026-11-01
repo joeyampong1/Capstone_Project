@@ -79,13 +79,14 @@
                 <x-input-error :messages="$errors->get('email')" class="text-xs font-semibold text-red-500 mt-1" />
             </div>
 
-            <!-- PASSWORD FIELD -->
+             <!-- PASSWORD FIELD -->
             <div class="space-y-1.5">
                 <label for="password" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                     {{ __('Password') }}
                 </label>
                 <div class="relative rounded-xl shadow-sm">
-                    <input id="password" class="block w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium" type="password" name="password" placeholder="••••••••" required autocomplete="new-password" />
+                    <!--  minlength="12" -->
+                    <input id="password" class="block w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium" type="password" name="password" placeholder="••••••••" minlength="12" required autocomplete="new-password" />
 
                     <button type="button" onclick="togglePasswordVisibility('password')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-400 transition">
                         <svg id="eye-open-password" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,6 +98,10 @@
                         </svg>
                     </button>
                 </div>
+                <!-- HELPER TEXT -->
+                <p class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-1">
+                    Password must be at least 12 characters.
+                </p>
                 <x-input-error :messages="$errors->get('password')" class="text-xs font-semibold text-red-500 mt-1" />
             </div>
 
@@ -106,7 +111,8 @@
                     {{ __('Confirm Password') }}
                 </label>
                 <div class="relative rounded-xl shadow-sm">
-                    <input id="password_confirmation" class="block w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium" type="password" name="password_confirmation" placeholder="••••••••" required autocomplete="new-password" />
+                    <!-- minlength="12" -->
+                    <input id="password_confirmation" class="block w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium" type="password" name="password_confirmation" placeholder="••••••••" minlength="12" required autocomplete="new-password" />
 
                     <button type="button" onclick="togglePasswordVisibility('password_confirmation')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-400 transition">
                         <svg id="eye-open-confirm" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -3,6 +3,25 @@
         @csrf
         @method('patch')
 
+        <!-- ✅ GLOBAL ERROR SUMMARY -->
+        @if($errors->any())
+            <div class="p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <div class="min-w-0">
+                        <p class="text-sm font-bold text-red-700 dark:text-red-400">Please fix the following errors:</p>
+                        <ul class="list-disc list-inside text-xs text-red-600 dark:text-red-400 mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- First Name -->
         <div>
             <label for="f_name" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
@@ -32,7 +51,7 @@
                 class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
             <x-input-error class="mt-2 text-xs font-semibold text-red-500" :messages="$errors->get('l_name')" />
         </div>
-        
+
         <!-- Email -->
         <div>
             <label for="email" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
@@ -60,7 +79,7 @@
             <label for="date_of_birth" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.pf_dob') }}
             </label>
-            <input id="date_of_birth" name="date_of_birth" type="date" 
+            <input id="date_of_birth" name="date_of_birth" type="date"
                    value="{{ old('date_of_birth', $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : '') }}"
                    class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
             <p class="mt-1 text-xs text-neutral-400 dark:text-neutral-500">{{ __('messages.pf_auto_fill_id') }}</p>
@@ -88,7 +107,7 @@
             <label for="contact_number" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 {{ __('messages.pf_contact_number') }}
             </label>
-            <input id="contact_number" name="contact_number" type="tel" 
+            <input id="contact_number" name="contact_number" type="tel"
                    value="{{ old('contact_number', $user->contact_number) }}"
                    placeholder="{{ __('messages.pf_contact_number_ph') }}"
                    class="mt-1 block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">

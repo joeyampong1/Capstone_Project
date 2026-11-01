@@ -46,6 +46,23 @@
                 </a>
             </div>
 
+            {{-- ✅ IDUGANG KINI: GLOBAL ERROR SUMMARY --}}
+            @if($errors->any())
+                <div class="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl border border-red-500 bg-red-50 dark:bg-red-950/20 dark:border-red-700">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl shrink-0">⚠️</span>
+                        <div class="min-w-0">
+                            <p class="font-bold text-red-700 dark:text-red-400 mb-1">Please fix the following errors:</p>
+                            <ul class="list-disc list-inside text-xs text-red-600 dark:text-red-400 space-y-0.5">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- MESSAGE ALERTS (Success / Error) -->
             @if(session('status'))
                 <div class="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl border border-green-500 bg-green-50 dark:bg-green-950/20 dark:border-green-700">
@@ -69,6 +86,7 @@
             {{-- PENDING — show status card only              --}}
             {{-- ========================================== --}}
             @if($status === 'pending' && $hasApplied)
+                <!-- ... existing pending status code ... -->
                 <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-10">
                     <div class="flex flex-col items-center text-center">
                         <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400 mb-4">
@@ -116,6 +134,7 @@
             {{-- APPROVED — show status card only             --}}
             {{-- ========================================== --}}
             @elseif($status === 'approved')
+                <!-- ... existing approved status code ... -->
                 <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-10">
                     <div class="flex flex-col items-center text-center">
                         <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 mb-4">
@@ -153,6 +172,7 @@
             {{-- REJECTED — show status card + reapply        --}}
             {{-- ========================================== --}}
             @elseif($status === 'rejected')
+                <!-- ... existing rejected status code ... -->
                 <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 p-6 sm:p-10 mb-4 sm:mb-6">
                     <div class="flex flex-col items-center text-center">
                         <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 mb-4">
@@ -256,7 +276,7 @@
                                 <label for="bio" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                     {{ __('messages.sa_about_you') }}
                                 </label>
-                                <textarea id="bio" name="bio" rows="4"
+                                <textarea id="bio" name="bio" rows="4" required
                                     placeholder="{{ __('messages.sa_about_placeholder') }}"
                                     class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">{{ old('bio', $sitterProfile->bio ?? '') }}</textarea>
                                 <p class="mt-1 text-xs text-neutral-400">{{ __('messages.sa_about_hint') }}</p>
@@ -268,7 +288,7 @@
                                 <label for="years_experience" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                     {{ __('messages.sa_years_exp') }}
                                 </label>
-                                <input id="years_experience" name="years_experience" type="number" step="0.5" min="0" max="50"
+                                <input id="years_experience" name="years_experience" type="number" step="0.5" min="0" max="50" required
                                     value="{{ old('years_experience', $sitterProfile->experience_years ?? '') }}"
                                     placeholder="{{ __('messages.sa_years_placeholder') }}"
                                     class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
@@ -281,7 +301,7 @@
                                 <label for="sitter_type" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                     {{ __('messages.sa_sitter_type') }}
                                 </label>
-                                <select id="sitter_type" name="sitter_type"
+                                <select id="sitter_type" name="sitter_type" required
                                     class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
                                     <option value="small_pets" {{ old('sitter_type', $sitterProfile->sitter_type ?? 'small_pets') == 'small_pets' ? 'selected' : '' }}>
                                         🐱 {{ __('messages.sa_st_small') }}
@@ -311,7 +331,7 @@
                                 <label for="rate_per_visit" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                     {{ __('messages.sa_rate_per_visit') }}
                                 </label>
-                                <input id="rate_per_visit" name="rate_per_visit" type="number" step="0.01" min="0"
+                                <input id="rate_per_visit" name="rate_per_visit" type="number" step="0.01" min="0" required
                                     value="{{ old('rate_per_visit', $sitterProfile->base_rate ?? '') }}"
                                     placeholder="{{ __('messages.sa_rate_placeholder') }}"
                                     class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
@@ -324,7 +344,7 @@
                                 <label for="food_preference" class="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                     {{ __('messages.sa_food_arrangement') }}
                                 </label>
-                                <select id="food_preference" name="food_preference"
+                                <select id="food_preference" name="food_preference" required
                                     class="mt-1 block w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50/50 dark:bg-neutral-950 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition text-sm font-medium">
                                     <option value="owner_provides" {{ old('food_preference', $sitterProfile->food_preference ?? '') == 'owner_provides' ? 'selected' : '' }}>{{ __('messages.sa_food_owner') }}</option>
                                     <option value="sitter_provides" {{ old('food_preference', $sitterProfile->food_preference ?? '') == 'sitter_provides' ? 'selected' : '' }}>{{ __('messages.sa_food_sitter') }}</option>
