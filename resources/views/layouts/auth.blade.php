@@ -1,3 +1,16 @@
+@php
+    $totalPetsCount = \App\Models\Pet::count();
+
+    // Calculate satisfaction rate (4 and 5 stars)
+    $totalReviews = \App\Models\Review::count();
+    if ($totalReviews > 0) {
+        $positiveReviews = \App\Models\Review::where('rating', '>=', 4)->count();
+        $satisfactionRate = round(($positiveReviews / $totalReviews) * 100);
+    } else {
+        $satisfactionRate = 100; // Default if no reviews exist
+    }
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -42,18 +55,18 @@
     <!-- MAIN CONTAINER: Full width split layout    -->
     <!-- ========================================== -->
     <div class="flex min-h-screen">
-        
+
         <!-- ========================================== -->
         <!-- LEFT SIDE: Branding / Collage (60%)        -->
         <!-- Hidden on mobile (lg:flex)                 -->
         <!-- ========================================== -->
         <div class="hidden lg:flex lg:w-3/5 bg-gradient-to-br from-primary-300 via-primary-400 to-accent-400 dark:from-primary-800 dark:via-neutral-700 dark:to-neutral-600 relative overflow-hidden flex-col justify-between p-12">
-            
+
             <!-- DECORATIVE BLOBS: Background blur effects -->
             <div class="absolute top-[-300px] right-[-200px] w-[700px] h-[700px] bg-white/20 dark:bg-white/10 rounded-full blur-3xl pointer-events-none animate-pulse-slow"></div>
             <div class="absolute bottom-[-200px] left-[-150px] w-[500px] h-[500px] bg-white/15 dark:bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-white/15 dark:bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-            
+
             <!-- DECORATIVE PAW PRINTS: Scattered icons -->
             <div class="absolute top-20 right-12 text-white/20 dark:text-white/10 text-6xl">🐾</div>
             <div class="absolute bottom-32 left-12 text-white/20 dark:text-white/10 text-5xl">🐾</div>
@@ -83,15 +96,15 @@
                     <!-- Glowing border effect -->
                     <div class="absolute -inset-1 bg-gradient-to-r from-white/30 to-white/10 rounded-3xl blur-xl"></div>
                     <!-- IMAGE: July Blog Photo Collage -->
-                    <img src="{{ asset('assets/image/July-Blog-Photo_collage.png') }}" 
-                         alt="Happy pets collage" 
+                    <img src="{{ asset('assets/image/July-Blog-Photo_collage.png') }}"
+                         alt="Happy pets collage"
                          class="relative w-full h-auto rounded-3xl shadow-2xl border-4 border-white/50 animate-float">
-                    
+
                     <!-- FLOATING BADGE: Rating overlay on image -->
                     <div class="absolute -bottom-3 -right-3 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-xl border border-white/50">
                         <div class="flex items-center gap-2">
                             <span class="text-yellow-400 text-sm">★★★★★</span>
-                            <span class="text-xs font-bold text-gray-800">4.9</span>
+                            <span class="text-xs font-bold text-gray-800">5.0</span>
                             <span class="text-xs text-gray-500">(1.2k)</span>
                         </div>
                     </div>
@@ -112,18 +125,21 @@
             <!-- BOTTOM: Trust Badges / Social Proof        -->
             <!-- ========================================== -->
             <div class="relative z-10 text-neutral-900/90 dark:text-white/90 text-sm flex items-center justify-center gap-8 pt-6 border-t border-neutral-900/10 dark:border-white/20">
-                <div class="flex items-center gap-2">
-                    <span class="text-yellow-300 dark:text-yellow-200 text-lg" style="text-shadow: 0 0 10px rgba(255, 255, 0, 0.3), 0 0 20px rgba(255, 255, 0, 0.1), 0 0 2px rgba(255,255,255,0.5);">★★★★★</span>
-                    <span class="font-black text-neutral-900 dark:text-white">4.9</span>
+               <div class="text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-yellow-300 dark:text-yellow-200 text-lg" style="text-shadow: 0 0 10px rgba(255, 255, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1), 0 0 2px rgba(255,255,255,0.5);">★★★★★</span>
+                        <span class="font-black text-neutral-900 dark:text-white text-lg">5.0</span>
+                    </div>
+                    <div class="text-neutral-700 dark:text-white/60 text-xs font-bold uppercase tracking-wider mt-1">Max Rate</div>
                 </div>
                 <div class="w-px h-8 bg-neutral-900/20 dark:bg-white/20"></div>
                 <div class="text-center">
-                    <div class="font-black text-neutral-900 dark:text-white text-lg">1,200+</div>
+                    <div class="font-black text-neutral-900 dark:text-white text-lg">{{ $totalPetsCount }}+</div>
                     <div class="text-neutral-700 dark:text-white/60 text-xs font-bold uppercase tracking-wider">Pets</div>
                 </div>
                 <div class="w-px h-8 bg-neutral-900/20 dark:bg-white/20"></div>
                 <div class="text-center">
-                    <div class="font-black text-neutral-900 dark:text-white text-lg">98%</div>
+                    <div class="font-black text-neutral-900 dark:text-white text-lg">{{ $satisfactionRate }}%</div>
                     <div class="text-neutral-700 dark:text-white/60 text-xs font-bold uppercase tracking-wider">Satisfaction</div>
                 </div>
             </div>
@@ -136,22 +152,22 @@
         <!-- RIGHT SIDE: Login Card Container (40%)    -->
         <!-- Visible on all screen sizes               -->
         <!-- ========================================== -->
-        <div class="w-full lg:w-2/5 flex items-center justify-center p-4 sm:p-8 bg-secondary dark:bg-neutral-950 relative min-h-screen lg:min-h-0 bg-cover bg-center bg-no-repeat" 
+        <div class="w-full lg:w-2/5 flex items-center justify-center p-4 sm:p-8 bg-secondary dark:bg-neutral-950 relative min-h-screen lg:min-h-0 bg-cover bg-center bg-no-repeat"
             style="background-image: url('{{ asset('assets/image/Background1.png') }}'); background-attachment: fixed;">
 
             <!-- OVERLAY: To make text readable on top of background image -->
             <div class="absolute inset-0 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-sm"></div>
-            
+
             <!-- DECORATIVE PAW PRINTS -->
             <div class="absolute top-12 right-12 text-primary-200/30 dark:text-primary-500/10 text-5xl rotate-12 z-10">🐾</div>
             <div class="absolute bottom-20 left-8 text-accent-200/30 dark:text-accent-500/10 text-4xl -rotate-12 z-10">🐾</div>
             <div class="absolute top-1/3 right-6 text-primary-200/20 dark:text-primary-500/5 text-3xl z-10">🐾</div>
             <div class="absolute bottom-1/3 left-12 text-accent-200/20 dark:text-accent-500/5 text-3xl z-10">🐾</div>
-            
+
             <!-- DECORATIVE BLOBS -->
             <div class="absolute top-[-200px] right-[-200px] w-[500px] h-[500px] bg-primary-200/15 dark:bg-primary-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
             <div class="absolute bottom-[-150px] left-[-150px] w-[400px] h-[400px] bg-accent-200/15 dark:bg-accent-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
-            
+
             <!-- RADIAL GRADIENT -->
             <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-100/5 via-transparent to-transparent dark:from-primary-500/5 pointer-events-none z-0"></div>
 

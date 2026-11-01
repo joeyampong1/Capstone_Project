@@ -1,3 +1,24 @@
+@php
+    // 1. Happy Pets (Total Pets on database)
+    $happyPetsCount = \App\Models\Pet::count();
+
+    // 2. Satisfaction Rate (those with 4 and 5 stars)
+    $totalReviews = \App\Models\Review::count();
+    if ($totalReviews > 0) {
+        $positiveReviews = \App\Models\Review::where('rating', '>=', 4)->count();
+        $satisfactionRate = round(($positiveReviews / $totalReviews) * 100);
+    } else {
+        $satisfactionRate = 100; // Default if no reviews exist
+    }
+
+    // 3. Verified Sitters (Approved and Verified)
+    $verifiedSittersCount = \App\Models\User::where('is_sitter', true)
+        ->where('sitter_status', 'approved')
+        ->where('id_validation_status', 'verified')
+        ->count();
+@endphp
+
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -65,12 +86,12 @@
                 </div>
             </div>
         </header>
-        
+
         <!-- ============================================ -->
         <!-- HERO SECTION                                 -->
         <!-- ============================================ -->
         <section class="relative overflow-hidden bg-gradient-to-br from-primary-50 via-white to-accent-50/30 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-700 py-8 sm:py-24">
-            
+
             <!-- DECORATIVE BLOBS -->
             <div class="absolute top-[-300px] right-[-200px] w-[700px] h-[700px] bg-primary-200/20 dark:bg-primary-500/5 rounded-full blur-3xl pointer-events-none"></div>
             <div class="absolute bottom-[-200px] left-[-150px] w-[600px] h-[600px] bg-accent-200/20 dark:bg-accent-500/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -95,8 +116,7 @@
                         <!-- SUBTEXT -->
                         <p class="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                             A dual-role platform built around decentralized scheduling,
-                            multi-tiered credential validation, automatic late-deductions,
-                            and unified community protection funds.
+                            multi-tiered credential validation, and real-time visit tracking.
                         </p>
 
                         <!-- CTA BUTTONS -->
@@ -115,15 +135,15 @@
                         <div class="mt-8 sm:mt-10 grid grid-cols-3 gap-2.5 sm:gap-4 max-w-lg mx-auto lg:mx-0">
                             <div class="bg-white/70 dark:bg-neutral-700/50 backdrop-blur-sm rounded-2xl p-3 sm:p-4 border border-gray-200/50 dark:border-neutral-600/50">
                                 <p class="text-lg sm:text-2xl font-black text-primary">₱150-300</p>
-                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">Per Visit</p>
+                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">Starting Rate</p>
                             </div>
                             <div class="bg-white/70 dark:bg-neutral-700/50 backdrop-blur-sm rounded-2xl p-3 sm:p-4 border border-gray-200/50 dark:border-neutral-600/50">
-                                <p class="text-lg sm:text-2xl font-black text-accent">10%</p>
-                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">Platform Fee</p>
+                                <p class="text-lg sm:text-2xl font-black text-accent">100%</p>
+                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">Verified</p>
                             </div>
                             <div class="bg-white/70 dark:bg-neutral-700/50 backdrop-blur-sm rounded-2xl p-3 sm:p-4 border border-gray-200/50 dark:border-neutral-600/50">
-                                <p class="text-lg sm:text-2xl font-black text-accent">2%</p>
-                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">Injury Fund</p>
+                                <p class="text-lg sm:text-2xl font-black text-accent">24/7</p>
+                                <p class="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider mt-0.5">Live Updates</p>
                             </div>
                         </div>
                     </div>
@@ -131,55 +151,84 @@
                     <!-- HERO RIGHT: Sitter Cards -->
                     <div class="w-full max-w-[400px] lg:max-w-[440px] flex-shrink-0">
                         <div class="bg-white dark:bg-neutral-800 rounded-3xl border border-gray-200/80 dark:border-neutral-700 shadow-2xl p-4 sm:p-6 space-y-4">
-                            
+
                             <!-- CARD HEADER -->
                             <div class="flex justify-between items-center border-b border-gray-100 dark:border-neutral-700 pb-3">
                                 <h3 class="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                                     <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                                     Active Local Sitters
                                 </h3>
-                                <span class="text-xs text-primary font-bold hover:underline cursor-pointer">Filter →</span>
+                                <a href="{{ route('find.sitter') }}" class="text-xs text-primary font-bold hover:underline">Filter →</a>
                             </div>
 
-                            <!-- SITTER CARD 1 -->
-                            <div class="flex items-start p-3.5 sm:p-4 bg-primary-50/50 dark:bg-neutral-700/50 border border-primary-100 dark:border-neutral-700 rounded-2xl space-x-3.5">
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-500 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-sm">
-                                    KM
-                                </div>
-                                <div class="flex-grow min-w-0">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate">Kristine M.</h4>
-                                        <span class="bg-accent text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wide shrink-0">Level 3</span>
-                                    </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">⭐ 5.0 (54 Visits)</p>
-                                    <div class="flex gap-1.5 mt-2 flex-wrap">
-                                        <span class="bg-white dark:bg-neutral-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-neutral-600">Dogs Only</span>
-                                        <span class="bg-white dark:bg-neutral-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-neutral-600">₱250/Visit</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- DYNAMIC SITTER CARDS -->
+                            @forelse($topSitters as $sitter)
+                                @php
+                                    $profile = $sitter->sitterProfile;
+                                    $initial = strtoupper(substr($sitter->f_name ?? 'S', 0, 1));
+                                    $fullName = ($sitter->f_name ?? 'Sitter') . ' ' . strtoupper(substr($sitter->l_name ?? '', 0, 1)) . '.';
+                                    $rating = number_format($profile->average_ratings ?? 3.0, 1);
+                                    $visits = $profile->total_bookings ?? 0;
+                                    $rate = number_format($profile->base_rate ?? 150, 0);
 
-                            <!-- SITTER CARD 2 -->
-                            <div class="flex items-start p-3.5 sm:p-4 bg-gray-50 dark:bg-neutral-700/30 border border-gray-100 dark:border-neutral-700/80 rounded-2xl space-x-3.5">
-                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-400 to-accent-500 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-sm">
-                                    JD
-                                </div>
-                                <div class="flex-grow min-w-0">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate">John D.</h4>
-                                        <span class="bg-gray-400 text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wide shrink-0">Level 1</span>
+                                    // Dynamic mapping for BOTH Level and Type Tag
+                                    $sitterType = $profile->sitter_type ?? 'small_pets';
+
+                                    $levelLabel = match($sitterType) {
+                                        'small_pets'  => 'Lvl 1',
+                                        'large_pets'  => 'Lvl 2',
+                                        'exotic_pets' => 'Lvl 3',
+                                        'all_pets'    => 'Lvl 4',
+                                        default       => 'Lvl 1'
+                                    };
+
+                                    $typeTag = match($sitterType) {
+                                        'small_pets'  => 'Small Pets',
+                                        'large_pets'  => 'Large Pets',
+                                        'exotic_pets' => 'Exotic Pets',
+                                        'all_pets'    => 'All Pets',
+                                        default       => 'Small Pets'
+                                    };
+                                @endphp
+
+                                <div class="flex items-start p-3.5 sm:p-4 bg-primary-50/50 dark:bg-neutral-700/50 border border-primary-100 dark:border-neutral-700 rounded-2xl space-x-3.5">
+                                    <!-- Avatar -->
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-400 to-primary-500 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-sm">
+                                        {{ $initial }}
                                     </div>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">⭐ 3.0 Baseline Default</p>
-                                    <div class="flex gap-1.5 mt-2 flex-wrap">
-                                        <span class="bg-white dark:bg-neutral-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-neutral-600">Cats, Birds</span>
-                                        <span class="bg-white dark:bg-neutral-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-neutral-600">₱150/Visit</span>
+
+                                    <div class="flex-grow min-w-0">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <h4 class="font-bold text-sm text-gray-900 dark:text-white truncate">{{ $fullName }}</h4>
+                                            <span class="bg-accent text-white text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wide shrink-0 cursor-help"
+                                                title="Level 1: Small Pets | Level 2: Large Pets | Level 3: Exotic Pets | Level 4: All Pets">
+                                                {{ $levelLabel }}
+                                            </span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">⭐ {{ $rating }} ({{ $visits }} Visits)</p>
+                                        <div class="flex gap-1.5 mt-2 flex-wrap">
+                                            <!-- Dynamic Type Tag -->
+                                            <span class="bg-white dark:bg-neutral-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-neutral-600">{{ $typeTag }}</span>
+                                            <span class="bg-white dark:bg-neutral-700 px-2 py-0.5 rounded-md text-[10px] font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-neutral-600">₱{{ $rate }}/Visit</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @empty
+                                <!-- Empty if no active sitter -->
+                                <div class="text-center py-6">
+                                    <p class="text-sm text-gray-500">No active sitters at the moment.</p>
+                                </div>
+                            @endforelse
 
                             <!-- VIEW ALL LINK -->
                             <div class="pt-2">
-                                <a href="#" class="block text-center text-sm font-bold text-primary hover:underline">View All Sitters →</a>
+                                <a href="{{ route('find.sitter') }}" class="block text-center text-sm font-bold text-primary hover:underline">View All Sitters →</a>
+                            </div>
+                            <!-- ✅ LEGEND -->
+                            <div class="pt-3 mt-2 border-t border-gray-100 dark:border-neutral-700 text-center">
+                                <p class="text-[9px] text-gray-400 dark:text-gray-500 font-medium">
+                                    Lvl 1: Small | Lvl 2: Large | Lvl 3: Exotic | Lvl 4: All Pets
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -204,7 +253,7 @@
 
                 <!-- FEATURES GRID -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    
+
                     <!-- FEATURE 1 -->
                     <div class="bg-secondary/50 dark:bg-neutral-700/30 rounded-2xl p-5 sm:p-6 border border-gray-200/50 dark:border-neutral-600/50 hover:shadow-lg transition">
                         <div class="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-4">
@@ -231,22 +280,23 @@
                     <div class="bg-secondary/50 dark:bg-neutral-700/30 rounded-2xl p-5 sm:p-6 border border-gray-200/50 dark:border-neutral-600/50 hover:shadow-lg transition">
                         <div class="w-12 h-12 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Per‑Visit Payment</h3>
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Pay only for each visit. No daily minimums, no hidden charges.</p>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Real-Time Chat</h3>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Communicate directly with your sitter. Send messages, photos, and updates instantly.</p>
                     </div>
 
                     <!-- FEATURE 4 -->
                     <div class="bg-secondary/50 dark:bg-neutral-700/30 rounded-2xl p-5 sm:p-6 border border-gray-200/50 dark:border-neutral-600/50 hover:shadow-lg transition">
                         <div class="w-12 h-12 rounded-xl bg-accent-100 dark:bg-accent-900/30 flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Protection Fund</h3>
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">2% of service fee goes to a protection fund for sitter injury claims.</p>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Photo Proofs</h3>
+                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Sitters upload timestamped photos during every visit so you know your pet is safe.</p>
                     </div>
 
                     <!-- FEATURE 5 -->
@@ -331,20 +381,20 @@
             <div class="w-full sm:max-w-7xl mx-auto px-2 sm:px-16 lg:px-24">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
                     <div>
-                        <p class="text-2xl sm:text-4xl font-black text-primary">1,200+</p>
+                        <p class="text-2xl sm:text-4xl font-black text-primary">{{ number_format($happyPetsCount) }}+</p>
                         <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider mt-1">Happy Pets</p>
                     </div>
                     <div>
-                        <p class="text-2xl sm:text-4xl font-black text-accent">98%</p>
+                        <p class="text-2xl sm:text-4xl font-black text-accent">{{ $satisfactionRate }}%</p>
                         <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider mt-1">Satisfaction Rate</p>
                     </div>
                     <div>
-                        <p class="text-2xl sm:text-4xl font-black text-primary">150+</p>
+                        <p class="text-2xl sm:text-4xl font-black text-primary">{{ number_format($verifiedSittersCount) }}+</p>
                         <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider mt-1">Verified Sitters</p>
                     </div>
                     <div>
-                        <p class="text-2xl sm:text-4xl font-black text-accent">⭐ 4.9</p>
-                        <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider mt-1">Average Rating</p>
+                        <p class="text-2xl sm:text-4xl font-black text-accent">⭐ 5.0</p>
+                        <p class="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider mt-1">Max Rating System</p>
                     </div>
                 </div>
             </div>

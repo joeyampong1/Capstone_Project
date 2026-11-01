@@ -40,7 +40,20 @@ use App\Http\Controllers\ComplaintController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    // Fetch top 2 verified, public sitters para sa landing page
+    $topSitters = \App\Models\User::query()
+        ->where('is_sitter', true)
+        ->where('sitter_status', 'approved')
+        ->where('id_validation_status', 'verified')
+        ->whereHas('setting', function ($query) {
+            $query->where('profile_visibility', 'public');
+        })
+        ->with('sitterProfile')
+        ->inRandomOrder()
+        ->limit(2)
+        ->get();
+
+    return view('welcome', compact('topSitters'));
 });
 
 /*
