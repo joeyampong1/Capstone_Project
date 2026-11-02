@@ -201,17 +201,16 @@ class SitterVerificationController extends Controller
 
         DB::beginTransaction();
         try {
-            $updateData = [
-                'sitter_status'      => 'approved',
-                'sitter_approved_at' => now(),
-                'is_sitter'          => true,
-            ];
+            // ✅ DIRECT ASSIGNMENT
+            $user->sitter_status      = 'approved';
+            $user->sitter_approved_at = now();
+            $user->is_sitter          = true;
 
             if (Schema::hasColumn('users', 'admin_notes')) {
-                $updateData['admin_notes'] = $request->input('remarks');
+                $user->admin_notes = $request->input('remarks');
             }
 
-            $user->update($updateData);
+            $user->save();
 
             DB::commit();
 
@@ -243,14 +242,15 @@ class SitterVerificationController extends Controller
 
         DB::beginTransaction();
         try {
-            $user->update([
-                'sitter_status' => 'rejected',
-                'is_sitter'     => false,
-            ]);
+            // ✅ DIRECT ASSIGNMENT
+            $user->sitter_status = 'rejected';
+            $user->is_sitter     = false;
 
             if (Schema::hasColumn('users', 'admin_notes')) {
-                $user->update(['admin_notes' => $reason]);
+                $user->admin_notes = $reason;
             }
+
+            $user->save();
 
             DB::commit();
 

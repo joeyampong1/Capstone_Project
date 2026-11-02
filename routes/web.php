@@ -187,7 +187,7 @@ Route::middleware(['auth'])->group(function () {
     | ADMIN ROUTES
     |--------------------------------------------------------------------------
     */
-        Route::prefix('admin')->name('admin.')->group(function () {
+        Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
 
         // ============================================================
         // ADMIN HOME (Creative Homepage)

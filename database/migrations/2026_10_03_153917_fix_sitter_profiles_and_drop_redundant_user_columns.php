@@ -30,11 +30,11 @@ return new class extends Migration
             }
         });
 
-        // Extend sitter_type ENUM
-        DB::statement("ALTER TABLE sitter_profiles MODIFY COLUMN sitter_type ENUM('1','2','3','ST1','ST2','ST3','ST4') NOT NULL DEFAULT '1'");
-
-        // Extend food_preference ENUM
-        DB::statement("ALTER TABLE sitter_profiles MODIFY COLUMN food_preference ENUM('owner_provides','sitter_provides','flexible','owner_provided','sitter_provided') NOT NULL DEFAULT 'owner_provides'");
+        // Align columns with app values (portable across MySQL/SQLite/Postgres)
+        Schema::table('sitter_profiles', function (Blueprint $table) {
+            $table->string('sitter_type')->default('small_pets')->change();
+            $table->string('food_preference')->default('owner_provides')->change();
+        });
 
         // ==========================================
         // 2. DROP REDUNDANT COLUMNS  users TABLE
@@ -100,8 +100,10 @@ return new class extends Migration
             ]);
         });
 
-        // Revert ENUMs
-        DB::statement("ALTER TABLE sitter_profiles MODIFY COLUMN sitter_type ENUM('ST1','ST2','ST3','ST4') NOT NULL");
-        DB::statement("ALTER TABLE sitter_profiles MODIFY COLUMN food_preference ENUM('owner_provided','sitter_provided') NOT NULL");
+        // Revert to original defaults
+        Schema::table('sitter_profiles', function (Blueprint $table) {
+            $table->string('sitter_type')->default('1')->change();
+            $table->string('food_preference')->default('owner_provides')->change();
+        });
     }
 };

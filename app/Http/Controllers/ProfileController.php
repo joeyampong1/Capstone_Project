@@ -413,7 +413,9 @@ class ProfileController extends Controller
             return back()->with('error', 'Only approved pet sitters can toggle Sitter Mode.');
         }
 
-        $user->update(['is_sitter' => !$user->is_sitter]);
+        // USED DIRECT ASSIGNMENT
+        $user->is_sitter = !$user->is_sitter;
+        $user->save();
 
         return back()->with(
             'status',

@@ -19,7 +19,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = [
+        protected $fillable = [
         // ========================================== //
         // PROFILE INFORMATION FIELDS                 //
         // ========================================== //
@@ -33,29 +33,16 @@ class User extends Authenticatable
         'contact_number',
         'address',
         'password',
-        // ========================================== //
-        // ROLE & BASIC INFO                          //
-        // ========================================== //
-        'role',
 
         // ========================================== //
-        // SITTER-SPECIFIC FIELDS                     //
-        // ========================================== //
-        'is_sitter',
-        'sitter_level',
-        'sitter_status',
-        'sitter_applied_at',
-        'sitter_approved_at',
-
-        // ========================================== //
-        // OWNER-SPECIFIC FIELDS                     //
+        // OWNER-SPECIFIC FIELDS                      //
         // ========================================== //
         'location',
         'latitude',
         'longitude',
 
         // ========================================== //
-        // PROFILE & VERIFICATION                    //
+        // PROFILE & VERIFICATION (User uploads only) //
         // ========================================== //
         'profile_photo',
         'profile_photo_public_id',
@@ -63,33 +50,15 @@ class User extends Authenticatable
         'cover_photo_public_id',
         'gov_id_path',
         'gov_id_public_id',
-        'id_validation_status',
         'id_type',
         'selfie_photo',
         'selfie_photo_public_id',
-        'admin_notes',
-        'id_reviewed_by',
-        'id_reviewed_at',
-        'face_match_score',
-        'ocr_result',
-        'face_detected_on_id',
-        'face_detected_on_selfie',
-        'document_authenticity',
-        'liveness_detection',
-        'id_expired',
-        'name_match',
-        'birthdate_match',
+
+        // ========================================== //
+        // USER PREFERENCES & SYSTEM                  //
+        // ========================================== //
         'locale',
         'onboarding_dismissed',
-
-        // ========================================== //
-        // SYSTEM & STATUS                          //
-        // ========================================== //
-        'pet_count',
-        'status',
-        'last_active_at',
-
-        // For push notifications:
         'fcm_token',
         'push_notifications_enabled',
         'email_notifications_enabled',

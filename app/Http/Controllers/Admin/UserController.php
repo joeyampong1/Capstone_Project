@@ -123,9 +123,8 @@ class UserController extends Controller
 
         $reason = $request->input('reason', 'Suspended by admin.');
 
-        $user->update([
-            'status' => 'suspended',
-        ]);
+        $user->status = 'suspended';
+        $user->save();
 
         // Optional: notify user
         \App\Services\NotificationService::send(
@@ -143,9 +142,8 @@ class UserController extends Controller
     // ==========================================
     public function activate(User $user)
     {
-        $user->update([
-            'status' => 'active',
-        ]);
+        $user->status = 'active';
+        $user->save();
 
         \App\Services\NotificationService::send(
             userId:    $user->id,
@@ -169,10 +167,9 @@ class UserController extends Controller
 
         DB::beginTransaction();
         try {
-            $user->update([
-                'status'    => 'banned',
-                'is_sitter' => false,   // Tangtangon ang sitter privilege
-            ]);
+            $user->status    = 'banned';
+            $user->is_sitter = false;
+            $user->save();
 
             // Optional: cancel tanan active bookings
             \App\Models\Booking::where(function ($q) use ($user) {
@@ -200,9 +197,9 @@ class UserController extends Controller
     // ==========================================
     public function restore(User $user)
     {
-        $user->update([
-            'status' => 'active',
-        ]);
+
+        $user->status = 'active';
+        $user->save();
 
         return back()->with('status', "{$user->f_name}'s account has been restored.");
     }
@@ -306,9 +303,8 @@ class UserController extends Controller
             return back()->with('error', 'User is already an admin.');
         }
 
-        $user->update([
-            'role' => 'admin',
-        ]);
+        $user->role = 'admin';
+        $user->save();
 
         Log::warning('User PROMOTED to admin', [
             'admin_id' => Auth::id(),
@@ -319,39 +315,38 @@ class UserController extends Controller
         return back()->with('status', "{$user->full_name} has been promoted to Administrator.");
     }
 
-    // ==========================================
-    // DEMOTE — Admin → Owner
-    // ==========================================
-    public function demote(User $user)
-    {
-        // Safety: cannot demote self
-        if ($user->id === Auth::id()) {
-            return back()->with('error', 'You cannot demote yourself.');
-        }
-
-        // Safety: cannot demote if only admin left
-        if (User::where('role', 'admin')->count() <= 1) {
-            return back()->with('error', 'Cannot demote the only remaining admin.');
-        }
-
-        // Safety: not admin
-        if (! $user->isAdmin()) {
-            return back()->with('error', 'User is not an admin.');
-        }
-
-        $user->update([
-            'role'      => 'owner',
-            'is_sitter' => false,   // Tangtangon ang sitter privileges
-        ]);
-
-        Log::warning('Admin DEMOTED to owner', [
-            'admin_id' => Auth::id(),
-            'user_id'  => $user->id,
-            'email'    => $user->email,
-        ]);
-
-        return back()->with('status', "{$user->full_name} has been demoted to Pet Owner.");
+// ========================================== //
+// DEMOTE — Admin → Owner                     //
+// ========================================== //
+public function demote(User $user)
+{
+    // Safety: cannot demote self
+    if ($user->id === Auth::id()) {
+        return back()->with('error', 'You cannot demote yourself.');
     }
+
+    // Safety: cannot demote if only admin left
+    if (User::where('role', 'admin')->count() <= 1) {
+        return back()->with('error', 'Cannot demote the only remaining admin.');
+    }
+
+    // Safety: not admin
+    if (! $user->isAdmin()) {
+        return back()->with('error', 'User is not an admin.');
+    }
+
+    $user->role      = 'owner';
+    $user->is_sitter = false;
+    $user->save();
+
+    Log::warning('Admin DEMOTED to owner', [
+        'admin_id' => Auth::id(),
+        'user_id'  => $user->id,
+        'email'    => $user->email,
+    ]);
+
+    return back()->with('status', "{$user->full_name} has been demoted to Pet Owner.");
+}
 
     /**
      * Export users as CSV (Excel-compatible).

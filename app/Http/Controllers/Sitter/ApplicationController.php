@@ -196,10 +196,11 @@ class ApplicationController extends Controller
 
             $sitterProfile->save();
 
-            if ($user->sitter_status === null) {
-                $user->is_sitter         = true;
-                $user->sitter_status     = 'pending';
-                $user->sitter_applied_at = Carbon::now();
+            if (in_array($user->sitter_status, [null, 'rejected'], true)) {
+                $user->is_sitter          = true;
+                $user->sitter_status      = 'pending';
+                $user->sitter_applied_at  = Carbon::now();
+                $user->sitter_approved_at = null;
                 $user->save();
 
                 NotificationService::sitterApplicationSubmitted($user);

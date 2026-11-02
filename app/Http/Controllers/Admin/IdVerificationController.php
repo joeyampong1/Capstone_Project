@@ -39,12 +39,12 @@ class IdVerificationController extends Controller
             return back()->with('error', 'This user is already verified.');
         }
 
-        $user->update([
-            'id_validation_status' => 'verified',
-            'admin_notes'          => $request->input('admin_notes'),
-            'id_reviewed_by'       => auth()->id(),
-            'id_reviewed_at'       => now(),
-        ]);
+        // ✅ DIRECT ASSIGNMENT
+        $user->id_validation_status = 'verified';
+        $user->admin_notes          = $request->input('admin_notes');
+        $user->id_reviewed_by       = auth()->id();
+        $user->id_reviewed_at       = now();
+        $user->save();
 
         NotificationService::idVerified($user);
 
@@ -66,14 +66,14 @@ class IdVerificationController extends Controller
             return back()->with('error', 'This user is already rejected.');
         }
 
-        $user->update([
-            'id_validation_status' => 'rejected',
-            'admin_notes'          => $request->input('admin_notes'),
-            'id_reviewed_by'       => auth()->id(),
-            'id_reviewed_at'       => now(),
-        ]);
+        // ✅ DIRECT ASSIGNMENT
+        $user->id_validation_status = 'rejected';
+        $user->admin_notes          = $request->input('admin_notes');
+        $user->id_reviewed_by       = auth()->id();
+        $user->id_reviewed_at       = now();
+        $user->save();
 
-         NotificationService::idRejected($user, $request->input('admin_notes') ?? '');
+        NotificationService::idRejected($user, $request->input('admin_notes') ?? '');
 
         Log::info('User ID verification rejected', [
             'user_id'  => $user->id,

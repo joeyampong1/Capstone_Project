@@ -29,24 +29,28 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::min(12)],
         ]);
 
+        // ✅ Create with only fillable fields
         $user = User::create([
-            'f_name' => $request->f_name,
-            'l_name' => $request->l_name,
-            'm_name' => $request->m_name,
-            'email' => $request->email,
+            'f_name'   => $request->f_name,
+            'l_name'   => $request->l_name,
+            'm_name'   => $request->m_name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'owner',
-            'status' => 'active',
-            'is_sitter' => false,
-            'sitter_level' => 1,
-            'sitter_status' => 'pending',
-            'id_validation_status' => 'unverified',
-            'pet_count' => 0,
         ]);
+
+        // ✅ Direct assignment for non-fillable fields (fresh account defaults)
+        $user->role                  = 'owner';
+        $user->status                = 'active';
+        $user->is_sitter             = false;
+        $user->sitter_level          = 1;
+        $user->sitter_status         = null;
+        $user->id_validation_status  = 'unverified';
+        $user->pet_count             = 0;
+        $user->save();
 
         event(new Registered($user));
 
         return redirect()->route('login')
-                         ->with('status', 'Your account has been created successfully! Please log in.');
+                        ->with('status', 'Your account has been created successfully! Please log in.');
     }
 }

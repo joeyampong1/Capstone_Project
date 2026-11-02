@@ -42,6 +42,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // 1. Attempt to login
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -50,6 +51,26 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // 2. ✅ ISSUE #6 FIX: Check user status
+        if (Auth::user()->status !== 'active') {
+            // Force logout kay banned/suspended ang account
+            Auth::logout();
+
+            // Invalidate session para malimpyo
+            $this->session()->invalidate();
+            $this->session()->regenerateToken();
+
+            // Custom error message
+            $message = Auth::user()->status === 'banned'
+                ? 'Your account has been permanently banned.'
+                : 'Your account has been suspended. Please contact support.';
+
+            throw ValidationException::withMessages([
+                'email' => $message,
+            ]);
+        }
+
+        // 3. Clear rate limiter kung successful ug active
         RateLimiter::clear($this->throttleKey());
     }
 
