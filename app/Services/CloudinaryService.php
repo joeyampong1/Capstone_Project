@@ -33,6 +33,7 @@ class CloudinaryService
                 'resource_type' => 'auto',
                 'quality'       => 'auto',
                 'fetch_format'  => 'auto',
+                'type'          => 'upload',
             ];
 
             $result = $this->cloudinary->uploadApi()->upload(
@@ -52,7 +53,6 @@ class CloudinaryService
                 'folder' => $folder,
                 'error'  => $e->getMessage(),
             ]);
-
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }
@@ -62,7 +62,8 @@ class CloudinaryService
         if (empty($publicId)) return false;
 
         try {
-            $this->cloudinary->uploadApi()->destroy($publicId);
+            // Use 'authenticated' type for deletion if the resource was uploaded with that type
+            $this->cloudinary->uploadApi()->destroy($publicId, ['type' => 'authenticated']);
             return true;
         } catch (\Exception $e) {
             Log::error('Cloudinary delete failed', [
@@ -73,14 +74,21 @@ class CloudinaryService
         }
     }
 
-    public function uploadMultiple(array $files, string $folder = 'general'): array
+    public function getSignedUrl(?string $publicId, array $options = []): ?string
     {
-        $results = [];
-        foreach ($files as $file) {
-            if ($file instanceof UploadedFile) {
-                $results[] = $this->upload($file, $folder);
-            }
+        if (empty($publicId)) return null;
+
+        try {
+            return $this->cloudinary->image($publicId)
+                ->deliveryType('authenticated')
+                ->signUrl(true)
+                ->toUrl($options);
+        } catch (\Exception $e) {
+            Log::error('Cloudinary signed URL generation failed', [
+                'public_id' => $publicId,
+                'error'     => $e->getMessage(),
+            ]);
+            return null;
         }
-        return $results;
     }
 }

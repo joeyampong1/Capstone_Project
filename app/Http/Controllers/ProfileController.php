@@ -217,15 +217,16 @@ class ProfileController extends Controller
             // Delete old ID (Cloudinary o local)
             $this->deleteOldImage($user->gov_id_path, $user->gov_id_public_id);
 
-            // Upload new ID to Cloudinary
-            $upload = $this->cloudinary->upload($request->file('gov_id_path'), 'ids');
+            // ✅ UPLOAD TO CLOUDINARY — authenticated type
+            $upload = $this->cloudinary->upload($request->file('gov_id_path'), 'ids', ['type' => 'authenticated']);
 
             if (!$upload['success']) {
                 \Log::error('Cloudinary ID upload failed', ['error' => $upload['error']]);
                 return back()->withErrors(['gov_id_path' => 'Upload failed: ' . $upload['error']]);
             }
 
-            $user->gov_id_path      = $upload['url'];
+            // ✅ SAVE TO USER MODEL
+            $user->gov_id_path      = $upload['public_id'];
             $user->gov_id_public_id = $upload['public_id'];
 
             \Log::info('ID uploaded to Cloudinary', [
@@ -236,25 +237,25 @@ class ProfileController extends Controller
             // ------------------------------------------------------------
             // RUN OCR — save temp local file for OCR service
             // ------------------------------------------------------------
+            $tempStoragePath = 'temp/' . uniqid() . '.jpg';
+
             try {
                 $localTempPath = $request->file('gov_id_path')->getRealPath();
-                $tempStoragePath = 'temp/' . uniqid() . '.jpg';
 
                 Storage::disk('public')->put($tempStoragePath, file_get_contents($localTempPath));
 
                 $ocrResult = $ocr->extractIdDetails($tempStoragePath);
 
                 \Log::info('=== OCR COMPLETED ===', [
+                    'user_id'   => $user->id,
                     'success'   => $ocrResult['success'] ?? false,
-                    'name'      => $ocrResult['name'] ?? null,
-                    'id_number' => $ocrResult['id_number'] ?? null,
-                    'dob'       => $ocrResult['dob'] ?? null,
+                    'has_name'  => !empty($ocrResult['name']),
+                    'has_id_no' => !empty($ocrResult['id_number']),
+                    'has_dob'   => !empty($ocrResult['dob']),
                 ]);
 
                 $user->ocr_result = $ocrResult;
 
-                // Cleanup temp file
-                Storage::disk('public')->delete($tempStoragePath);
             } catch (\Exception $e) {
                 \Log::error('OCR exception', [
                     'message' => $e->getMessage(),
@@ -264,6 +265,11 @@ class ProfileController extends Controller
                     'success' => false,
                     'error'   => 'OCR failed: ' . $e->getMessage(),
                 ];
+            } finally {
+                // Cleanup temp file
+                if (Storage::disk('public')->exists($tempStoragePath)) {
+                    Storage::disk('public')->delete($tempStoragePath);
+                }
             }
 
             $user->save();
@@ -282,21 +288,21 @@ class ProfileController extends Controller
             // Delete old selfie
             $this->deleteOldImage($user->selfie_photo, $user->selfie_photo_public_id);
 
-            // Upload to Cloudinary
-            $upload = $this->cloudinary->upload($request->file('selfie_photo'), 'selfies');
+            // ✅ UPLOAD TO CLOUDINARY — authenticated type
+            $upload = $this->cloudinary->upload($request->file('selfie_photo'), 'selfies', ['type' => 'authenticated']);
 
             if (!$upload['success']) {
                 return back()->withErrors(['selfie_photo' => 'Upload failed: ' . $upload['error']]);
             }
 
-            $user->selfie_photo           = $upload['url'];
+            // ✅ SAVE TO USER MODEL
+            $user->selfie_photo           = $upload['public_id'];
             $user->selfie_photo_public_id = $upload['public_id'];
             $user->id_validation_status   = 'unverified';
             $user->save();
 
             return redirect()->route('profile.edit')->with('status', 'id-updated');
         }
-
         // ==========================================
         // Step 4: Submit for verification (face match)
         // ==========================================
@@ -319,24 +325,38 @@ class ProfileController extends Controller
             // ------------------------------------------------------------
             // RUN FACE MATCH — download selfie from Cloudinary to temp
             // ------------------------------------------------------------
+            $localSelfiePath = null;
+            $tempStoragePath = 'temp/selfies/' . uniqid() . '.jpg';
+
             try {
-                $localSelfiePath = $this->downloadToTemp($user->selfie_photo);
+                // Generate signed URL for Cloudinary authenticated asset
+                $signedSelfieUrl = $this->cloudinary->getSignedUrl($user->selfie_photo_public_id);
+
+                if (!$signedSelfieUrl) {
+                    throw new \Exception('Failed to generate secure URL for selfie.');
+                }
+
+                $localSelfiePath = $this->downloadToTemp($signedSelfieUrl);
 
                 // FaceMatchService expects relative path on 'public' disk
                 // Move to storage temporarily
-                $tempStoragePath = 'temp/selfies/' . uniqid() . '.jpg';
                 Storage::disk('public')->put($tempStoragePath, file_get_contents($localSelfiePath));
 
                 $result = $faceMatch->verify($tempStoragePath);
 
-                // Cleanup
-                @unlink($localSelfiePath);
-                Storage::disk('public')->delete($tempStoragePath);
             } catch (\Exception $e) {
                 \Log::error('Face match exception', ['error' => $e->getMessage()]);
                 return back()->withErrors([
                     'selfie_photo' => 'Face verification failed: ' . $e->getMessage(),
                 ]);
+            } finally {
+                // Cleanup temp files
+                if ($localSelfiePath && file_exists($localSelfiePath)) {
+                    @unlink($localSelfiePath);
+                }
+                if (Storage::disk('public')->exists($tempStoragePath)) {
+                    Storage::disk('public')->delete($tempStoragePath);
+                }
             }
 
             if (!$result['success']) {
@@ -495,19 +515,18 @@ class ProfileController extends Controller
      */
     private function deleteOldImage(?string $path, ?string $publicId): void
     {
-        if (!$path) return;
-
-        // Cloudinary image
-        if (str_starts_with($path, 'http') && $publicId) {
+        // Kung naay public_id, i-delete gikan sa Cloudinary
+        if ($publicId) {
             $this->cloudinary->delete($publicId);
             return;
         }
 
-        // Local storage image
-        if (!str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
+        // Fallback para sa daang local storage images
+        if ($path && !str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
     }
+
 
     /**
      * Download a remote URL to a local temp file.

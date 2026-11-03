@@ -4,20 +4,31 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\NotificationService;
+use App\Services\CloudinaryService;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 class IdVerificationController extends Controller
 {
+    public function __construct(
+        private CloudinaryService $cloudinary
+    ) {}
+
     public function index()
     {
         $verifications = User::query()
             ->whereNotNull('gov_id_path')
             ->latest()
             ->paginate(10);
+
+        // Generate Signed URLs for authenticated Cloudinary assets
+        $verifications->getCollection()->transform(function ($user) {
+            $user->gov_id_signed_url = $this->cloudinary->getSignedUrl($user->gov_id_public_id);
+            $user->selfie_signed_url = $this->cloudinary->getSignedUrl($user->selfie_photo_public_id);
+            return $user;
+        });
 
         $stats = [
             'pending'  => User::whereNotNull('gov_id_path')->where('id_validation_status', 'pending')->count(),
@@ -87,9 +98,13 @@ class IdVerificationController extends Controller
     {
         $user = User::findOrFail($id);
 
+        // Generate Signed URLs for the authenticated files
+        $govIdUrl  = $this->cloudinary->getSignedUrl($user->gov_id_public_id);
+        $selfieUrl = $this->cloudinary->getSignedUrl($user->selfie_photo_public_id);
+
         $files = array_filter([
-            'gov_id' => $user->gov_id_path,
-            'selfie' => $user->selfie_photo,
+            'gov_id' => $govIdUrl,
+            'selfie' => $selfieUrl,
         ]);
 
         if (empty($files)) {
@@ -97,13 +112,21 @@ class IdVerificationController extends Controller
         }
 
         if (count($files) === 1) {
-            $path = reset($files);
-            if (! Storage::disk('public')->exists($path)) {
-                return back()->with('error', 'File not found on storage.');
+            $label = array_key_first($files);
+            $url   = reset($files);
+
+            // Download directly from Cloudinary URL
+            $content = @file_get_contents($url);
+            if ($content === false) {
+                return back()->with('error', 'File not found or link expired.');
             }
-            return Storage::disk('public')->download($path);
+
+            return response($content, 200)
+                ->header('Content-Type', 'image/jpeg')
+                ->header('Content-Disposition', 'attachment; filename="' . $label . '_' . $user->id . '.jpg"');
         }
 
+        // Multiple files — create ZIP
         $zipName = 'verification_user_' . $user->id . '_' . now()->format('Ymd_His') . '.zip';
         $zipPath = storage_path('app/tmp/' . $zipName);
         if (! is_dir(dirname($zipPath))) mkdir(dirname($zipPath), 0755, true);
@@ -113,10 +136,10 @@ class IdVerificationController extends Controller
             return back()->with('error', 'Unable to create ZIP archive.');
         }
 
-        foreach ($files as $label => $path) {
-            if (Storage::disk('public')->exists($path)) {
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-                $zip->addFromString($label . '.' . $ext, Storage::disk('public')->get($path));
+        foreach ($files as $label => $url) {
+            $content = @file_get_contents($url);
+            if ($content !== false) {
+                $zip->addFromString($label . '.jpg', $content);
             }
         }
         $zip->close();
@@ -125,16 +148,15 @@ class IdVerificationController extends Controller
     }
 
     public function updateOcrName(Request $request, $id)
-        {
-            $request->validate(['ocr_name' => 'required|string|max:255']);
+    {
+        $request->validate(['ocr_name' => 'required|string|max:255']);
 
-            $user = User::findOrFail($id);
-            $ocr = $user->ocr_result;
-            $ocr['name'] = $request->ocr_name;
-            $user->ocr_result = $ocr;
-            $user->save();
+        $user = User::findOrFail($id);
+        $ocr = $user->ocr_result;
+        $ocr['name'] = $request->ocr_name;
+        $user->ocr_result = $ocr;
+        $user->save();
 
-            return response()->json(['success' => true]);
-        }
-
+        return response()->json(['success' => true]);
+    }
 }

@@ -73,8 +73,8 @@
                 default           => $u->id_type ?? '—',
             },
             'id_number'  => $ocr['id_number'] ?? '—',
-            'id_front'   => $u->gov_id_url,
-            'selfie'     => $u->selfie_url,
+            'id_front'   => $u->gov_id_signed_url,
+            'selfie'     => $u->selfie_signed_url,
             'api' => [
                 'face_match'      => $u->face_match_score,
                 'doc_auth'        => $u->document_authenticity,
