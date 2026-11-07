@@ -221,6 +221,45 @@
                         </span>
                     </div>
                 </div>
+
+                {{-- ✅ IBUTANG NI DIRI BOSS: OWNER PAYMENT ACTION --}}
+                @if($isOwner && $booking->status === 'completed')
+                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-neutral-800">
+
+                        @if(($booking->payment_status ?? 'unpaid') === 'unpaid')
+                            <div class="p-4 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+                                <p class="text-sm font-bold text-amber-800 dark:text-amber-400 mb-1">{{ __('messages.pay_required') }}</p>
+                                <p class="text-xs text-amber-700 dark:text-amber-500 mb-3">{{ __('messages.pay_instruction') }}</p>
+
+                                <form action="{{ route('mybookings.mark-paid', $booking->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-600 text-white font-bold text-sm rounded-xl transition shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        {{ __('messages.pay_btn_claim') }}
+                                    </button>
+                                </form>
+                            </div>
+
+                        @elseif(($booking->payment_status ?? 'unpaid') === 'pending')
+                            <div class="p-4 rounded-xl border border-blue-200 bg-blue-50 dark:bg-blue-950/20 text-center">
+                                <p class="text-sm font-bold text-blue-800 dark:text-blue-400 flex items-center justify-center gap-2">
+                                    ⏳ {{ __('messages.pay_waiting') }}
+                                </p>
+                                <p class="text-xs text-blue-600 dark:text-blue-500 mt-1">{{ __('messages.pay_waiting_desc') }}</p>
+                            </div>
+
+                        @elseif($booking->payment_status === 'paid')
+                            <div class="p-4 rounded-xl border border-green-200 bg-green-50 dark:bg-green-950/20 text-center">
+                                <p class="text-sm font-bold text-green-800 dark:text-green-400 flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ __('messages.pay_confirmed') }}
+                                </p>
+                                <p class="text-xs text-green-600 dark:text-green-500 mt-1">{{ __('messages.pay_paid_on_date', ['date' => optional($booking->paid_at)->format('M d, Y')]) }}</p>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+                {{-- ✅ END OF OWNER PAYMENT ACTION --}}
             </div>
 
             {{-- ========================================== --}}

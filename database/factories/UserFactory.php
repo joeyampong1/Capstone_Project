@@ -28,14 +28,15 @@ class UserFactory extends Factory
             'f_name' => fake()->firstName(),
             'm_name' => fake()->optional()->firstName(),
             'l_name' => fake()->lastName(),
-            'name' => fake()->name(),
+
+            // ✅ Removed 'name' field as it was dropped from the database
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
-            'role' => 'owner',
-            'status' => 'active',
-            'id_validation_status' => 'unverified',
+
+            // ✅ Removed role, status, and id_validation_status
+            // They have default values in the database and are not mass assignable.
         ];
     }
 

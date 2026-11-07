@@ -111,6 +111,40 @@
                         </div>
                     </div>
                 @endif
+
+
+                {{-- ✅ SITTER PAYMENT CONFIRMATION --}}
+                @if(auth()->id() === $booking->sitter_id && $booking->status === 'completed')
+                    <div class="mt-4 pt-4 border-t border-gray-100 dark:border-neutral-800">
+
+                        @if(($booking->payment_status ?? 'unpaid') === 'pending')
+                            <div class="p-4 rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20">
+                                <p class="text-sm font-bold text-amber-800 dark:text-amber-400 mb-1">{{ __('messages.pay_claimed') }}</p>
+                                <p class="text-xs text-amber-700 dark:text-amber-500 mb-3">{{ __('messages.pay_claimed_desc') }}</p>
+
+                                <form action="{{ route('sitter.confirm-payment', $booking->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl transition shadow-sm">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        {{ __('messages.pay_btn_confirm') }}
+                                    </button>
+                                </form>
+                            </div>
+                        @elseif($booking->payment_status === 'paid')
+                            <div class="p-4 rounded-xl border border-green-200 bg-green-50 dark:bg-green-950/20 text-center">
+                                <p class="text-sm font-bold text-green-800 dark:text-green-400 flex items-center justify-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    {{ __('messages.pay_sitter_confirmed') }}
+                                </p>
+                            </div>
+                        @else
+                            <div class="p-4 rounded-xl border border-neutral-200 bg-neutral-50 dark:bg-neutral-800/50 text-center">
+                                <p class="text-sm font-bold text-neutral-500">{{ __('messages.pay_waiting_owner') }}</p>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+                {{-- ✅ END OF SITTER PAYMENT CONFIRMATION --}}
             </div>
 
             {{-- ========================================== --}}

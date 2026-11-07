@@ -41,7 +41,20 @@ class FaceMatchService
 
         Log::info('FaceMatch: running', ['cmd' => $cmd]);
 
-        $output = shell_exec($cmd);
+        // Use Symfony Process for better error handling and timeouts
+        try {
+            $process = \Symfony\Component\Process\Process::fromShellCommandline($cmd);
+            $process->setTimeout(60); // Abort if execution exceeds 1 minute
+            $process->run();
+
+            $output = $process->getOutput() ?: $process->getErrorOutput();
+        } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException $e) {
+            \Log::error('FaceMatch: Python script timed out');
+            return ['success' => false, 'error' => 'Face verification timed out. Please try again.'];
+        } catch (\Exception $e) {
+            \Log::error('FaceMatch: Execution error', ['error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'System error during verification.'];
+        }
 
         if (empty($output)) {
             return ['success' => false, 'error' => 'No output from Python script'];

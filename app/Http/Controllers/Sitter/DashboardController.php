@@ -176,4 +176,26 @@ class DashboardController extends Controller
             'totalVisitsLast30Days'
         ));
     }
+
+    // ==========================================
+    // CONFIRM PAYMENT — Sitter confirms receipt
+    // ==========================================
+    public function confirmPayment(Booking $booking)
+    {
+        // 1. Ensure the logged-in user is the sitter for this booking
+        abort_if($booking->sitter_id !== Auth::id(), 403, 'Unauthorized action.');
+
+        // 2. Ensure the Owner has already marked it as 'pending' (claimed paid)
+        if ($booking->payment_status !== 'pending') {
+            return back()->with('error', 'Invalid payment status. The owner has not marked this as paid yet.');
+        }
+
+        // 3. Sitter confirms receipt — change to 'paid' and set timestamp
+        $booking->update([
+            'payment_status' => 'paid',
+            'paid_at'        => now(),
+        ]);
+
+        return back()->with('status', 'Payment received and confirmed successfully!');
+    }
 }

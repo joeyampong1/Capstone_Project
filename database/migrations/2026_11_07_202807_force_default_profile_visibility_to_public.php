@@ -1,14 +1,18 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // Force change the default value using raw SQL for MySQL
-        DB::statement("ALTER TABLE settings MODIFY profile_visibility VARCHAR(20) NOT NULL DEFAULT 'public'");
+        // ✅ Use standard Laravel Schema builder instead of raw SQL for SQLite compatibility
+        Schema::table('settings', function (Blueprint $table) {
+            $table->string('profile_visibility', 20)->default('public')->change();
+        });
 
         // Update all existing records to public for testing
         DB::table('settings')->update(['profile_visibility' => 'public']);
@@ -17,6 +21,8 @@ return new class extends Migration
     public function down(): void
     {
         // Revert back to private
-        DB::statement("ALTER TABLE settings MODIFY profile_visibility VARCHAR(20) NOT NULL DEFAULT 'private'");
+        Schema::table('settings', function (Blueprint $table) {
+            $table->string('profile_visibility', 20)->default('private')->change();
+        });
     }
 };

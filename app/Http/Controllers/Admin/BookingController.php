@@ -55,7 +55,7 @@ class BookingController extends Controller
 
         $booking->update([
             'status'       => 'cancelled',
-            'cancelled_by' => auth()->id(),
+            'cancelled_by' => 'admin', // ✅ FIX: Use enum string instead of auth ID
             'cancelled_at' => now(),
         ]);
 
@@ -79,15 +79,16 @@ class BookingController extends Controller
         ]);
 
         // Mark all visits as done
+        // Note: Only updating 'status' to avoid SQL error if 'completed_at' column doesn't exist on visits table.
         $booking->visits()
             ->where('status', '!=', 'completed')
-            ->update(['status' => 'completed', 'completed_at' => now()]);
+            ->update(['status' => 'completed']);
 
         return back()->with('success', 'Booking force-completed.');
     }
 
     /**
-     * Manual payment tracking (kung wala pang payment gateway).
+     * Manual payment tracking (if no payment gateway).
      */
     public function markPaid(Request $request, $id)
     {
@@ -96,10 +97,10 @@ class BookingController extends Controller
         $isPaid = $request->input('payment_status') === 'paid';
 
         $booking->update([
-            'payment_status' => $isPaid ? 'paid' : 'pending',
+            'payment_status' => $isPaid ? 'paid' : 'unpaid', // ✅ FIX: 'unpaid' matches migration default
             'paid_at'        => $isPaid ? now() : null,
         ]);
 
-        return back()->with('success', 'Payment status updated.');
+        return back()->with('success', 'Payment status updated successfully.');
     }
 }

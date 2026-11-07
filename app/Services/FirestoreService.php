@@ -6,15 +6,30 @@ use Kreait\Firebase\Contract\Firestore;
 
 class FirestoreService
 {
-    public function __construct(
-        private Firestore $firestore
-    ) {}
+    private ?Firestore $firestore = null;
+
+    public function __construct()
+    {
+        try {
+            // Check if credentials exist before resolving the Firestore service
+            if (config('firebase.projects.app.credentials')) {
+                $this->firestore = app(Firestore::class);
+            }
+        } catch (\Throwable $e) {
+            // Log a warning but don't crash the app if Firebase is not configured
+            \Log::warning('FirestoreService initialization skipped: ' . $e->getMessage());
+            $this->firestore = null;
+        }
+    }
 
     /**
      * Push a chat message to Firestore for real-time delivery.
      */
     public function sendMessage(string $roomId, array $data): void
     {
+        // Skip if Firebase is not configured
+        if (!$this->firestore) return;
+
         try {
             $this->firestore
                 ->database()
@@ -36,6 +51,9 @@ class FirestoreService
      */
     public function markMessagesRead(string $roomId, int $readerId): void
     {
+        // Skip if Firebase is not configured
+        if (!$this->firestore) return;
+
         try {
             $collection = $this->firestore
                 ->database()
@@ -69,6 +87,9 @@ class FirestoreService
      */
     public function updateMessageReactions(string $roomId, int $messageId, array $reactions): void
     {
+        // Skip if Firebase is not configured
+        if (!$this->firestore) return;
+
         try {
             $this->firestore
                 ->database()

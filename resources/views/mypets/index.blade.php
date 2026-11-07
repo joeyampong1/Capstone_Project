@@ -144,12 +144,26 @@
                                     </a>
 
                                     {{-- Delete --}}
+                                    @php
+                                        // Check if pet has active bookings to disable button
+                                        $hasActive = \App\Models\Booking::where('pet_id', $pet->id)
+                                        ->whereIn('status', ['pending', 'accepted'])
+                                        ->exists();
+                                    @endphp
+
                                     <button type="button"
-                                            @click.stop="$dispatch('open-delete-modal', { petId: {{ $pet->id }}, petName: '{{ $pet->name }}' })"
-                                            class="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition">
+                                            @if($hasActive)
+                                                disabled
+                                                title="{{ __('Cannot delete: Active booking exists') }}"
+                                                class="p-1.5 rounded-lg text-neutral-300 dark:text-neutral-600 cursor-not-allowed opacity-50"
+                                            @else
+                                                @click.stop="$dispatch('open-delete-modal', { petId: {{ $pet->id }}, petName: '{{ $pet->name }}' })"
+                                                class="p-1.5 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition"
+                                            @endif
+                                            >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                         </svg>
                                     </button>
                                 </div>

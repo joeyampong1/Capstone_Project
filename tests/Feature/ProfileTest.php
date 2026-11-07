@@ -38,7 +38,8 @@ class ProfileTest extends TestCase
 
         $user->refresh();
 
-        $this->assertSame('Test User', $user->name);
+        $this->assertSame('Test', $user->f_name);    // ✅ Use new columns
+        $this->assertSame('User', $user->l_name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
     }
@@ -76,7 +77,7 @@ class ProfileTest extends TestCase
             ->assertRedirect('/');
 
         $this->assertGuest();
-        $this->assertNull($user->fresh());
+        $this->assertSoftDeleted($user); // ✅ Use soft delete assertion
     }
 
     public function test_correct_password_must_be_provided_to_delete_account(): void

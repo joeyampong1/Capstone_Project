@@ -175,6 +175,11 @@ return [
     'booking_guide_3'            => 'Investigate complaints when necessary.',
     'booking_guide_4'            => 'Cancel bookings only when required.',
     'booking_visit_label'        => 'Visit :n',
+
+    'mark_as_paid'     => 'Mark as Paid',
+    'payment_received' => 'Payment Received',
+    'paid_on'          => 'Paid on',
+
     // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
@@ -880,6 +885,7 @@ return [
     'ud_yrs'                   => 'yrs',
     'ud_back_btn'              => '⬅ Back',
     'ud_delete_btn'          => 'Delete User',
+    'ud_promote_btn' => 'Promote to Admin',
     // ========================================== //
     // ADMIN HOME (Creative Homepage)             //
     // ========================================== //
@@ -2422,4 +2428,24 @@ return [
     'search_no_accounts_title'  => 'No accounts found',
     'search_no_accounts_desc'   => 'We couldn\'t find any users matching ":query".',
 
+    // Payment status labels
+    'pay_status_label'   => 'Payment Status',
+    'pay_status_paid'    => 'Paid',
+    'pay_status_pending' => 'Pending',
+    'pay_status_unpaid'  => 'Unpaid',
+    'pay_on'             => 'on',
+
+    // Owner & Sitter Payment Actions
+    'pay_required'        => 'Payment Required',
+    'pay_instruction'     => 'Please hand the cash to the sitter, then click below.',
+    'pay_btn_claim'       => 'I have paid the sitter',
+    'pay_waiting'         => 'Waiting for Sitter Confirmation',
+    'pay_waiting_desc'    => 'The sitter needs to confirm they received your payment.',
+    'pay_confirmed'       => 'Payment Confirmed',
+    'pay_paid_on_date'    => 'Paid on :date',
+    'pay_claimed'         => 'Payment Claimed by Owner',
+    'pay_claimed_desc'    => 'The owner marked this as paid. Please confirm if you received the cash.',
+    'pay_btn_confirm'     => 'Confirm Payment Received',
+    'pay_sitter_confirmed'=> 'You confirmed receipt of payment.',
+    'pay_waiting_owner'   => 'Waiting for owner to pay.',
 ];

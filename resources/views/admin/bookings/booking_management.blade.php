@@ -80,6 +80,9 @@
                             ? $b->services
                             : (json_decode($b->services ?? '[]', true) ?: []),
 
+            'payment_status' => $b->payment_status ?? 'unpaid',
+            'paid_at'        => optional($b->paid_at)->format('M d, Y g:i A'),
+
             'visits' => collect($b->visits ?? [])->map(fn ($v) => [
                 'id'     => $v->id,
                 'label'  => __('messages.booking_visit_label', ['n' => $v->sequence ?? $v->id]),
@@ -343,9 +346,28 @@
                                         ₱{{ number_format((float) ($b->subtotal ?? $b->total_amount ?? 0), 0) }}
                                     </td>
                                     <td class="py-2.5 sm:py-3 px-2 sm:px-4">
-                                        <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold {{ $statusClasses($b->status) }} whitespace-nowrap">
-                                            {{ $statusLabel($b->status) }}
-                                        </span>
+                                        <div class="flex flex-col gap-1 items-start">
+                                            {{-- Booking Status --}}
+                                            <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] font-bold {{ $statusClasses($b->status) }} whitespace-nowrap">
+                                                {{ $statusLabel($b->status) }}
+                                            </span>
+
+                                            {{-- ✅ Payment Status Badge --}}
+                                            @if(($b->payment_status ?? 'unpaid') === 'paid')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 whitespace-nowrap">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                                    {{ __('messages.pay_status_paid') }}
+                                                </span>
+                                            @elseif(($b->payment_status ?? 'unpaid') === 'pending')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 whitespace-nowrap">
+                                                    ⏳ {{ __('messages.pay_status_pending') }}
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 whitespace-nowrap">
+                                                    {{ __('messages.pay_status_unpaid') }}
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="py-2.5 sm:py-3 px-2 sm:px-4 text-right">
                                         <button type="button"
@@ -633,6 +655,20 @@
                                         <span class="text-neutral-500 dark:text-neutral-400">{{ __('messages.booking_remaining_visits') }}</span>
                                         <span class="font-bold text-amber-600 dark:text-amber-400 shrink-0" x-text="(selected.total_visits ?? 0) - (selected.completed_visits ?? 0)"></span>
                                     </div>
+
+                                    <div class="flex items-center justify-between gap-2 border-t border-gray-200 dark:border-neutral-700 pt-2 mt-2">
+                                        <span class="text-neutral-500 dark:text-neutral-400">{{ __('messages.pay_status_label') }}</span>
+                                        <div x-show="selected.payment_status === 'paid'">
+                                            <span class="font-bold text-green-600 dark:text-green-400">{{ __('messages.pay_status_paid') }}</span>
+                                            <span class="text-xs text-neutral-500 ml-1" x-text="selected.paid_at ? '({{ __('messages.pay_on') }} ' + selected.paid_at + ')' : ''"></span>
+                                        </div>
+                                        <div x-show="selected.payment_status === 'pending'">
+                                            <span class="font-bold text-blue-600 dark:text-blue-400">{{ __('messages.pay_status_pending') }}</span>
+                                        </div>
+                                        <div x-show="selected.payment_status === 'unpaid'">
+                                            <span class="font-bold text-amber-600 dark:text-amber-400">{{ __('messages.pay_status_unpaid') }}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -640,6 +676,29 @@
                             <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.booking_admin_actions') }}</p>
                                 <div class="space-y-2">
+                                    <!-- ✅ Mark Paid Action -->
+                                    <form method="POST"
+                                        :action="'{{ url('admin/bookings') }}/' + (selected.id ?? '') + '/mark-paid'"
+                                        x-show="selected.id && selected.payment_status !== 'paid'">
+                                        @csrf
+                                        <input type="hidden" name="payment_status" value="paid">
+                                        <button type="submit"
+                                                class="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 bg-emerald-100/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs rounded-lg hover:bg-emerald-100/30 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            {{ __('messages.mark_as_paid') }}
+                                        </button>
+                                    </form>
+
+                                    <!-- ✅ Badge if paid -->
+                                    <div x-show="selected.id && selected.payment_status === 'paid'" class="w-full flex flex-col items-center justify-center gap-1 px-3 py-2.5 bg-green-100/20 text-green-600 dark:text-green-400 font-bold text-xs rounded-lg cursor-default">
+                                        <span class="flex items-center gap-1.5">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            {{ __('messages.payment_received') }}
+                                        </span>
+                                        <span class="text-[10px] font-normal text-green-700 dark:text-green-500" x-text="selected.paid_at ? '{{ __('messages.paid_on') }}: ' + selected.paid_at : ''"></span>
+                                    </div>
 
                                     <a :href="'{{ url('admin/users') }}/' + (selected.owner?.id ?? '')"
                                        x-show="selected.owner?.id"

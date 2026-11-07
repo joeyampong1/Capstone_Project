@@ -113,7 +113,8 @@ class ApplicationController extends Controller
             $sitterProfile->is_active = true;
             $sitterProfile->save();
 
-            $user->is_sitter         = true;
+            // Do NOT set is_sitter to true until admin approves
+            $user->is_sitter         = false;
             $user->sitter_status     = 'pending';
             $user->sitter_applied_at = Carbon::now();
             $user->save();
@@ -196,8 +197,9 @@ class ApplicationController extends Controller
 
             $sitterProfile->save();
 
+            // Only reset to pending if they are a new applicant or previously rejected
             if (in_array($user->sitter_status, [null, 'rejected'], true)) {
-                $user->is_sitter          = true;
+                $user->is_sitter          = false;
                 $user->sitter_status      = 'pending';
                 $user->sitter_applied_at  = Carbon::now();
                 $user->sitter_approved_at = null;

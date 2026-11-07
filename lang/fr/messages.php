@@ -175,6 +175,10 @@ return [
     'booking_guide_3'            => 'Investigate complaints when necessary.',
     'booking_guide_4'            => 'Cancel bookings only when required.',
     'booking_visit_label'        => 'Visit :n',
+
+    'mark_as_paid'     => 'Marquer comme payé',
+    'payment_received' => 'Paiement reçu',
+    'paid_on'          => 'Payé le',
     // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
@@ -872,6 +876,7 @@ return [
     'ud_yrs'                   => 'yrs',
     'ud_back_btn'              => 'Ã¢â€ Â Back',
     'ud_delete_btn'          => 'Delete User',
+    'ud_promote_btn' => 'Promouvoir en Admin',
     // ========================================== //
     // ADMIN HOME (Creative Homepage)             //
     // ========================================== //
@@ -2420,4 +2425,24 @@ return [
     'search_no_accounts_title'  => 'Aucun compte trouvé',
     'search_no_accounts_desc'   => 'Nous n\'avons trouvé aucun utilisateur correspondant à ":query".',
 
+    //Payment status labels
+    'pay_status_label'   => 'Statut du Paiement',
+    'pay_status_paid'    => 'Payé',
+    'pay_status_pending' => 'En attente',
+    'pay_status_unpaid'  => 'Non payé',
+    'pay_on'             => 'le',
+
+    // Owner & Sitter Payment Actions (Issue #24)
+    'pay_required'        => 'Paiement Requis',
+    'pay_instruction'     => 'Veuillez remettre l\'argent au pet-sitter, puis cliquez ci-dessous.',
+    'pay_btn_claim'       => 'J\'ai payé le pet-sitter',
+    'pay_waiting'         => 'En attente de confirmation du pet-sitter',
+    'pay_waiting_desc'    => 'Le pet-sitter doit confirmer la réception de votre paiement.',
+    'pay_confirmed'       => 'Paiement Confirmé',
+    'pay_paid_on_date'    => 'Payé le :date',
+    'pay_claimed'         => 'Paiement Réclamé par le Propriétaire',
+    'pay_claimed_desc'    => 'Le propriétaire a marqué cela comme payé. Veuillez confirmer si vous avez reçu l\'argent.',
+    'pay_btn_confirm'     => 'Confirmer le Paiement Reçu',
+    'pay_sitter_confirmed'=> 'Vous avez confirmé la réception du paiement.',
+    'pay_waiting_owner'   => 'En attente du paiement du propriétaire.',
 ];

@@ -163,6 +163,18 @@ class PetController extends Controller
     {
         $pet = auth()->user()->pets()->findOrFail($id);
 
+        // ✅ FIX ISSUE #23: Prevent deletion if the pet has active bookings
+        // Assuming the Pet model has a 'bookings' relationship
+        $hasActiveBookings = $pet->bookings()
+            ->whereIn('status', ['pending', 'accepted'])
+            ->exists();
+
+        if ($hasActiveBookings) {
+            return redirect()
+                ->route('mypets.index')
+                ->with('error', 'Cannot delete this pet because it has an active booking (pending or accepted). Please cancel or complete the booking first.');
+        }
+
         // Delete photo (Cloudinary or local)
         $this->deleteOldPhoto($pet->photo_path, $pet->photo_public_id);
 

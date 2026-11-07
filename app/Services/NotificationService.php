@@ -148,15 +148,25 @@ class NotificationService
     // ==========================================
     private static function sendPush(User $user, string $title, string $message, ?string $actionUrl): void
     {
-        $messaging = app('firebase.messaging');
+        // Check if Firebase credentials exist before attempting to connect
+        if (!config('firebase.projects.app.credentials')) {
+            return; // Skip silently if Firebase is not configured
+        }
 
-        $cloudMessage = CloudMessage::withTarget('token', $user->fcm_token)
-            ->withNotification(FcmNotification::create($title, $message))
-            ->withData([
-                'url' => $actionUrl ?? route('dashboard'),
-            ]);
+        try {
+            $messaging = app('firebase.messaging');
 
-        $messaging->send($cloudMessage);
+            $cloudMessage = CloudMessage::withTarget('token', $user->fcm_token)
+                ->withNotification(FcmNotification::create($title, $message))
+                ->withData([
+                    'url' => $actionUrl ?? route('dashboard'),
+                ]);
+
+            $messaging->send($cloudMessage);
+        } catch (\Throwable $e) {
+            // Log a warning instead of an error so it doesn't clutter the main logs
+            \Log::warning("FCM Push failed for user {$user->id}: " . $e->getMessage());
+        }
     }
 
     // ==========================================

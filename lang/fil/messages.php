@@ -176,6 +176,9 @@ return [
     'booking_guide_3'            => 'Imbestigahan ang mga reklamo kung kinakailangan.',
     'booking_guide_4'            => 'Kanselahin ang booking kung kinakailangan lamang.',
     'booking_visit_label'        => 'Bisita :n',
+    'mark_as_paid'     => 'Markahan bilang Bayad',
+    'payment_received' => 'Natanggap na ang Bayad',
+    'paid_on'          => 'Binayaran noong',
     // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
@@ -837,6 +840,7 @@ return [
     'ud_unknown_type'          => 'Hindi Alam',
     'ud_yrs'                   => 'taon',
     'ud_back_btn'              => '⬅ Bumalik',
+    'ud_promote_btn' => 'I-promote sa Admin',
     // ========================================== //
     // ADMIN HOME (Creative Homepage)              //
     // ========================================== //
@@ -2269,5 +2273,26 @@ return [
     'search_results_for'        => 'Ipinapakita ang mga resulta para sa ":query"',
     'search_no_accounts_title'  => 'Walang nahanap na account',
     'search_no_accounts_desc'   => 'Wala kaming mahanap na user na tumutugma sa ":query".',
+
+    //Payment status
+    'pay_status_label'   => 'Estado ng Bayad',
+    'pay_status_paid'    => 'Bayad Na',
+    'pay_status_pending' => 'Naghihintay',
+    'pay_status_unpaid'  => 'Hindi Pa Bayad',
+    'pay_on'             => 'noong',
+
+    // Owner & Sitter Payment Actions (Issue #24)
+    'pay_required'        => 'Kailangan ng Bayad',
+    'pay_instruction'     => 'Pakisuyo ibigay ang cash sa sitter, pagkatapos ay i-click sa ibaba.',
+    'pay_btn_claim'       => 'Nabayaran ko na ang sitter',
+    'pay_waiting'         => 'Naghihintay ng Kumpirmasyon ng Sitter',
+    'pay_waiting_desc'    => 'Kailangan kumpirmahin ng sitter na natanggap nila ang iyong bayad.',
+    'pay_confirmed'       => 'Kumpirmado ang Bayad',
+    'pay_paid_on_date'    => 'Binayaran noong :date',
+    'pay_claimed'         => 'Sabi ng Owner ay Bayad Na',
+    'pay_claimed_desc'    => 'Minarkahan ng owner ito bilang bayad na. Pakikumpirma kung natanggap mo ang cash.',
+    'pay_btn_confirm'     => 'Kumpirmahin ang Natanggap na Bayad',
+    'pay_sitter_confirmed'=> 'Kinumpirma mo ang pagtanggap ng bayad.',
+    'pay_waiting_owner'   => 'Naghihintay na magbayad ang owner.',
 
     ];

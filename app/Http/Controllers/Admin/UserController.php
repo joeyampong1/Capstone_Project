@@ -266,15 +266,23 @@ class UserController extends Controller
     {
         $user = User::withTrashed()->findOrFail($id);
 
-        // Safety
+        // Safety: cannot delete self or admins
         if ($user->id === Auth::id() || $user->isAdmin()) {
             return back()->with('error', 'Not allowed.');
         }
 
-        $name = $user->full_name ?: $user->email;
-        $user->forceDelete(); // permanent — DILI ma-restore
+        // ✅ FIX ISSUE #20: Check if the user has any bookings (active or history)
+        // We don't want to cascade-delete bookings and lose financial records.
+        $hasBookings = $user->bookingsAsOwner()->exists() || $user->bookingsAsSitter()->exists();
 
-        Log::info('User soft-deleted by admin', [
+        if ($hasBookings) {
+            return back()->with('error', 'Cannot permanently delete this user because they have booking history. Please use the Soft Delete option instead to preserve data integrity.');
+        }
+
+        $name = $user->full_name ?: $user->email;
+        $user->forceDelete(); // Permanent deletion — cannot be restored
+
+        Log::warning('User permanently deleted by admin', [
             'admin_id' => Auth::id(),
             'user_id'  => $id,
             'email'    => $user->email,

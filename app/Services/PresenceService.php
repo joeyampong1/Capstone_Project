@@ -6,15 +6,29 @@ use Kreait\Firebase\Contract\Database;
 
 class PresenceService
 {
-    public function __construct(
-        private Database $database
-    ) {}
+    private ?Database $database = null;
+
+    public function __construct()
+    {
+        try {
+            // Check if credentials exist before resolving the Database service
+            if (config('firebase.projects.app.credentials')) {
+                $this->database = app(Database::class);
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('PresenceService initialization skipped: ' . $e->getMessage());
+            $this->database = null;
+        }
+    }
 
     /**
      * Set user as online.
      */
     public function setOnline(int $userId): void
     {
+        // Skip if Firebase is not configured
+        if (!$this->database) return;
+
         try {
             $this->database->getReference("presence/{$userId}")->update([
                 'status'    => 'online',
@@ -33,6 +47,9 @@ class PresenceService
      */
     public function setOffline(int $userId): void
     {
+        // Skip if Firebase is not configured
+        if (!$this->database) return;
+
         try {
             $this->database->getReference("presence/{$userId}")->update([
                 'status'    => 'offline',
@@ -51,6 +68,9 @@ class PresenceService
      */
     public function setTyping(string $roomId, int $userId, bool $isTyping): void
     {
+        // Skip if Firebase is not configured
+        if (!$this->database) return;
+
         try {
             $this->database->getReference("typing/{$roomId}/{$userId}")->set([
                 'is_typing'  => $isTyping,
@@ -70,6 +90,9 @@ class PresenceService
      */
     public function getUserPresence(int $userId): ?array
     {
+        // Skip if Firebase is not configured
+        if (!$this->database) return null;
+
         try {
             $snapshot = $this->database->getReference("presence/{$userId}")->getSnapshot();
 
@@ -84,6 +107,9 @@ class PresenceService
      */
     public function getMultipleUserPresence(array $userIds): array
     {
+        // Skip if Firebase is not configured
+        if (!$this->database) return [];
+
         $result = [];
 
         foreach ($userIds as $userId) {

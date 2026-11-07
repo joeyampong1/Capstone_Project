@@ -50,7 +50,25 @@ return [
              *
              */
 
-           'credentials' => json_decode(file_get_contents(env('FIREBASE_CREDENTIALS')), true),
+            'credentials' => (function () {
+                $path = env('FIREBASE_CREDENTIALS');
+
+                // If no path is provided in .env, return null
+                if (!$path) return null;
+
+                // Resolve relative path to absolute if needed
+                if (!file_exists($path)) {
+                    $path = base_path($path);
+                }
+
+                // Check if the file actually exists before reading
+                if (file_exists($path)) {
+                    return json_decode(file_get_contents($path), true);
+                }
+
+                // Return null if file is missing (prevents config:cache from crashing)
+                return null;
+           })(),
 
             /*
              * ------------------------------------------------------------------------
@@ -235,5 +253,6 @@ return [
         'messaging_sender_id' => env('FIREBASE_MESSAGING_SENDER_ID'),
         'app_id'              => env('FIREBASE_APP_ID'),
         'database_url'        => env('FIREBASE_DATABASE_URL'),
+        'vapid_key'           => env('FIREBASE_VAPID_KEY'),
     ],
 ];

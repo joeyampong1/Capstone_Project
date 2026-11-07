@@ -3,21 +3,29 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use App\Models\PetType; // Make sure to import the model
 
 class PetTypeSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('pet_types')->insert([
-            ['name' => 'Dog', 'icon' => '🐶', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Cat', 'icon' => '🐱', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Bird', 'icon' => '🐦', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Rabbit', 'icon' => '🐰', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Hamster', 'icon' => '🐹', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Fish', 'icon' => '🐟', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Reptile', 'icon' => '🦎', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Other', 'icon' => '🐾', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        $petTypes = [
+            ['name' => 'Dog', 'icon' => '🐶'],
+            ['name' => 'Cat', 'icon' => '🐱'],
+            ['name' => 'Bird', 'icon' => '🐦'],
+            ['name' => 'Rabbit', 'icon' => '🐰'],
+            ['name' => 'Hamster', 'icon' => '🐹'],
+            ['name' => 'Fish', 'icon' => '🐟'],
+            ['name' => 'Reptile', 'icon' => '🦎'],
+            ['name' => 'Other', 'icon' => '🐾'],
+        ];
+
+        foreach ($petTypes as $type) {
+            // Checks if the name exists. If not, it creates it.
+            PetType::firstOrCreate(
+                ['name' => $type['name']],
+                ['icon' => $type['icon']]
+            );
+        }
     }
 }

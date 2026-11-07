@@ -78,9 +78,10 @@ class BookingController extends Controller
 
         $sitter = User::with('sitterProfile')->findOrFail($sitterId);
 
-        if (!$sitter->is_sitter) {
+        // ✅ FIX ISSUE #21: Check both is_sitter and sitter_status
+        if (!$sitter->is_sitter || $sitter->sitter_status !== 'approved') {
             return redirect()->route('find.sitter')
-                ->with('error', 'Selected user is not a pet sitter.');
+                ->with('error', 'Selected user is not an approved pet sitter.');
         }
 
         if ($sitter->id === Auth::id()) {
@@ -134,9 +135,9 @@ class BookingController extends Controller
         $owner  = Auth::user();
         $sitter = User::with('sitterProfile')->findOrFail($validated['sitter_id']);
 
-        // Verify sitter
-        if (!$sitter->is_sitter) {
-            return back()->withErrors(['sitter_id' => 'Selected user is not a sitter.'])->withInput();
+        // ✅ FIX ISSUE #21: Check both is_sitter and sitter_status
+        if (!$sitter->is_sitter || $sitter->sitter_status !== 'approved') {
+            return back()->withErrors(['sitter_id' => 'Selected user is not an approved pet sitter.'])->withInput();
         }
 
         if ($sitter->id === $owner->id) {
@@ -364,7 +365,7 @@ class BookingController extends Controller
                 'cancelled_by'        => 'owner',
             ]);
 
-            // Delete pending visits (kay cancelled na ang booking)
+            // Delete pending visits since the booking is cancelled
             $booking->visits()
                 ->where('status', 'pending')
                 ->delete();
@@ -399,7 +400,7 @@ class BookingController extends Controller
             'This booking cannot be completed yet — the booking period has not ended.'
         );
 
-        // Check kung tanan visits completed na
+        // Check if all visits are completed
         $pendingVisits = $booking->visits()
             ->whereIn('status', ['pending', 'in_progress'])
             ->count();
@@ -431,7 +432,7 @@ class BookingController extends Controller
      */
     protected function generateVisits(Booking $booking): void
     {
-        // Skip kung naa nay existing visits (para dili ma-duplicate)
+        // Skip if there are already existing visits (to prevent duplicates)
         if ($booking->visits()->exists()) {
             return;
         }
@@ -466,5 +467,31 @@ class BookingController extends Controller
                 ]);
             }
         }
+    }
+
+    // ==========================================
+    // MARK AS PAID — Owner claims they paid the sitter
+    // ==========================================
+    public function markPaid(Request $request, Booking $booking)
+    {
+        // Ensure the logged-in user is the owner of this booking
+        abort_if($booking->owner_id !== Auth::id(), 403, 'Unauthorized.');
+
+        // Only allow marking as paid if the booking is completed
+        if ($booking->status !== 'completed') {
+            return back()->with('error', 'You can only mark a completed booking as paid.');
+        }
+
+        // Ensure it's not already paid or pending confirmation
+        if (in_array($booking->payment_status, ['paid', 'pending'])) {
+            return back()->with('error', 'Payment status is already updated.');
+        }
+
+        // ✅ Set to 'pending' to wait for Sitter's confirmation
+        $booking->update([
+            'payment_status' => 'pending',
+        ]);
+
+        return back()->with('status', 'Payment claimed. Waiting for the sitter to confirm receipt.');
     }
 }

@@ -13,6 +13,11 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // ✅ 1. CALL OTHER SEEDERS (Fixes Issue #15)
+        $this->call([
+            PetTypeSeeder::class,
+        ]);
+
         // ========================================== //
         // ADMIN USER — ONLY                          //
         // ========================================== //

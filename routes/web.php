@@ -58,6 +58,11 @@ Route::get('/', function () {
 
 Route::get('/search', [App\Http\Controllers\Owner\PublicProfileController::class, 'search'])->name('search');
 
+Route::get('/firebase-messaging-sw.js', function () {
+    return response()->view('firebase-messaging-sw')
+        ->header('Content-Type', 'application/javascript');
+})->name('firebase.sw');
+
 /*
 |--------------------------------------------------------------------------
 | AUTHENTICATED ROUTES (Shared: Admin, Owner, Sitter)
@@ -329,6 +334,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Booking actions (Owner)
         Route::post('/mybookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('mybookings.cancel');
+
+        Route::post('/mybookings/{booking}/mark-paid', [BookingController::class, 'markPaid'])->name('mybookings.mark-paid');
     });
 
     /*
@@ -367,6 +374,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/sitter/availability', [AvailabilityController::class, 'store'])->name('sitter.availability.store');
     Route::delete('/sitter/availability/{id}', [AvailabilityController::class, 'destroy'])->name('sitter.availability.destroy');
 
+    Route::post('/sitter/bookings/{booking}/confirm-payment', [App\Http\Controllers\Sitter\DashboardController::class, 'confirmPayment'])->name('sitter.confirm-payment');
     // ---------- SITTER PAYMENTS ----------
     // Route::get('/sitter/payments', function () {
     //     return view('sitters.sitter_payment_index');

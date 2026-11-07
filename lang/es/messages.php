@@ -204,6 +204,10 @@ return [
 
     'booking_visit_label'        => 'Visita :n',
 
+    'mark_as_paid'     => 'Marcar como Pagado',
+    'payment_received' => 'Pago Recibido',
+    'paid_on'          => 'Pagado el',
+
     // ========================================== //
     // ANALYTICS DASHBOARD (Admin)                 //
     // ========================================== //
@@ -1008,6 +1012,7 @@ return [
     'ud_yrs'                   => 'años',
 
     'ud_back_btn'              => '← Atrás',
+    'ud_promote_btn' => 'Promover a Administrador',
 
     // ========================================== //
     // ADMIN HOME (Creative Homepage)              //
@@ -2615,4 +2620,25 @@ return [
     'search_results_for'        => 'Mostrando resultados para ":query"',
     'search_no_accounts_title'  => 'No se encontraron cuentas',
     'search_no_accounts_desc'   => 'No pudimos encontrar ningún usuario que coincida con ":query".',
+
+    //Payment status
+    'pay_status_label'   => 'Estado de Pago',
+    'pay_status_paid'    => 'Pagado',
+    'pay_status_pending' => 'Pendiente',
+    'pay_status_unpaid'  => 'No Pagado',
+    'pay_on'             => 'el',
+
+    // Owner & Sitter Payment Actions (Issue #24)
+    'pay_required'        => 'Pago Requerido',
+    'pay_instruction'     => 'Entregue el efectivo al niñero, luego haga clic abajo.',
+    'pay_btn_claim'       => 'He pagado al niñero',
+    'pay_waiting'         => 'Esperando confirmación del niñero',
+    'pay_waiting_desc'    => 'El niñero debe confirmar que recibió su pago.',
+    'pay_confirmed'       => 'Pago Confirmado',
+    'pay_paid_on_date'    => 'Pagado el :date',
+    'pay_claimed'         => 'Pago Reclamado por el Dueño',
+    'pay_claimed_desc'    => 'El dueño marcó esto como pagado. Confirme si recibió el efectivo.',
+    'pay_btn_confirm'     => 'Confirmar Pago Recibido',
+    'pay_sitter_confirmed'=> 'Ha confirmado la recepción del pago.',
+    'pay_waiting_owner'   => 'Esperando que el dueño pague.',
 ];

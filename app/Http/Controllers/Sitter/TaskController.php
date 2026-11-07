@@ -20,7 +20,7 @@ class TaskController extends Controller
     ) {}
 
     // ==========================================
-    // INDEX — List tanan visits sa sitter
+    // INDEX — List all visits for the sitter
     // ==========================================
 
     public function index(Request $request)
@@ -90,7 +90,7 @@ class TaskController extends Controller
     }
 
     // ==========================================
-    // CHECK IN — Sitter arrives sa location
+    // CHECK IN — Sitter arrives at the location
     // ==========================================
 
     public function checkIn(Visit $visit)
@@ -159,40 +159,31 @@ class TaskController extends Controller
     // ==========================================
     // COMPLETE — Mark visit as completed
     // ==========================================
-
     public function complete(Visit $visit)
     {
         $this->authorizeVisit($visit);
 
+        // ✅ FIX ISSUE #22: Strictly require the visit to be in_progress
+        // A visit cannot be completed if it hasn't been checked in.
         abort_if(
-            !in_array($visit->status, ['in_progress', 'pending']),
+            $visit->status !== 'in_progress',
             400,
-            'Only pending or in-progress visits can be completed.'
+            'You must check in before you can complete this visit.'
         );
 
-        abort_if($visit->check_out === null && $visit->status === 'in_progress',
+        // ✅ Require check_out timestamp
+        abort_if(
+            $visit->check_out === null,
             400,
-            'You must check out first before completing.'
+            'You must check out first before completing the visit.'
         );
 
         $visit->update(['status' => 'completed']);
-
-        // NotificationService::send(
-        //     userId:    $visit->booking->owner_id,
-        //     type:      'visit_completed',
-        //     title:     'Visit completed',
-        //     message:   "Visit #{$visit->visit_number} for {$visit->booking->pet->name} has been completed.",
-        //     actionUrl: route('task.monitor', $visit->booking_id),
-        //     actorId:   Auth::id(),
-        //     meta:      ['visit_id' => $visit->id, 'booking_id' => $visit->booking_id],
-
-        // );
 
         NotificationService::visitCompleted(
             sitter: Auth::user(),
             owner: $visit->booking->owner,
             visit: $visit
-
         );
 
         $this->checkBookingCompletion($visit->booking);
@@ -370,7 +361,7 @@ class TaskController extends Controller
         $path     = $existingPaths[$index];
         $publicId = $existingPublicIds[$index] ?? null;
 
-        // Delete from Cloudinary (o local)
+        // Delete from Cloudinary (or local)
         if (str_starts_with($path, 'http') && $publicId) {
             $this->cloudinary->delete($publicId);
         } elseif (!str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {

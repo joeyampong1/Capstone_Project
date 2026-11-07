@@ -24,7 +24,7 @@ class Booking extends Model
         'end_date',
         'visit_per_day',
         'total_visits',
-        'schedule_times',           
+        'schedule_times',
         'tasks',
         'instructions',
         'base_rate',
@@ -36,6 +36,9 @@ class Booking extends Model
         'status',
         'cancellation_reason',
         'cancelled_by',
+        'cancelled_at'    => 'datetime',
+        'completed_at'    => 'datetime',
+        'paid_at'         => 'datetime',
     ];
 
     // ==========================================
@@ -71,7 +74,7 @@ class Booking extends Model
 
     public function pet(): BelongsTo
     {
-        return $this->belongsTo(Pet::class, 'pet_id');
+        return $this->belongsTo(Pet::class, 'pet_id')->withTrashed();
     }
 
     /**
@@ -342,5 +345,5 @@ class Booking extends Model
         return $this->review()->exists();
     }
 
-    
+
 }
