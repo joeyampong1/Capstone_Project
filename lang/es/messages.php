@@ -1106,6 +1106,14 @@ return [
     'nav_time_2d'                    => 'hace 2 días',
     'nav_recent'                     => 'recientes',
     'nav_no_notifications'           => 'No hay nuevas notificaciones.',
+    // Search Bar Translations
+    'nav_search_accounts'   => 'Buscar cuentas...',
+    'nav_search_results'    => 'Resultados de la búsqueda',
+    'nav_searching'         => 'Buscando...',
+    'nav_no_accounts'       => 'No se encontraron cuentas para',
+    'nav_view_all_results'  => 'Ver todos los resultados',
+    'vis_private'           => 'Privado',
+    'nav_toggle_dark_mode'  => 'Alternar modo oscuro',
 
     // ========================================== //
     // SIDEBAR                                     //
@@ -2038,6 +2046,10 @@ return [
     'pf_contact_number' => 'Número de Contacto',
     'pf_address' => 'Dirección',
 
+    'pf_cover_alt'     => 'Portada de :name',
+    'pf_private_title' => 'Esta cuenta es privada',
+    'pf_private_desc'  => ':name ha elegido mantener privados los detalles de su perfil. Solo los clientes anteriores pueden ver sus detalles completos, biografía e información de contacto.',
+
     'ss_title'                 => 'Ajustes del Sistema',
     'ss_subtitle'              => 'Gestiona tus preferencias de cuenta y configuraciones del sistema',
 
@@ -2597,4 +2609,10 @@ return [
     'sv_sitter_type' => 'Tipo de Cuidador',
     'ud_promote_btn' => 'Ascender a Administrador',
     'ud_demote_btn'  => 'Degradar de Administrador',
+
+    // Search page
+    'search_results_title'      => 'Resultados de la búsqueda',
+    'search_results_for'        => 'Mostrando resultados para ":query"',
+    'search_no_accounts_title'  => 'No se encontraron cuentas',
+    'search_no_accounts_desc'   => 'No pudimos encontrar ningún usuario que coincida con ":query".',
 ];

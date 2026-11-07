@@ -961,6 +961,14 @@ return [
     'nav_time_2d'                    => '2 days ago',
     'nav_recent'                     => 'récentes',
     'nav_no_notifications'           => 'Aucune nouvelle notification.',
+    // Search Bar Translations
+    'nav_search_accounts'   => 'Rechercher des comptes...',
+    'nav_search_results'    => 'Résultats de recherche',
+    'nav_searching'         => 'Recherche en cours...',
+    'nav_no_accounts'       => 'Aucun compte trouvé pour',
+    'nav_view_all_results'  => 'Voir tous les résultats',
+    'vis_private'           => 'Privé',
+    'nav_toggle_dark_mode'  => 'Basculer en mode sombre',
     // ========================================== //
     // SIDEBAR                                     //
     // ========================================== //
@@ -1864,6 +1872,9 @@ return [
     'pf_gender' => 'Genre',
     'pf_contact_number' => 'Numéro de contact',
     'pf_address' => 'Adresse',
+    'pf_cover_alt'     => 'Couverture de :name',
+    'pf_private_title' => 'Ce compte est privé',
+    'pf_private_desc'  => ':name a choisi de garder les détails de son profil privés. Seuls les anciens clients peuvent voir tous les détails, la biographie et les informations de contact.',
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -2402,5 +2413,11 @@ return [
     'otb_tasks_progress'        => 'Tasks Progress',
     'otb_overdue'               => 'Overdue Ã¢â‚¬â€ scheduled :time',
     'otb_view_details'          => 'View visit details Ã¢â€ â€™',
+
+    // Search page
+    'search_results_title'      => 'Résultats de recherche',
+    'search_results_for'        => 'Affichage des résultats pour ":query"',
+    'search_no_accounts_title'  => 'Aucun compte trouvé',
+    'search_no_accounts_desc'   => 'Nous n\'avons trouvé aucun utilisateur correspondant à ":query".',
 
 ];

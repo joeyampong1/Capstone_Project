@@ -969,6 +969,14 @@ return [
     'nav_time_2d'                    => '2 days ago',
     'nav_recent'                     => 'recent',
     'nav_no_notifications'           => 'No new notifications.',
+    // Search Bar Translations
+    'nav_search_accounts'   => 'Search accounts...',
+    'nav_search_results'    => 'Search Results',
+    'nav_searching'         => 'Searching...',
+    'nav_no_accounts'       => 'No accounts found for',
+    'nav_view_all_results'  => 'View all results',
+    'vis_private'           => 'Private',
+    'nav_toggle_dark_mode' => 'Toggle dark mode',
     // ========================================== //
     // SIDEBAR                                     //
     // ========================================== //
@@ -1733,6 +1741,9 @@ return [
     'pf_contact'               => 'Contact',
     'pf_mixed'                 => 'Mixed',
     'pf_unknown'               => 'Unknown',
+    'pf_cover_alt'     => ":name's Cover",
+    'pf_private_title' => 'This account is private',
+    'pf_private_desc'  => ':name has chosen to keep their profile details private. Only previous clients can view their full details, bio, and contact information.',
     // Edit page
     'pe_title'                 => 'Profile Settings',
     'pe_subtitle'              => 'Manage your account details and verification',
@@ -2404,5 +2415,11 @@ return [
     'otb_tasks_progress'        => 'Tasks Progress',
     'otb_overdue'               => "Overdue — scheduled :time",
     'otb_view_details'          => 'View visit details →',
+
+    // Search page
+    'search_results_title'      => 'Search Results',
+    'search_results_for'        => 'Showing results for ":query"',
+    'search_no_accounts_title'  => 'No accounts found',
+    'search_no_accounts_desc'   => 'We couldn\'t find any users matching ":query".',
 
 ];

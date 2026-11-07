@@ -56,6 +56,8 @@ Route::get('/', function () {
     return view('welcome', compact('topSitters'));
 });
 
+Route::get('/search', [App\Http\Controllers\Owner\PublicProfileController::class, 'search'])->name('search');
+
 /*
 |--------------------------------------------------------------------------
 | AUTHENTICATED ROUTES (Shared: Admin, Owner, Sitter)

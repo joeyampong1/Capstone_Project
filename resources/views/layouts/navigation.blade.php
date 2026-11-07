@@ -333,6 +333,98 @@
                         <!-- ========================================== -->
                         <div class="flex items-center gap-2 sm:gap-3">
 
+                            <!-- ✅ SEARCH BAR (Expandable Icon with Live Search) -->
+                            <div class="relative flex items-center" x-data="{
+                                searchQuery: '',
+                                searchResults: [],
+                                isSearching: false,
+                                async fetchResults() {
+                                    if (this.searchQuery.length < 2) {
+                                        this.searchResults = [];
+                                        return;
+                                    }
+                                    this.isSearching = true;
+                                    try {
+                                        let response = await fetch(`{{ route('search') }}?q=${this.searchQuery}`, {
+                                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                                        });
+                                        let data = await response.json();
+                                        this.searchResults = data;
+                                    } catch (e) {
+                                        console.error(e);
+                                    } finally {
+                                        this.isSearching = false;
+                                    }
+                                }
+                            }" @click.away="searchOpen = false; searchResults = []; searchQuery = '';">
+
+                                <form action="{{ route('search') }}" method="GET"
+                                      class="flex items-center bg-neutral-50 dark:bg-neutral-800 border border-transparent focus-within:border-primary focus-within:bg-white dark:focus-within:bg-neutral-900 rounded-xl transition-all duration-300 overflow-hidden"
+                                      :class="searchOpen ? 'w-48 sm:w-64 px-2' : 'w-9 px-0 bg-transparent dark:bg-transparent border-transparent'">
+
+                                    <!-- Search Icon Button -->
+                                    <button type="button" @click="searchOpen = !searchOpen; if(searchOpen) { $nextTick(() => $refs.searchInput.focus()) }"
+                                            class="p-1.5 text-neutral-500 hover:text-primary shrink-0 transition">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Input Field -->
+                                    <input type="text" name="q" x-show="searchOpen" x-cloak
+                                           x-ref="searchInput"
+                                           x-model="searchQuery"
+                                           @input.debounce.300ms="fetchResults()"
+                                           placeholder="{{ __('messages.nav_search_accounts') }}"
+                                           class="w-full min-w-0 bg-transparent border-none text-sm focus:ring-0 px-1 py-1.5 outline-none text-neutral-700 dark:text-neutral-200 placeholder-neutral-400">
+                                </form>
+
+                                <!-- ✅ DROPDOWN MODAL -->
+                                <div x-show="searchOpen && searchQuery.length >= 2" x-cloak
+                                     class="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-100 dark:border-neutral-800 z-50 overflow-hidden flex flex-col">
+
+                                    <div class="p-2 border-b border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+                                        <span class="text-xs font-bold text-neutral-500 uppercase tracking-wider">{{ __('messages.nav_search_results') }}</span>
+                                    </div>
+
+                                    <!-- Scrollable list -->
+                                    <div class="max-h-80 overflow-y-auto">
+                                        <!-- Loading state -->
+                                        <div x-show="isSearching" class="p-4 text-center text-sm text-neutral-500">
+                                            {{ __('messages.nav_searching') }}
+                                        </div>
+
+                                        <!-- No results state -->
+                                        <div x-show="!isSearching && searchResults.length === 0" class="p-4 text-center text-sm text-neutral-500">
+                                            {{ __('messages.nav_no_accounts') }} "<span x-text="searchQuery"></span>"
+                                        </div>
+
+                                        <!-- Results -->
+                                        <template x-for="user in searchResults" :key="user.id">
+                                            <a :href="user.url" class="flex items-center gap-3 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition border-b border-gray-50 dark:border-neutral-800/50 last:border-0">
+                                                <img :src="user.photo" class="w-10 h-10 rounded-full object-cover shrink-0">
+                                                <div class="min-w-0">
+                                                    <p class="text-sm font-bold text-[#1B3B36] dark:text-white truncate" x-text="user.name"></p>
+                                                    <p class="text-xs text-neutral-500 flex items-center gap-1">
+                                                        <span x-text="user.is_sitter ? '{{ __('messages.role_sitter') }}' : '{{ __('messages.role_owner') }}'"></span>
+                                                        <template x-if="user.visibility === 'private'">
+                                                            <span class="inline-flex items-center text-amber-600 gap-1">
+                                                                • <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> {{ __('messages.vis_private') }}
+                                                            </span>
+                                                        </template>
+                                                    </p>
+                                                </div>
+                                            </a>
+                                        </template>
+                                    </div>
+
+                                    <!-- View all results footer -->
+                                    <div class="p-2 border-t border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50 text-center">
+                                        <a :href="'{{ route('search') }}?q=' + searchQuery" class="text-xs font-bold text-primary hover:underline">{{ __('messages.nav_view_all_results') }}</a>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- User Profile Dropdown -->
                             <div x-data="{ profileOpen: false }" class="relative flex items-center">
                                 <button @click="profileOpen = !profileOpen"

@@ -281,22 +281,36 @@ class SitterVerificationController extends Controller
             ? $profile->certificates_path
             : [$profile->certificates_path];
 
-        // Filter existing files
-        $existingPaths = array_values(array_filter($paths, function ($path) {
-            return $path && Storage::disk('public')->exists($path);
-        }));
+        // Remove empty values
+        $paths = array_values(array_filter($paths));
 
-        if (empty($existingPaths)) {
-            return back()->with('error', 'File not found on storage.');
+        if (empty($paths)) {
+            return back()->with('error', 'File not found.');
         }
 
         // Single file — download directly
-        if (count($existingPaths) === 1) {
-            $path = $existingPaths[0];
-            $ext = pathinfo($path, PATHINFO_EXTENSION);
-            $downloadName = 'sitter_' . $user->id . '_certificate.' . $ext;
+        if (count($paths) === 1) {
+            $path = $paths[0];
 
-            return Storage::disk('public')->download($path, $downloadName);
+            // ✅ Check if Cloudinary URL
+            if (str_starts_with($path, 'http')) {
+                $content = @file_get_contents($path);
+                if ($content === false) {
+                    return back()->with('error', 'Failed to download file from Cloudinary.');
+                }
+
+                $ext = pathinfo(parse_url($path, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                return response($content, 200)
+                    ->header('Content-Type', 'application/octet-stream')
+                    ->header('Content-Disposition', 'attachment; filename="sitter_' . $user->id . '_certificate.' . $ext . '"');
+            }
+            // ✅ Local storage fallback
+            elseif (Storage::disk('public')->exists($path)) {
+                $ext = pathinfo($path, PATHINFO_EXTENSION);
+                return Storage::disk('public')->download($path, 'sitter_' . $user->id . '_certificate.' . $ext);
+            }
+
+            return back()->with('error', 'File not found on storage or Cloudinary.');
         }
 
         // Multiple files — create ZIP
@@ -311,10 +325,22 @@ class SitterVerificationController extends Controller
 
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
-            foreach ($existingPaths as $index => $path) {
-                $fullPath = Storage::disk('public')->path($path);
-                $ext = pathinfo($path, PATHINFO_EXTENSION);
-                $zip->addFile($fullPath, 'certificate_' . ($index + 1) . '.' . $ext);
+            foreach ($paths as $index => $path) {
+                $fileName = 'certificate_' . ($index + 1);
+
+                // ✅ Check if Cloudinary URL
+                if (str_starts_with($path, 'http')) {
+                    $content = @file_get_contents($path);
+                    if ($content !== false) {
+                        $ext = pathinfo(parse_url($path, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                        $zip->addFromString($fileName . '.' . $ext, $content);
+                    }
+                }
+                // ✅ Local storage fallback
+                elseif (Storage::disk('public')->exists($path)) {
+                    $ext = pathinfo($path, PATHINFO_EXTENSION);
+                    $zip->addFromString($fileName . '.' . $ext, Storage::disk('public')->get($path));
+                }
             }
             $zip->close();
         }

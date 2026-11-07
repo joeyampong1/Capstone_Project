@@ -925,6 +925,13 @@ return [
     'nav_time_2d'                    => '2 araw ang nakalipas',
     'nav_recent'                     => 'kamakailan',
     'nav_no_notifications'           => 'Walang bagong notification.',
+    // Search Bar Translations
+    'nav_search_accounts'   => 'Maghanap ng account...',
+    'nav_search_results'    => 'Mga Resulta ng Paghahanap',
+    'nav_searching'         => 'Naghahanap...',
+    'nav_no_accounts'       => 'Walang nahanap na account para sa',
+    'nav_view_all_results'  => 'Tingnan lahat ng resulta',
+    'vis_private'           => 'Pribado',
     // ========================================== //
     // SIDEBAR                                     //
     // ========================================== //
@@ -1763,6 +1770,10 @@ return [
     'pf_delete_confirm_desc'   => 'Hindi na maibabalik ang aksyon na ito. Ilagay ang iyong password upang kumpirmahin.',
     'pf_password'              => 'Password',
     'pf_cancel'                => 'Kanselahin',
+    'pf_cover_alt'     => 'Cover ni :name',
+    'pf_private_title' => 'Pribado ang account na ito',
+    'pf_private_desc'  => 'Pinili ni :name na panatilihing pribado ang kanyang mga detalye. Mga dating kliyente lamang ang maaaring makakita ng kanyang buong detalye, bio, at impormasyon sa pakikipag-ugnayan.',
+
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -2252,5 +2263,11 @@ return [
     'pf_gender' => 'Kasarian',
     'pf_contact_number' => 'Numero ng Telepono',
     'pf_address' => 'Tirahan',
+
+    // Search page
+    'search_results_title'      => 'Mga Resulta ng Paghahanap',
+    'search_results_for'        => 'Ipinapakita ang mga resulta para sa ":query"',
+    'search_no_accounts_title'  => 'Walang nahanap na account',
+    'search_no_accounts_desc'   => 'Wala kaming mahanap na user na tumutugma sa ":query".',
 
     ];
