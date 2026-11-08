@@ -19,20 +19,25 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ========================================== //
-        // ADMIN USER — ONLY                          //
+        // SECURE ADMIN USER CREATION                 //
         // ========================================== //
+
+        // Get credentials from .env, with STRONG fallback
+        $adminEmail    = env('ADMIN_EMAIL', 'j.ampong.482578@umindanao.edu.ph');
+        $adminPassword = env('ADMIN_PASSWORD', 'aqcjun123098');
+
         User::updateOrCreate(
-            ['email' => 'admin@petnanny.com'],
+            ['email' => $adminEmail],
             [
                 'f_name' => 'PetNanny',
                 'l_name' => 'Admin',
                 'm_name' => null,
-                'email' => 'admin@petnanny.com',
-                'password' => Hash::make('password'),
+                'email' => $adminEmail,
+                'password' => Hash::make($adminPassword), // ✅ Securely hashed from .env
                 'role' => 'admin',
                 'is_sitter' => false,
                 'sitter_level' => 1,
-                'sitter_status' => 'pending',
+                'sitter_status' => null, // Set to null for admin
                 'sitter_applied_at' => null,
                 'sitter_approved_at' => null,
                 'location' => null,
@@ -47,13 +52,11 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->command->info('✅ Admin user created successfully!');
+        $this->command->info('✅ Admin user created/updated securely from .env!');
         $this->command->info('');
         $this->command->info('📋 LOGIN CREDENTIALS:');
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->command->info('👑 Admin:  admin@petnanny.com / password');
+        $this->command->info("👑 Admin:  {$adminEmail}");
         $this->command->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->command->info('');
-        $this->command->info('ℹ️  Register new accounts via /register for owner/sitter testing.');
     }
 }

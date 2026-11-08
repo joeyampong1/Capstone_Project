@@ -2448,4 +2448,25 @@ return [
     'pay_btn_confirm'     => 'Confirm Payment Received',
     'pay_sitter_confirmed'=> 'You confirmed receipt of payment.',
     'pay_waiting_owner'   => 'Waiting for owner to pay.',
+
+    // Location
+    'std_location_title'    => 'Service Location',
+    'std_get_directions'    => 'Get Directions',
+    'std_address_not_set'   => 'Address not provided.',
+    'std_coords_not_set'    => 'Location coordinates not set by owner.',
+    'std_pet_location'      => "Pet's Location",
+
+    // Late Deduction (Issue #29)
+    'std_late_penalty_title' => 'Late Check-in Penalty Applied',
+    'std_late_penalty_desc'  => 'You checked in :min minutes late. A :pct% deduction was applied to this specific visit\'s earnings.',
+    'std_base_earnings'      => 'Base Earnings (This Visit):',
+    'std_deduction_amount'   => 'Deduction (:pct%):',
+    'std_final_earnings'     => 'Final Visit Earnings:',
+
+    // Booking Card Status
+    'bc_expired' => 'Expired',
+    'bc_pet_fallback' => 'Pet',
+    'bc_per_visit'    => 'per visit',
+    'bc_total_label'  => 'Total:',
+
 ];

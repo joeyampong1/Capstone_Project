@@ -2641,4 +2641,25 @@ return [
     'pay_btn_confirm'     => 'Confirmar Pago Recibido',
     'pay_sitter_confirmed'=> 'Ha confirmado la recepción del pago.',
     'pay_waiting_owner'   => 'Esperando que el dueño pague.',
+
+    // Location
+    'std_location_title'    => 'Ubicación del Servicio',
+    'std_get_directions'    => 'Obtener Direcciones',
+    'std_address_not_set'   => 'Dirección no proporcionada.',
+    'std_coords_not_set'    => 'El propietario no ha establecido las coordenadas de ubicación.',
+    'std_pet_location'      => 'Ubicación de la Mascota',
+
+    // Late Deduction (Issue #29)
+    'std_late_penalty_title' => 'Penalización por Registro Tardío Aplicada',
+    'std_late_penalty_desc'  => 'Te registraste :min minutos tarde. Se aplicó una deducción del :pct% a las ganancias de esta visita específica.',
+    'std_base_earnings'      => 'Ganancias Base (Esta Visita):',
+    'std_deduction_amount'   => 'Deducción (:pct%):',
+    'std_final_earnings'     => 'Ganancias Finales de la Visita:',
+
+    // Booking Card Status
+    'bc_expired' => 'Expirado',
+    'bc_pet_fallback' => 'Mascota',
+    'bc_per_visit'    => 'por visita',
+    'bc_total_label'  => 'Total:',
 ];
+

@@ -107,18 +107,26 @@
 
         {{-- SITTER view: Accept / Decline --}}
         @if(!$isOwnerView && $booking->status === 'pending')
-            <form method="POST" action="{{ route('bookings.accept', $booking->id) }}" class="inline">
-                @csrf
-                <button type="submit"
-                        class="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold bg-green-500 hover:bg-green-600 text-white rounded-lg transition">
-                    {{ __('messages.bc_accept') }}
-                </button>
-            </form>
+            @if(now()->gte($booking->start_date))
+                {{-- ✅ FIX ISSUE #30: Expired badge instead of buttons --}}
+                <span class="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 rounded-lg border border-neutral-200 dark:border-neutral-700 inline-flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    {{ __('messages.bc_expired') }}
+                </span>
+            @else
+                <form method="POST" action="{{ route('bookings.accept', $booking->id) }}" class="inline">
+                    @csrf
+                    <button type="submit"
+                            class="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold bg-green-500 hover:bg-green-600 text-white rounded-lg transition">
+                        {{ __('messages.bc_accept') }}
+                    </button>
+                </form>
 
-            <button type="button" @click="rejectOpen = true"
-                    class="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition">
-                {{ __('messages.bc_decline') }}
-            </button>
+                <button type="button" @click="rejectOpen = true"
+                        class="px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-bold border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition">
+                    {{ __('messages.bc_decline') }}
+                </button>
+            @endif
         @endif
 
         {{-- SITTER view: Mark Complete --}}
@@ -134,6 +142,18 @@
 
         {{-- OWNER view: Cancel button --}}
         @if($isOwnerView && in_array($booking->status, ['pending', 'accepted']))
+            <button type="button"
+                    @click="$dispatch('open-cancel-modal', {
+                        bookingId: {{ $booking->id }},
+                        bookingRef: '{{ $booking->booking_reference }}'
+                    })"
+                    class="text-xs text-red-500 font-semibold hover:underline">
+                {{ __('messages.bc_cancel') }}
+            </button>
+        @endif
+
+        {{-- ✅ FIX ISSUE #30: SITTER Cancel button (Main Row) --}}
+        @if(!$isOwnerView && in_array($booking->status, ['pending', 'accepted']))
             <button type="button"
                     @click="$dispatch('open-cancel-modal', {
                         bookingId: {{ $booking->id }},
@@ -194,6 +214,18 @@
                 @endif
 
                 @if($isOwnerView && in_array($booking->status, ['pending', 'accepted']))
+                    <button type="button"
+                            @click="menuOpen = false; $dispatch('open-cancel-modal', {
+                                bookingId: {{ $booking->id }},
+                                bookingRef: '{{ $booking->booking_reference }}'
+                            })"
+                            class="block w-full text-left px-3 py-2 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30">
+                        {{ __('messages.bc_cancel_booking') }}
+                    </button>
+                @endif
+
+                {{-- ✅ FIX ISSUE #30: SITTER Cancel in Dropdown --}}
+                @if(!$isOwnerView && in_array($booking->status, ['pending', 'accepted']))
                     <button type="button"
                             @click="menuOpen = false; $dispatch('open-cancel-modal', {
                                 bookingId: {{ $booking->id }},

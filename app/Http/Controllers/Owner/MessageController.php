@@ -74,6 +74,18 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
+        // ✅ FIX ISSUE #26: Check if reply_to_id belongs to THIS conversation
+        if ($request->filled('reply_to_id')) {
+            $replyMessage = ChatMessage::find($request->reply_to_id);
+
+            if (!$replyMessage || $replyMessage->room_id !== $roomId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid reply target. Message does not belong to this conversation.'
+                ], 403);
+            }
+        }
+
         $messageText = trim((string) $request->input('message', ''));
         $attachmentPath = null;
         $attachmentPublicId = null;
@@ -220,6 +232,18 @@ class MessageController extends Controller
         $currentUser = Auth::user();
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
+
+        // ✅ FIX ISSUE #26: Ensure the message being reacted to actually belongs to this room
+        $messageExistsInRoom = ChatMessage::where('id', $request->message_id)
+            ->where('room_id', $roomId)
+            ->exists();
+
+        if (!$messageExistsInRoom) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized to react to this message.'
+            ], 403);
+        }
 
         $existing = MessageReaction::where('message_id', $request->message_id)
             ->where('user_id', $currentUser->id)

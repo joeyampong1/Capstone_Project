@@ -148,4 +148,39 @@ class Visit extends Model
             return null;
         }, $this->all_photos)));
     }
+
+    // ==========================================
+    // ACCESSOR — Late Deduction & Earnings (Issue #29)
+    // ==========================================
+
+    /**
+     * Calculate the specific deduction amount for this visit.
+     */
+    public function getDeductionAmountAttribute(): float
+    {
+        // Check if there's a booking and if the percentage is greater than 0
+        if (!$this->booking || (float) $this->late_deduction_percentage <= 0) {
+            return 0.00;
+        }
+
+        // Base earnings per visit
+        $perVisitEarnings = $this->booking->total_amount / max(1, $this->booking->total_visits);
+
+        // Calculate deduction (cast to float to prevent type errors)
+        return (float) $perVisitEarnings * ((float) $this->late_deduction_percentage / 100);
+    }
+
+    /**
+     * Calculate the final earnings for this specific visit (Base - Deduction).
+     */
+    public function getEarningsAttribute(): float
+    {
+        if (!$this->booking) {
+            return 0.00;
+        }
+
+        $perVisitEarnings = $this->booking->total_amount / max(1, $this->booking->total_visits);
+
+        return (float) $perVisitEarnings - $this->deduction_amount;
+    }
 }

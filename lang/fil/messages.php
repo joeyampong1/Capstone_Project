@@ -2295,4 +2295,24 @@ return [
     'pay_sitter_confirmed'=> 'Kinumpirma mo ang pagtanggap ng bayad.',
     'pay_waiting_owner'   => 'Naghihintay na magbayad ang owner.',
 
+    // Location
+    'std_location_title'    => 'Lokasyon ng Serbisyo',
+    'std_get_directions'    => 'Kumuha ng Direksyon',
+    'std_address_not_set'   => 'Walang ibinigay na address.',
+    'std_coords_not_set'    => 'Hindi naka-set ng may-ari ang mga coordinate ng lokasyon.',
+    'std_pet_location'      => 'Lokasyon ng Alaga',
+
+    // Late Deduction (Issue #29)
+    'std_late_penalty_title' => 'Nag-apply ng Parusa sa Pagkahuli ng Check-in',
+    'std_late_penalty_desc'  => 'Naka-check in ka ng :min minuto na huli. Nag-apply ng :pct% na bawas sa kikitain ng partikular na pagbisitang ito.',
+    'std_base_earnings'      => 'Pangunahing Kita (Bawat Pagbisita):',
+    'std_deduction_amount'   => 'Bawas (:pct%):',
+    'std_final_earnings'     => 'Huling Kita sa Pagbisita:',
+
+    // Booking Card Status
+    'bc_expired' => 'Lapas na',
+    'bc_pet_fallback' => 'Alaga',
+    'bc_per_visit'    => 'bawat bisita',
+    'bc_total_label'  => 'Kabuuan:',
+
     ];

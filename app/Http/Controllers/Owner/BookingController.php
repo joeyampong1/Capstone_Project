@@ -110,6 +110,7 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+
         $validated = $request->validate([
             'sitter_id'        => 'required|exists:users,id',
             'pet_id'           => 'required|exists:pets,id',
@@ -124,6 +125,16 @@ class BookingController extends Controller
             'tasks.*'          => 'string|max:255',
             'instructions'     => 'nullable|string|max:2000',
         ]);
+
+        // ✅ FIX ISSUE #27: Limit booking duration to a maximum of 90 days
+        $startDate = \Carbon\Carbon::parse($validated['start_date']);
+        $endDate   = \Carbon\Carbon::parse($validated['end_date']);
+
+        if ($startDate->diffInDays($endDate) > 90) {
+            return back()
+                ->withErrors(['end_date' => 'The booking duration cannot exceed 90 days.'])
+                ->withInput();
+        }
 
         // Validate: count sa schedule_times dapat equal sa visit_per_day
         if (count($validated['schedule_times']) !== (int) $validated['visit_per_day']) {
@@ -160,23 +171,57 @@ class BookingController extends Controller
         }
 
         // ==========================================
-        // CHECK: Overlap sa existing accepted bookings
+        // ✅ FIX ISSUE #28: Check Sitter Availability & Time Overlap
         // ==========================================
-        $overlap = Booking::where('sitter_id', $sitter->id)
-            ->where('status', 'accepted')
-            ->where(function ($q) use ($validated) {
-                $q->whereBetween('start_date', [$validated['start_date'], $validated['end_date']])
-                  ->orWhereBetween('end_date', [$validated['start_date'], $validated['end_date']])
-                  ->orWhere(function ($q2) use ($validated) {
-                      $q2->where('start_date', '<=', $validated['start_date'])
-                         ->where('end_date', '>=', $validated['end_date']);
-                  });
-            })
+
+        // 1. Check if the sitter has marked themselves as unavailable on these dates
+        $hasUnavailableDates = \App\Models\Availability::where('sitter_id', $sitter->id)
+            ->where('is_available', 0)
+            ->whereBetween('date', [$validated['start_date'], $validated['end_date']])
             ->exists();
 
-        if ($overlap) {
+        if ($hasUnavailableDates) {
             return back()
-                ->withErrors(['start_date' => 'This sitter already has a confirmed booking on the selected date(s). Please choose different dates.'])
+                ->withErrors(['start_date' => 'The sitter is not available on the selected date(s). Please choose different dates.'])
+                ->withInput();
+        }
+
+        // 2. Check for exact Time Overlaps
+        $existingBookings = Booking::where('sitter_id', $sitter->id)
+            ->where('status', 'accepted')
+            ->where(function ($q) use ($validated) {
+                // Check if the date ranges overlap first
+                $q->where('start_date', '<=', $validated['end_date'])
+                  ->where('end_date', '>=', $validated['start_date']);
+            })
+            ->get();
+
+        $hasTimeConflict = false;
+        $newTimes = $validated['schedule_times'];
+
+        foreach ($existingBookings as $existing) {
+            $existingTimes = $existing->schedule_times ?? [];
+
+            foreach ($newTimes as $newTime) {
+                $newTimeStart = Carbon::parse($newTime);
+                $newTimeEnd = $newTimeStart->copy()->addHour(); // Assuming 1-hour duration per visit
+
+                foreach ($existingTimes as $exTime) {
+                    $exTimeStart = Carbon::parse($exTime);
+                    $exTimeEnd = $exTimeStart->copy()->addHour();
+
+                    // ✅ STRICT OVERLAP: 9-10 and 10-11 will NOT overlap
+                    if ($newTimeStart->lt($exTimeEnd) && $newTimeEnd->gt($exTimeStart)) {
+                        $hasTimeConflict = true;
+                        break 3; // Break out of all loops
+                    }
+                }
+            }
+        }
+
+        if ($hasTimeConflict) {
+            return back()
+                ->withErrors(['start_date' => 'This sitter already has a confirmed booking at this exact time. Please choose a different schedule.'])
                 ->withInput();
         }
 
@@ -261,6 +306,14 @@ class BookingController extends Controller
     public function accept(Booking $booking)
     {
         abort_if($booking->sitter_id !== Auth::id(), 403, 'Only the assigned sitter can accept this booking.');
+
+        // ✅ FIX ISSUE #30: Prevent accepting expired bookings
+        abort_if(
+            now()->gte($booking->start_date),
+            400,
+            'This booking can no longer be accepted because the start date has already passed.'
+        );
+
         abort_if(!$booking->isPending(), 400, 'Only pending bookings can be accepted.');
 
         abort_if(
@@ -287,15 +340,24 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            $booking->update(['status' => 'accepted']);
+            // ✅ FIX ISSUE #30: Lock the row to prevent double click (Race Condition)
+            $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->first();
+
+            // Double-check status AFTER locking
+            if ($lockedBooking->status !== 'pending') {
+                DB::rollBack();
+                return back()->with('error', 'This booking has already been processed by another request.');
+            }
+
+            $lockedBooking->update(['status' => 'accepted']);
 
             // Auto-generate visit records
-            $this->generateVisits($booking);
+            $this->generateVisits($lockedBooking);
 
             NotificationService::bookingConfirmed(
                 sitter:  Auth::user(),
-                owner:   $booking->owner,
-                booking: $booking
+                owner:   $lockedBooking->owner,
+                booking: $lockedBooking
             );
 
             DB::commit();
@@ -339,46 +401,54 @@ class BookingController extends Controller
 
     public function cancel(Request $request, Booking $booking)
     {
-        abort_if($booking->owner_id !== Auth::id(), 403, 'Only the owner can cancel this booking.');
+        $user = Auth::user();
+        $isOwner = $booking->owner_id === $user->id;
+        $isSitter = $booking->sitter_id === $user->id;
+
+        // ✅ FIX ISSUE #30: Allow both Owner and Sitter to cancel
+        abort_if(!$isOwner && !$isSitter, 403, 'Only the assigned owner or sitter can cancel this booking.');
+
         abort_if($booking->isCancelled(), 400, 'Booking is already cancelled.');
         abort_if($booking->isCompleted(), 400, 'Completed bookings cannot be cancelled.');
+        abort_if($booking->status === 'rejected', 400, 'This booking has already been rejected.');
 
-        abort_if(
-            $booking->status === 'rejected',
-            400,
-            'This booking has already been rejected — it can no longer be cancelled.'
-        );
+        // Owner rule: Cannot cancel if less than 24 hours before start
+        if ($isOwner) {
+            abort_if(
+                now()->addDay()->gte($booking->start_date),
+                400,
+                'This booking can no longer be cancelled — less than 24 hours remain before the start date.'
+            );
+        }
 
-        abort_if(
-            now()->addDay()->gte($booking->start_date),
-            400,
-            'This booking can no longer be cancelled — less than 24 hours remain before the start date.'
-        );
-
-        $reason = $request->input('reason', 'Cancelled by owner.');
+        $reason = $request->input('reason', 'Cancelled by ' . ($isOwner ? 'owner' : 'sitter') . '.');
+        $cancelledBy = $isOwner ? 'owner' : 'sitter';
 
         DB::beginTransaction();
         try {
             $booking->update([
                 'status'              => 'cancelled',
                 'cancellation_reason' => $reason,
-                'cancelled_by'        => 'owner',
+                'cancelled_by'        => $cancelledBy,
             ]);
 
-            // Delete pending visits since the booking is cancelled
+            // Delete pending visits
             $booking->visits()
                 ->where('status', 'pending')
                 ->delete();
 
+            // Notify the other party
+            $recipient = $isOwner ? $booking->sitter : $booking->owner;
+
             NotificationService::bookingCancelled(
-                canceller: Auth::user(),
-                recipient: $booking->sitter,
+                canceller: $user,
+                recipient: $recipient,
                 booking:   $booking
             );
 
             DB::commit();
 
-            return back()->with('status', 'Booking cancelled. The sitter has been notified.');
+            return back()->with('status', 'Booking cancelled successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Failed to cancel: ' . $e->getMessage());
@@ -432,6 +502,15 @@ class BookingController extends Controller
      */
     protected function generateVisits(Booking $booking): void
     {
+        // ✅ FIX ISSUE #27: Safety check to prevent memory exhaustion
+        // Calculate total days based on start and end date
+        $daysCount = \Carbon\Carbon::parse($booking->start_date)->diffInDays(\Carbon\Carbon::parse($booking->end_date));
+
+        // If duration exceeds 90 days, abort immediately
+        if ($daysCount > 90) {
+            throw new \Exception('Cannot generate visits: Booking duration exceeds the maximum limit of 90 days.');
+        }
+
         // Skip if there are already existing visits (to prevent duplicates)
         if ($booking->visits()->exists()) {
             return;

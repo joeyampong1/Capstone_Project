@@ -104,11 +104,33 @@
                     </div>
                 </div>
 
-                @if($visit->lateness_minutes > 0)
-                    <div class="mt-4 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                        <p class="text-xs text-amber-700 dark:text-amber-400">
-                            {!! __('messages.std_late_msg', ['min' => $visit->lateness_minutes, 'pct' => $visit->late_deduction_percentage]) !!}
-                        </p>
+                @if((float) $visit->late_deduction_percentage > 0)
+                    <div class="mt-4 p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0">
+                                ⚠️
+                            </div>
+                            <div class="w-full">
+                                <p class="font-bold text-red-800 dark:text-red-400">{{ __('messages.std_late_penalty_title') }}</p>
+                                <p class="text-sm text-red-600 dark:text-red-300 mt-1">
+                                    {{ __('messages.std_late_penalty_desc', ['min' => $visit->lateness_minutes, 'pct' => (float) $visit->late_deduction_percentage]) }}
+                                </p>
+                                <div class="mt-3 pt-3 border-t border-red-200 dark:border-red-800/50 space-y-1 text-sm">
+                                    <div class="flex justify-between text-red-700 dark:text-red-300">
+                                        <span>{{ __('messages.std_base_earnings') }}</span>
+                                        <span>₱{{ number_format($visit->booking->total_amount / max(1, $visit->booking->total_visits), 2) }}</span>
+                                    </div>
+                                    <div class="flex justify-between text-red-700 dark:text-red-300 font-bold">
+                                        <span>{{ __('messages.std_deduction_amount', ['pct' => (float) $visit->late_deduction_percentage]) }}</span>
+                                        <span>-₱{{ number_format($visit->deduction_amount, 2) }}</span>
+                                    </div>
+                                    <div class="flex justify-between text-red-900 dark:text-red-100 font-black mt-1 pt-1 border-t border-red-200/50 dark:border-red-800/50">
+                                        <span>{{ __('messages.std_final_earnings') }}</span>
+                                        <span>₱{{ number_format($visit->earnings, 2) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 @endif
 
@@ -140,7 +162,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            Get Directions
+                            {{ __('messages.std_get_directions') }}
                         </a>
                     @endif
                 </div>
@@ -153,7 +175,7 @@
                         <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                         </svg>
-                        <span>{{ $owner->address ?? $owner->location ?? 'Address not provided.' }}</span>
+                        <span>{{ $owner->address ?? $owner->location ?? __('messages.std_address_not_set') }}</span>
                     </div>
 
                     @push('scripts')
@@ -181,7 +203,7 @@
                                 return;
                             }
 
-                            var address = @json($owner->address ?? $owner->location ?? 'Pet Location');
+                            var address = @json($owner->address ?? $owner->location ?? __('messages.std_pet_location'));
 
                             try {
                                 // Initialize map
@@ -198,7 +220,7 @@
 
                                 // Add marker
                                 var marker = L.marker([lat, lng]).addTo(map);
-                                marker.bindPopup("<b>Pet's Location</b><br>" + address).openPopup();
+                                marker.bindPopup("<b>{{ __('messages.std_pet_location') }}</b><br>" + address).openPopup();
 
                                 // FIX: Force Leaflet to recalculate size (crucial for Alpine/Tailwind layouts)
                                 setTimeout(function() {
@@ -220,7 +242,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            <p class="text-sm font-medium">Location coordinates not set by owner.</p>
+                            <p class="text-sm font-medium">{{ __('messages.std_coords_not_set') }}</p>
                         </div>
                     @endif
                 </div>

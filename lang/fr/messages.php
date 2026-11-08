@@ -2445,4 +2445,24 @@ return [
     'pay_btn_confirm'     => 'Confirmer le Paiement Reçu',
     'pay_sitter_confirmed'=> 'Vous avez confirmé la réception du paiement.',
     'pay_waiting_owner'   => 'En attente du paiement du propriétaire.',
+
+    // Location
+    'std_location_title'    => 'Lieu de Prestation',
+    'std_get_directions'    => 'Obtenir l\'Itinéraire',
+    'std_address_not_set'   => 'Adresse non fournie.',
+    'std_coords_not_set'    => 'Les coordonnées de localisation ne sont pas définies par le propriétaire.',
+    'std_pet_location'      => 'Emplacement de l\'Animal',
+
+    // Late Deduction (Issue #29)
+    'std_late_penalty_title' => 'Pénalité de Pointage Tardif Appliquée',
+    'std_late_penalty_desc'  => 'Vous avez pointé :min minutes en retard. Une déduction de :pct% a été appliquée aux gains de cette visite spécifique.',
+    'std_base_earnings'      => 'Gains de Base (Cette Visite) :',
+    'std_deduction_amount'   => 'Déduction (:pct%) :',
+    'std_final_earnings'     => 'Gains Finaux de la Visite :',
+
+    // Booking Card Status
+    'bc_expired' => 'Expiré',
+    'bc_pet_fallback' => 'Animal',
+    'bc_per_visit'    => 'par visite',
+    'bc_total_label'  => 'Total :',
 ];
