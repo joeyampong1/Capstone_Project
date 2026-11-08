@@ -2661,5 +2661,8 @@ return [
     'bc_pet_fallback' => 'Mascota',
     'bc_per_visit'    => 'por visita',
     'bc_total_label'  => 'Total:',
+
+    'bc_cancel' => 'Cancelar',
+    'db_error_friendly' => '¡Vaya! Algo salió mal por nuestra parte. Por favor, inténtalo de nuevo más tarde.',
 ];
 

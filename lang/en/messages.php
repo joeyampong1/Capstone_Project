@@ -2469,4 +2469,7 @@ return [
     'bc_per_visit'    => 'per visit',
     'bc_total_label'  => 'Total:',
 
+    // db error fallback message
+    'db_error_friendly' => 'Oops! Something went wrong on our end. Please try again later.'
+
 ];

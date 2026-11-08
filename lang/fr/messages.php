@@ -2465,4 +2465,8 @@ return [
     'bc_pet_fallback' => 'Animal',
     'bc_per_visit'    => 'par visite',
     'bc_total_label'  => 'Total :',
+
+    'bc_cancel' => 'Annuler',
+    'db_error_friendly' => 'Oups ! Une erreur s\'est produite de notre côté. Veuillez réessayer plus tard.',
+
 ];

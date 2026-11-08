@@ -15,6 +15,7 @@ use App\Services\NotificationService;
 use App\Services\PresenceService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MessageController extends Controller
 {
@@ -40,17 +41,14 @@ class MessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        ChatMessage::where('room_id', $roomId)
-            ->where('receiver_id', $currentUser->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true, 'read_at' => now()]);
-
-        // // ✅ Firebase: mark as read in Firestore too
-        // $this->firestore->markMessagesRead($roomId, $currentUser->id);
-
-        // // ✅ Firebase: get other user's presence
-        // $otherUserPresence = $this->presence->getUserPresence($otherUser->id);
-        // $isOtherUserOnline = $this->presence->isOnline($otherUserPresence);
+        try {
+            ChatMessage::where('room_id', $roomId)
+                ->where('receiver_id', $currentUser->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now()]);
+        } catch (\Exception $e) {
+            Log::error('Chat Mark Read Error: ' . $e->getMessage());
+        }
 
         $messagesJson = $this->formatMessages($messages, $currentUser);
 
@@ -74,7 +72,6 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        // ✅ FIX ISSUE #26: Check if reply_to_id belongs to THIS conversation
         if ($request->filled('reply_to_id')) {
             $replyMessage = ChatMessage::find($request->reply_to_id);
 
@@ -91,9 +88,6 @@ class MessageController extends Controller
         $attachmentPublicId = null;
         $messageType = 'text';
 
-        // ============================================
-        // UPLOAD ATTACHMENT TO CLOUDINARY
-        // ============================================
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
             $extension = strtolower($file->getClientOriginalExtension());
@@ -117,7 +111,7 @@ class MessageController extends Controller
                 $attachmentPublicId = $upload['public_id'];
                 $messageType = $isImage ? 'image' : 'document';
             } else {
-                \Log::error('Chat attachment upload failed', [
+                Log::error('Chat attachment upload failed', [
                     'sender_id' => $currentUser->id,
                     'error'     => $upload['error'],
                 ]);
@@ -136,60 +130,52 @@ class MessageController extends Controller
             ], 422);
         }
 
-        $msg = ChatMessage::create([
-            'room_id' => $roomId,
-            'sender_id' => $currentUser->id,
-            'receiver_id' => $otherUser->id,
-            'message' => $messageText !== '' ? $messageText : 'Attachment',
-            'message_type' => $messageType,
-            'reply_to_id' => $request->reply_to_id,
-            'attachment_path' => $attachmentPath,
-            'attachment_public_id' => $attachmentPublicId,
-            'is_read' => false,
-        ]);
-
-        $msg->load(['replyTo.sender', 'reactions']);
-
-        $formattedMessage = $this->formatSingleMessage($msg, $currentUser);
-
-        // ✅ Firebase: push message to Firestore for real-time delivery
-        // $this->firestore->sendMessage($roomId, [
-        //     'id'              => $formattedMessage['id'],
-        //     'sender_id'       => $formattedMessage['sender_id'],
-        //     'receiver_id'     => $formattedMessage['receiver_id'],
-        //     'message'         => $formattedMessage['message'],
-        //     'message_type'    => $formattedMessage['message_type'],
-        //     'attachment_url'  => $formattedMessage['attachment_url'],
-        //     'reply_to'        => $formattedMessage['reply_to'],
-        //     'reactions'       => $formattedMessage['reactions'],
-        //     'is_read'         => false,
-        //     'created_at'      => $formattedMessage['created_at'],
-        //     'created_at_full' => $formattedMessage['created_at_full'],
-        // ]);
-
-        // ============================================
-        // INSERT NOTIFICATION
-        // ============================================
-        if ($otherUser->id !== $currentUser->id) {
-            $preview = $messageText !== ''
-                ? $messageText
-                : ($messageType === 'image' ? '📷 Sent a photo' : '📎 Sent an attachment');
-
-            NotificationService::newMessage(
-                recipient: $otherUser,
-                sender: $currentUser,
-                preview: $preview,
-            );
-        }
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $formattedMessage,
+        // ✅ FIX ISSUE #31: Try-Catch for sending message
+        try {
+            $msg = ChatMessage::create([
+                'room_id' => $roomId,
+                'sender_id' => $currentUser->id,
+                'receiver_id' => $otherUser->id,
+                'message' => $messageText !== '' ? $messageText : 'Attachment',
+                'message_type' => $messageType,
+                'reply_to_id' => $request->reply_to_id,
+                'attachment_path' => $attachmentPath,
+                'attachment_public_id' => $attachmentPublicId,
+                'is_read' => false,
             ]);
-        }
 
-        return redirect()->route('owner.messages', $id);
+            $msg->load(['replyTo.sender', 'reactions']);
+
+            $formattedMessage = $this->formatSingleMessage($msg, $currentUser);
+
+            if ($otherUser->id !== $currentUser->id) {
+                $preview = $messageText !== ''
+                    ? $messageText
+                    : ($messageType === 'image' ? '📷 Sent a photo' : '📎 Sent an attachment');
+
+                NotificationService::newMessage(
+                    recipient: $otherUser,
+                    sender: $currentUser,
+                    preview: $preview,
+                );
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $formattedMessage,
+                ]);
+            }
+
+            return redirect()->route('owner.messages', $id);
+
+        } catch (\Exception $e) {
+            Log::error('Message Store Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.db_error_friendly'),
+            ], 500);
+        }
     }
 
     public function fetch(Request $request, $id)
@@ -206,14 +192,17 @@ class MessageController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        ChatMessage::where('room_id', $roomId)
-            ->where('receiver_id', $currentUser->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true, 'read_at' => now()]);
+        try {
+            ChatMessage::where('room_id', $roomId)
+                ->where('receiver_id', $currentUser->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now()]);
 
-        // ✅ Firebase: sync read status
-        if ($newMessages->isNotEmpty()) {
-            $this->firestore->markMessagesRead($roomId, $currentUser->id);
+            if ($newMessages->isNotEmpty()) {
+                $this->firestore->markMessagesRead($roomId, $currentUser->id);
+            }
+        } catch (\Exception $e) {
+            Log::error('Message Fetch Read Error: ' . $e->getMessage());
         }
 
         return response()->json([
@@ -233,7 +222,6 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        // ✅ FIX ISSUE #26: Ensure the message being reacted to actually belongs to this room
         $messageExistsInRoom = ChatMessage::where('id', $request->message_id)
             ->where('room_id', $roomId)
             ->exists();
@@ -245,30 +233,36 @@ class MessageController extends Controller
             ], 403);
         }
 
-        $existing = MessageReaction::where('message_id', $request->message_id)
-            ->where('user_id', $currentUser->id)
-            ->first();
+        try {
+            $existing = MessageReaction::where('message_id', $request->message_id)
+                ->where('user_id', $currentUser->id)
+                ->first();
 
-        if ($existing && $existing->emoji === $request->emoji) {
-            $existing->delete();
-            // $this->syncReactionsToFirestore($roomId, $request->message_id, $currentUser);
-            return response()->json(['success' => true, 'action' => 'removed']);
+            if ($existing && $existing->emoji === $request->emoji) {
+                $existing->delete();
+                return response()->json(['success' => true, 'action' => 'removed']);
+            }
+
+            if ($existing) {
+                $existing->update(['emoji' => $request->emoji]);
+                return response()->json(['success' => true, 'action' => 'updated']);
+            }
+
+            MessageReaction::create([
+                'message_id' => $request->message_id,
+                'user_id' => $currentUser->id,
+                'emoji' => $request->emoji,
+            ]);
+
+            return response()->json(['success' => true, 'action' => 'added']);
+
+        } catch (\Exception $e) {
+            Log::error('Message React Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.db_error_friendly'),
+            ], 500);
         }
-
-        if ($existing) {
-            $existing->update(['emoji' => $request->emoji]);
-            // $this->syncReactionsToFirestore($roomId, $request->message_id, $currentUser);
-            return response()->json(['success' => true, 'action' => 'updated']);
-        }
-
-        MessageReaction::create([
-            'message_id' => $request->message_id,
-            'user_id' => $currentUser->id,
-            'emoji' => $request->emoji,
-        ]);
-
-        // $this->syncReactionsToFirestore($roomId, $request->message_id, $currentUser);
-        return response()->json(['success' => true, 'action' => 'added']);
     }
 
     public function typing(Request $request, $id)
@@ -281,7 +275,6 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        // ✅ Firebase: real typing indicator via Realtime DB
         $this->presence->setTyping($roomId, $currentUser->id, (bool) $request->is_typing);
 
         return response()->json(['status' => 'ok']);
@@ -293,15 +286,23 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        ChatMessage::where('room_id', $roomId)
-            ->where('receiver_id', $currentUser->id)
-            ->where('is_read', false)
-            ->update(['is_read' => true, 'read_at' => now()]);
+        try {
+            ChatMessage::where('room_id', $roomId)
+                ->where('receiver_id', $currentUser->id)
+                ->where('is_read', false)
+                ->update(['is_read' => true, 'read_at' => now()]);
 
-        // ✅ Firebase: sync read status
-        $this->firestore->markMessagesRead($roomId, $currentUser->id);
+            $this->firestore->markMessagesRead($roomId, $currentUser->id);
 
-        return response()->json(['success' => true, 'message' => 'Marked as read.']);
+            return response()->json(['success' => true, 'message' => 'Marked as read.']);
+
+        } catch (\Exception $e) {
+            Log::error('Message MarkAsRead Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.db_error_friendly'),
+            ], 500);
+        }
     }
 
     public function archive($id)
@@ -310,25 +311,34 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        $existing = ChatArchive::where('user_id', $currentUser->id)
-            ->where('room_id', $roomId)
-            ->first();
+        try {
+            $existing = ChatArchive::where('user_id', $currentUser->id)
+                ->where('room_id', $roomId)
+                ->first();
 
-        if ($existing) {
-            $existing->delete();
-            return response()->json(['success' => true, 'message' => 'Conversation unarchived.', 'action' => 'unarchived']);
+            if ($existing) {
+                $existing->delete();
+                return response()->json(['success' => true, 'message' => 'Conversation unarchived.', 'action' => 'unarchived']);
+            }
+
+            ChatArchive::create([
+                'user_id' => $currentUser->id,
+                'room_id' => $roomId,
+            ]);
+
+            ChatDelete::where('user_id', $currentUser->id)
+                ->where('room_id', $roomId)
+                ->delete();
+
+            return response()->json(['success' => true, 'message' => 'Conversation archived.', 'action' => 'archived']);
+
+        } catch (\Exception $e) {
+            Log::error('Message Archive Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.db_error_friendly'),
+            ], 500);
         }
-
-        ChatArchive::create([
-            'user_id' => $currentUser->id,
-            'room_id' => $roomId,
-        ]);
-
-        ChatDelete::where('user_id', $currentUser->id)
-            ->where('room_id', $roomId)
-            ->delete();
-
-        return response()->json(['success' => true, 'message' => 'Conversation archived.', 'action' => 'archived']);
     }
 
     public function deleteConversation($id)
@@ -337,15 +347,24 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        ChatDelete::updateOrCreate(
-            ['user_id' => $currentUser->id, 'room_id' => $roomId]
-        );
+        try {
+            ChatDelete::updateOrCreate(
+                ['user_id' => $currentUser->id, 'room_id' => $roomId]
+            );
 
-        ChatArchive::where('user_id', $currentUser->id)
-            ->where('room_id', $roomId)
-            ->delete();
+            ChatArchive::where('user_id', $currentUser->id)
+                ->where('room_id', $roomId)
+                ->delete();
 
-        return response()->json(['success' => true, 'message' => 'Conversation deleted.']);
+            return response()->json(['success' => true, 'message' => 'Conversation deleted.']);
+
+        } catch (\Exception $e) {
+            Log::error('Message Delete Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.db_error_friendly'),
+            ], 500);
+        }
     }
 
     public function report(Request $request, $id)
@@ -359,55 +378,42 @@ class MessageController extends Controller
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
 
-        $alreadyReported = ChatReport::where('reporter_id', $currentUser->id)
-            ->where('reported_id', $otherUser->id)
-            ->where('status', 'pending')
-            ->exists();
+        try {
+            $alreadyReported = ChatReport::where('reporter_id', $currentUser->id)
+                ->where('reported_id', $otherUser->id)
+                ->where('status', 'pending')
+                ->exists();
 
-        if ($alreadyReported) {
+            if ($alreadyReported) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already reported this user. Our team will review it shortly.',
+                ], 429);
+            }
+
+            ChatReport::create([
+                'reporter_id' => $currentUser->id,
+                'reported_id' => $otherUser->id,
+                'room_id' => $roomId,
+                'reason' => $request->reason,
+                'description' => $request->description,
+                'status' => 'pending',
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Report submitted. Thank you.']);
+
+        } catch (\Exception $e) {
+            Log::error('Message Report Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'You have already reported this user. Our team will review it shortly.',
-            ], 429);
+                'message' => __('messages.db_error_friendly'),
+            ], 500);
         }
-
-        ChatReport::create([
-            'reporter_id' => $currentUser->id,
-            'reported_id' => $otherUser->id,
-            'room_id' => $roomId,
-            'reason' => $request->reason,
-            'description' => $request->description,
-            'status' => 'pending',
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Report submitted. Thank you.']);
     }
 
     // ============================================
     // HELPER METHODS
     // ============================================
-
-    /**
-     * Sync the current reactions of a message to Firestore.
-     */
-    private function syncReactionsToFirestore(string $roomId, int $messageId, $currentUser): void
-    {
-        $message = ChatMessage::with('reactions')->find($messageId);
-
-        if (!$message) {
-            return;
-        }
-
-        $reactions = $message->reactions->groupBy('emoji')->map(function ($group, $emoji) use ($currentUser) {
-            return [
-                'emoji'        => $emoji,
-                'count'        => $group->count(),
-                'user_reacted' => $group->contains('user_id', $currentUser->id),
-            ];
-        })->values()->toArray();
-
-        $this->firestore->updateMessageReactions($roomId, $messageId, $reactions);
-    }
 
     private function formatMessages($messages, $currentUser)
     {
@@ -500,7 +506,6 @@ class MessageController extends Controller
             return $b['last_message']->created_at <=> $a['last_message']->created_at;
         });
 
-        // ✅ Firebase: get presence for all conversation partners
         $presenceMap = $this->presence->getMultipleUserPresence($otherUserIds);
 
         $onlineMap = [];

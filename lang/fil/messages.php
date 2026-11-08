@@ -2315,4 +2315,7 @@ return [
     'bc_per_visit'    => 'bawat bisita',
     'bc_total_label'  => 'Kabuuan:',
 
+    'bc_cancel' => 'Kanselahin',
+    'db_error_friendly' => 'Oops! May problema sa aming sistema. Pakisubukang muli mamaya.',
+
     ];

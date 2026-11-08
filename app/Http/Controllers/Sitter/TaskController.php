@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class TaskController extends Controller
@@ -106,25 +107,48 @@ class TaskController extends Controller
 
         $graceMinutes = 15;
         if ($now->gt($scheduled->copy()->addMinutes($graceMinutes))) {
-            $lateness = $now->diffInMinutes($scheduled);
+            // ✅ FIX ISSUE #29: Reverse order to get positive minutes, cast to int
+            $lateness = (int) $scheduled->diffInMinutes($now);
         }
 
         $deductionPercent = min($lateness * 1, 50);
 
-        $visit->update([
-            'check_in'                  => $now,
-            'status'                    => 'in_progress',
-            'lateness_minutes'          => $lateness,
-            'late_deduction_percentage' => $deductionPercent,
-        ]);
+        // ✅ FIX ISSUE #31: Try-Catch for DB updates
+        try {
+            $visit->update([
+                'check_in'                  => $now,
+                'status'                    => 'in_progress',
+                'lateness_minutes'          => $lateness,
+                'late_deduction_percentage' => $deductionPercent,
+            ]);
 
-        NotificationService::visitCheckIn(
-            sitter: Auth::user(),
-            owner: $visit->booking->owner,
-            visit: $visit
-        );
+            // ✅ FIX ISSUE #29: Apply the deduction to the sitter's earnings
+            if ($deductionPercent > 0) {
+                $booking = $visit->booking;
 
-        return back()->with('status', 'Checked in successfully. Have a great visit!');
+                // Calculate the base earnings for a single visit
+                $perVisitEarnings = $booking->total_amount / $booking->total_visits;
+
+                // Calculate the exact deduction amount
+                $deductionAmount = $perVisitEarnings * ($deductionPercent / 100);
+
+                // Subtract from the total sitter earnings
+                $booking->sitter_earnings -= $deductionAmount;
+                $booking->save();
+            }
+
+            NotificationService::visitCheckIn(
+                sitter: Auth::user(),
+                owner: $visit->booking->owner,
+                visit: $visit
+            );
+
+            return back()->with('status', 'Checked in successfully. Have a great visit!');
+
+        } catch (\Exception $e) {
+            Log::error('Task CheckIn Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -142,18 +166,25 @@ class TaskController extends Controller
         $checkOut = now();
         $duration = $checkIn->diffInMinutes($checkOut);
 
-        $visit->update([
-            'check_out'        => $checkOut,
-            'duration_minutes' => $duration,
-        ]);
+        // ✅ FIX ISSUE #31: Try-Catch
+        try {
+            $visit->update([
+                'check_out'        => $checkOut,
+                'duration_minutes' => $duration,
+            ]);
 
-        NotificationService::visitCheckOut(
-            sitter: Auth::user(),
-            owner: $visit->booking->owner,
-            visit: $visit
-        );
+            NotificationService::visitCheckOut(
+                sitter: Auth::user(),
+                owner: $visit->booking->owner,
+                visit: $visit
+            );
 
-        return back()->with('status', 'Checked out. Review your tasks then click Complete.');
+            return back()->with('status', 'Checked out. Review your tasks then click Complete.');
+
+        } catch (\Exception $e) {
+            Log::error('Task CheckOut Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -163,32 +194,36 @@ class TaskController extends Controller
     {
         $this->authorizeVisit($visit);
 
-        // ✅ FIX ISSUE #22: Strictly require the visit to be in_progress
-        // A visit cannot be completed if it hasn't been checked in.
         abort_if(
             $visit->status !== 'in_progress',
             400,
             'You must check in before you can complete this visit.'
         );
 
-        // ✅ Require check_out timestamp
         abort_if(
             $visit->check_out === null,
             400,
             'You must check out first before completing the visit.'
         );
 
-        $visit->update(['status' => 'completed']);
+        // ✅ FIX ISSUE #31: Try-Catch
+        try {
+            $visit->update(['status' => 'completed']);
 
-        NotificationService::visitCompleted(
-            sitter: Auth::user(),
-            owner: $visit->booking->owner,
-            visit: $visit
-        );
+            NotificationService::visitCompleted(
+                sitter: Auth::user(),
+                owner: $visit->booking->owner,
+                visit: $visit
+            );
 
-        $this->checkBookingCompletion($visit->booking);
+            $this->checkBookingCompletion($visit->booking);
 
-        return back()->with('status', 'Visit marked as completed!');
+            return back()->with('status', 'Visit marked as completed!');
+
+        } catch (\Exception $e) {
+            Log::error('Task Complete Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -205,11 +240,18 @@ class TaskController extends Controller
             $completedTasks = [];
         }
 
-        $visit->update([
-            'completed_tasks' => array_values($completedTasks),
-        ]);
+        // ✅ FIX ISSUE #31: Try-Catch
+        try {
+            $visit->update([
+                'completed_tasks' => array_values($completedTasks),
+            ]);
 
-        return back()->with('status', 'Tasks updated.');
+            return back()->with('status', 'Tasks updated.');
+
+        } catch (\Exception $e) {
+            Log::error('Task UpdateTasks Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -248,7 +290,7 @@ class TaskController extends Controller
                 $newPaths[]     = $upload['url'];
                 $newPublicIds[] = $upload['public_id'];
             } else {
-                \Log::error('Visit photo upload failed', [
+                Log::error('Visit photo upload failed', [
                     'visit_id' => $visit->id,
                     'error'    => $upload['error'],
                 ]);
@@ -259,15 +301,22 @@ class TaskController extends Controller
             return back()->withErrors(['photos' => 'Upload failed. Please try again.']);
         }
 
-        $visit->update([
-            'photo_proof_paths'      => array_merge($existingPaths, $newPaths),
-            'photo_proof_public_ids' => array_merge($existingPublicIds, $newPublicIds),
-            'photo_timestamp'        => now(),
-        ]);
+        // ✅ FIX ISSUE #31: Try-Catch for DB update
+        try {
+            $visit->update([
+                'photo_proof_paths'      => array_merge($existingPaths, $newPaths),
+                'photo_proof_public_ids' => array_merge($existingPublicIds, $newPublicIds),
+                'photo_timestamp'        => now(),
+            ]);
 
-        $count = count($newPaths);
+            $count = count($newPaths);
 
-        return back()->with('status', "{$count} photo(s) uploaded successfully!");
+            return back()->with('status', "{$count} photo(s) uploaded successfully!");
+
+        } catch (\Exception $e) {
+            Log::error('Task UploadPhoto Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -282,9 +331,16 @@ class TaskController extends Controller
             'notes' => 'required|string|max:2000',
         ]);
 
-        $visit->update(['notes' => $validated['notes']]);
+        // ✅ FIX ISSUE #31: Try-Catch
+        try {
+            $visit->update(['notes' => $validated['notes']]);
 
-        return back()->with('status', 'Note added.');
+            return back()->with('status', 'Note added.');
+
+        } catch (\Exception $e) {
+            Log::error('Task AddNote Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -315,13 +371,19 @@ class TaskController extends Controller
             ->count();
 
         if ($remaining === 0 && $booking->status === 'accepted') {
-            $booking->update(['status' => 'completed']);
+            // ✅ FIX ISSUE #31: Try-Catch (bisan gitawag ra ni sa sulod sa complete method)
+            try {
+                $booking->update(['status' => 'completed']);
 
-            NotificationService::bookingCompleted(
-                sitter:  Auth::user(),
-                owner:   $booking->owner,
-                booking: $booking
-            );
+                NotificationService::bookingCompleted(
+                    sitter:  Auth::user(),
+                    owner:   $booking->owner,
+                    booking: $booking
+                );
+            } catch (\Exception $e) {
+                Log::error('Task CheckBookingCompletion Error: ' . $e->getMessage());
+                // Ayaw na nato i-return diri kay naa na sa parent method ang return
+            }
         }
     }
 
@@ -361,22 +423,29 @@ class TaskController extends Controller
         $path     = $existingPaths[$index];
         $publicId = $existingPublicIds[$index] ?? null;
 
-        // Delete from Cloudinary (or local)
-        if (str_starts_with($path, 'http') && $publicId) {
-            $this->cloudinary->delete($publicId);
-        } elseif (!str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        // ✅ FIX ISSUE #31: Try-Catch for deleting and DB update
+        try {
+            // Delete from Cloudinary (or local)
+            if (str_starts_with($path, 'http') && $publicId) {
+                $this->cloudinary->delete($publicId);
+            } elseif (!str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+
+            // Remove from arrays
+            unset($existingPaths[$index]);
+            unset($existingPublicIds[$index]);
+
+            $visit->update([
+                'photo_proof_paths'      => array_values($existingPaths),
+                'photo_proof_public_ids' => array_values($existingPublicIds),
+            ]);
+
+            return back()->with('status', 'Photo deleted successfully.');
+
+        } catch (\Exception $e) {
+            Log::error('Task DeletePhoto Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
         }
-
-        // Remove from arrays
-        unset($existingPaths[$index]);
-        unset($existingPublicIds[$index]);
-
-        $visit->update([
-            'photo_proof_paths'      => array_values($existingPaths),
-            'photo_proof_public_ids' => array_values($existingPublicIds),
-        ]);
-
-        return back()->with('status', 'Photo deleted successfully.');
     }
 }

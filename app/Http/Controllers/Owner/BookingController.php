@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
@@ -271,12 +272,14 @@ class BookingController extends Controller
 
             DB::commit();
 
-            return redirect()->route('mybookings.index')
+        return redirect()->route('mybookings.index')
                 ->with('status', 'Booking submitted! Waiting for sitter confirmation.');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Booking Store Error: ' . $e->getMessage());
+            // ✅ FIX ISSUE #30: Friendly error message for DB errors
             return back()
-                ->withErrors(['error' => 'Failed to create booking: ' . $e->getMessage()])
+                ->withErrors(['error' => __('messages.db_error_friendly')]) // ✅ Friendly message
                 ->withInput();
         }
     }
@@ -362,10 +365,12 @@ class BookingController extends Controller
 
             DB::commit();
 
-            return back()->with('status', 'Booking accepted! Visits have been scheduled.');
+           return back()->with('status', 'Booking accepted! Visits have been scheduled.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to accept booking: ' . $e->getMessage());
+            Log::error('Booking Accept Error: ' . $e->getMessage());
+
+            return back()->with('error', __('messages.db_error_friendly')); // ✅ Friendly message
         }
     }
 
@@ -380,20 +385,26 @@ class BookingController extends Controller
 
         $reason = $request->input('reason', 'Sitter is unavailable for the selected dates.');
 
-        $booking->update([
-            'status'              => 'rejected',
-            'cancellation_reason' => $reason,
-            'cancelled_by'        => 'sitter',
-        ]);
+         try { // ✅ GIBUTANGAN OG TRY
+            $booking->update([
+                'status'              => 'rejected',
+                'cancellation_reason' => $reason,
+                'cancelled_by'        => 'sitter',
+            ]);
 
-        NotificationService::bookingCancelled(
-            canceller: Auth::user(),
-            recipient: $booking->owner,
-            booking:   $booking
-        );
+            NotificationService::bookingCancelled(
+                canceller: Auth::user(),
+                recipient: $booking->owner,
+                booking:   $booking
+            );
 
-        return back()->with('status', 'Booking rejected. The owner has been notified.');
+            return back()->with('status', 'Booking rejected. The owner has been notified.');
+        } catch (\Exception $e) {
+            Log::error('Booking Reject Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
+
 
     // ==========================================
     // CANCEL — Owner cancels booking
@@ -451,7 +462,9 @@ class BookingController extends Controller
             return back()->with('status', 'Booking cancelled successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to cancel: ' . $e->getMessage());
+            Log::error('Booking Cancel Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+            // ✅ Friendly message
         }
     }
 
@@ -479,15 +492,20 @@ class BookingController extends Controller
             return back()->with('error', "There are still {$pendingVisits} unfinished visit(s). Please complete all visits before marking the booking as completed.");
         }
 
-        $booking->update(['status' => 'completed']);
+        try {
+            $booking->update(['status' => 'completed']);
 
-        NotificationService::bookingCompleted(
-            sitter:  Auth::user(),
-            owner:   $booking->owner,
-            booking: $booking
-        );
+            NotificationService::bookingCompleted(
+                sitter:  Auth::user(),
+                owner:   $booking->owner,
+                booking: $booking
+            );
 
-        return back()->with('status', 'Booking marked as completed!');
+            return back()->with('status', 'Booking marked as completed!');
+        } catch (\Exception $e) {
+            Log::error('Booking Complete Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -551,7 +569,7 @@ class BookingController extends Controller
     // ==========================================
     // MARK AS PAID — Owner claims they paid the sitter
     // ==========================================
-    public function markPaid(Request $request, Booking $booking)
+        public function markPaid(Request $request, Booking $booking)
     {
         // Ensure the logged-in user is the owner of this booking
         abort_if($booking->owner_id !== Auth::id(), 403, 'Unauthorized.');
@@ -566,11 +584,16 @@ class BookingController extends Controller
             return back()->with('error', 'Payment status is already updated.');
         }
 
-        // ✅ Set to 'pending' to wait for Sitter's confirmation
-        $booking->update([
-            'payment_status' => 'pending',
-        ]);
+        try {
+            // ✅ Set to 'pending' to wait for Sitter's confirmation
+            $booking->update([
+                'payment_status' => 'pending',
+            ]);
 
-        return back()->with('status', 'Payment claimed. Waiting for the sitter to confirm receipt.');
+            return back()->with('status', 'Payment claimed. Waiting for the sitter to confirm receipt.');
+        } catch (\Exception $e) {
+            Log::error('Booking MarkPaid Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 }
