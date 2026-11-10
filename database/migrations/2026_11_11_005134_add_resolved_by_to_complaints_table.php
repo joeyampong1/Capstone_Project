@@ -1,0 +1,29 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('complaints', function (Blueprint $table) {
+            // ✅ FIX ISSUE #44: Add resolved_by column for audit trail
+            $table->foreignId('resolved_by')->nullable()->after('status')->constrained('users')->nullOnDelete();
+        });
+    }
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('complaints', function (Blueprint $table) {
+            $table->dropForeign(['resolved_by']);
+            $table->dropColumn('resolved_by');
+        });
+    }
+};

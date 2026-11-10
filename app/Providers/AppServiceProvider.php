@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // ==========================================
-        // Share badge counts sa tanan views
+        // Share badge counts across all views
         // ==========================================
         View::composer('*', function ($view) {
             if (!Auth::check()) {
@@ -52,14 +52,14 @@ class AppServiceProvider extends ServiceProvider
 
             if (class_exists(\App\Models\Booking::class)) {
                 if ($user->is_sitter) {
-                    // Sitter: pending bookings nga kinahanglan accept/decline
+                    // Sitter: pending bookings that need to be accepted or declined
                     $pendingBookingsCount = \App\Models\Booking::where('sitter_id', $userId)
                         ->where('status', 'pending')
                         ->count();
                 } else {
-                    // Owner: pending + confirmed upcoming bookings
+                    // Owner: pending + accepted upcoming bookings
                     $pendingBookingsCount = \App\Models\Booking::where('owner_id', $userId)
-                        ->whereIn('status', ['pending', 'confirmed'])
+                        ->whereIn('status', ['pending', 'accepted']) // FIXED ISSUE #36: Changed 'confirmed' to 'accepted'
                         ->count();
                 }
             }

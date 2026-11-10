@@ -40,6 +40,12 @@
                 });
                 if (this.dateFrom) params.set('from', this.dateFrom);
                 if (this.dateTo)   params.set('to',   this.dateTo);
+
+                // ✅ FIX ISSUE: Add userType filter to URL
+                if (this.userType && this.userType !== 'all') {
+                    params.set('role', this.userType);
+                }
+
                 return this.exportBase + '?' + params.toString();
             },
             goExport(format) {
@@ -53,6 +59,7 @@
                 this.status = 'all';
             }
          }"
+
          class="py-4 sm:py-6 bg-white dark:bg-neutral-950 min-h-screen antialiased text-neutral-800 dark:text-neutral-200">
         <div class="w-full sm:max-w-7xl mx-auto px-2 sm:px-16 lg:px-24">
 

@@ -26,6 +26,7 @@ class SitterVerificationController extends Controller
 
         // Base query — users nga naay sitter profile (nag-apply)
         $query = User::query()
+            ->whereNotNull('sitter_applied_at')
             ->whereHas('sitterProfile')
             ->with('sitterProfile')
             ->withCount([
@@ -77,14 +78,18 @@ class SitterVerificationController extends Controller
         // STATS
         // ==========================================
         $stats = [
-            'pending'  => User::whereHas('sitterProfile')
+            'pending'  => User::whereNotNull('sitter_applied_at') // ✅ FIX ISSUE #43
+                            ->whereHas('sitterProfile')
                             ->where(function ($q) {
                                 $q->where('sitter_status', 'pending')
                                 ->orWhereNull('sitter_status');
                             })->count(),
-            'approved' => User::where('sitter_status', 'approved')->count(),
-            'rejected' => User::where('sitter_status', 'rejected')->count(),
-            'total'    => User::whereHas('sitterProfile')->count(),
+            'approved' => User::whereNotNull('sitter_applied_at')
+                            ->where('sitter_status', 'approved')->count(),
+            'rejected' => User::whereNotNull('sitter_applied_at')
+                            ->where('sitter_status', 'rejected')->count(),
+            'total'    => User::whereNotNull('sitter_applied_at')
+                            ->whereHas('sitterProfile')->count(),
         ];
 
         // ==========================================
@@ -193,6 +198,13 @@ class SitterVerificationController extends Controller
     {
         $user = User::findOrFail($id);
 
+        // ✅ FIX ISSUE #43: Ensure they actually submitted an application
+        abort_if(
+            !$user->sitter_applied_at,
+            400,
+            'This user has not submitted a sitter application.'
+        );
+
         abort_if(
             ! in_array($user->sitter_status, ['pending', 'rejected']),
             400,
@@ -231,6 +243,13 @@ class SitterVerificationController extends Controller
     public function reject(Request $request, $id)
     {
         $user = User::findOrFail($id);
+
+        // ✅ FIX ISSUE #43: Ensure they actually submitted an application
+        abort_if(
+            !$user->sitter_applied_at,
+            400,
+            'This user has not submitted a sitter application.'
+        );
 
         abort_if(
             ! in_array($user->sitter_status, ['pending', 'approved']),

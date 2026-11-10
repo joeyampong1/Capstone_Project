@@ -380,9 +380,15 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function reviews()
     {
-        return $this->hasMany(Review::class, 'sitter_id');
+        return $this->hasManyThrough(
+            Review::class,          // Final model
+            SitterProfile::class,   // Intermediate model
+            'user_id',              // FK on sitter_profiles (references users.id)
+            'sitter_id',            // FK on reviews (references sitter_profiles.id)
+            'id',                   // Local key on users
+            'id'                    // Local key on sitter_profiles
+        );
     }
-
    /**
      * Comments written by this user
      */
@@ -396,9 +402,15 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function commentsReceived()
     {
-        return $this->hasMany(Comment::class, 'sitter_id');
+        return $this->hasManyThrough(
+            Comment::class,         // Final model
+            SitterProfile::class,   // Intermediate model
+            'user_id',              // FK on sitter_profiles (references users.id)
+            'sitter_id',            // FK on comments (references sitter_profiles.id)
+            'id',                   // Local key on users
+            'id'                    // Local key on sitter_profiles
+        );
     }
-
     /**
      * Alias for commentsReceived (para sa sitter profile page)
      */

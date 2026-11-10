@@ -24,6 +24,7 @@ class Complaint extends Model
         'admin_notes',
         'resolution',
         'resolved_at',
+        'resolved_by',
     ];
 
     // ==========================================
@@ -124,5 +125,11 @@ class Complaint extends Model
             'dismissed'    => 'Dismissed',
             default        => ucfirst($this->status),
         };
+    }
+
+    // ✅ FIX ISSUE #44: Add relationship to the user who resolved the complaint
+    public function resolver()
+    {
+        return $this->belongsTo(User::class, 'resolved_by');
     }
 }

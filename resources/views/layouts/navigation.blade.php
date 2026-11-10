@@ -313,7 +313,7 @@
                                     {{ __('messages.nav_system_settings') }}
                                 </a>
                                 <hr class="border-gray-200 dark:border-neutral-800">
-                                <form method="POST" action="{{ route('logout') }}">
+                                <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event)">
                                     @csrf
                                     <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-red-600 dark:text-red-400">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -481,7 +481,7 @@
                                         {{ __('messages.nav_my_profile') }}
                                     </a>
 
-                                    <form method="POST" action="{{ route('logout') }}">
+                                    <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event)">
                                         @csrf
                                         <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-red-500 font-bold">
                                             <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -623,12 +623,12 @@
                             {{ __('messages.nav_profile') }}
                         </x-responsive-nav-link>
 
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event)">
                             @csrf
-                            <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                            <button type="submit" class="w-full text-left flex items-center px-4 py-2 text-base font-medium text-gray-600 dark:text-neutral-300 hover:text-gray-800 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-neutral-800 transition duration-150 ease-in-out">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                 {{ __('messages.nav_log_out') }}
-                            </x-responsive-nav-link>
+                            </button>
                         </form>
                     </div>
                 </div>

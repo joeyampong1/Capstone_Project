@@ -213,7 +213,7 @@
                                     <td>{{ $u->id }}</td>
                                     <td>{{ trim(($u->f_name ?? '') . ' ' . ($u->l_name ?? '')) }}</td>
                                     <td>{{ $u->email }}</td>
-                                    <td>{{ $u->is_sitter ? __('messages.report_pdf_role_sitter') : __('messages.role_owner') }}</td>
+                                    <td>{{ $u->isAdmin() ? __('messages.role_admin') : ($u->is_sitter ? __('messages.report_pdf_role_sitter') : __('messages.role_owner')) }}</td>
                                     <td>{{ $u->id_validation_status === 'verified' ? __('messages.report_pdf_yes') : __('messages.report_pdf_no') }}</td>
                                     <td>{{ ucfirst($u->status) }}</td>
                                     <td>{{ optional($u->created_at)->format('Y-m-d') }}</td>

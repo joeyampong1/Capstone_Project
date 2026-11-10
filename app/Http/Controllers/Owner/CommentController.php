@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CommentController extends Controller
 {
@@ -22,7 +23,7 @@ class CommentController extends Controller
             'parent_id' => 'nullable|exists:comments,id',
         ]);
 
-        // ✅ Resolve the SitterProfile from User ID
+        // Resolve the SitterProfile from User ID
         $sitterProfile = SitterProfile::where('user_id', $sitterId)->first();
 
         if (!$sitterProfile) {
@@ -31,50 +32,86 @@ class CommentController extends Controller
             ]);
         }
 
-        // Save comment using the SitterProfile ID (not the User ID)
-        $comment = Comment::create([
-            'sitter_id' => $sitterProfile->id,   // ← FK to sitter_profiles.id
-            'user_id'   => Auth::id(),
-            'body'      => $request->body,
-            'parent_id' => $request->parent_id,
-        ]);
+        // ============================================
+        // FIX ISSUE #32: CHECK IF PROFILE IS HIDDEN/PRIVATE
+        // ============================================
+        // IMPORTANT: Check your database columns.
+        // Adjust the condition if your column name is different (e.g., 'is_private', 'visibility_status').
+        $isHidden = $sitterProfile->is_hidden ?? false;
+
+        if ($isHidden) {
+            abort(403, 'You cannot comment on a hidden or private profile.');
+        }
 
         // ============================================
-        // NOTIFICATION LOGIC
+        // FIX ISSUE #32: CHECK IF PARENT ID BELONGS TO THIS SITTER
         // ============================================
-        $sender = Auth::user();
-
-        if ($request->parent_id) {
-            // ═══ REPLY scenario — notify parent comment author ═══
+        if ($request->filled('parent_id')) {
             $parentComment = Comment::find($request->parent_id);
 
-            if ($parentComment && $parentComment->user_id !== $sender->id) {
-                $recipient = User::find($parentComment->user_id);
+            // Ensure the parent comment belongs to this sitter profile
+            if (!$parentComment || $parentComment->sitter_id !== $sitterProfile->id) {
+                return back()->withErrors([
+                    'body' => 'Invalid reply target. This comment does not belong to this profile.',
+                ]);
+            }
+        }
 
-                if ($recipient) {
+        // ============================================
+        // FIX ISSUE #31: TRY-CATCH FOR DB ERRORS
+        // ============================================
+        try {
+            // Save comment using the SitterProfile ID (not the User ID)
+            $comment = Comment::create([
+                'sitter_id' => $sitterProfile->id,   // FK to sitter_profiles.id
+                'user_id'   => Auth::id(),
+                'body'      => $request->body,
+                'parent_id' => $request->parent_id,
+            ]);
+
+            // ============================================
+            // NOTIFICATION LOGIC
+            // ============================================
+            $sender = Auth::user();
+
+            if ($request->parent_id) {
+                // REPLY scenario — notify parent comment author
+                $parentComment = Comment::find($request->parent_id);
+
+                if ($parentComment && $parentComment->user_id !== $sender->id) {
+                    $recipient = User::find($parentComment->user_id);
+
+                    if ($recipient) {
+                        NotificationService::commentReceived(
+                            recipient: $recipient,
+                            commenter: $sender,
+                            comment: $request->body,
+                            sitterId: (int) $sitterId,
+                        );
+                    }
+                }
+            } else {
+                // DIRECT COMMENT scenario — notify sitter
+                $sitter = User::find($sitterId);
+
+                if ($sitter && $sitter->id !== $sender->id) {
                     NotificationService::commentReceived(
-                        recipient: $recipient,
+                        recipient: $sitter,
                         commenter: $sender,
                         comment: $request->body,
                         sitterId: (int) $sitterId,
                     );
                 }
             }
-        } else {
-            // ═══ DIRECT COMMENT scenario — notify sitter ═══
-            $sitter = User::find($sitterId);
 
-            if ($sitter && $sitter->id !== $sender->id) {
-                NotificationService::commentReceived(
-                    recipient: $sitter,
-                    commenter: $sender,
-                    comment: $request->body,
-                    sitterId: (int) $sitterId,
-                );
-            }
+            return redirect()->route('owner.sitter.profile', $sitterId);
+
+        } catch (\Exception $e) {
+            Log::error('Comment Store Error: ' . $e->getMessage());
+            return back()->withErrors([
+                'body' => __('messages.db_error_friendly'),
+            ])->withInput();
         }
-
-        return redirect()->route('owner.sitter.profile', $sitterId);
     }
 
     /**
@@ -89,17 +126,23 @@ class CommentController extends Controller
             abort(403);
         }
 
-        // ✅ Resolve the User ID from the comment's SitterProfile ID
+        // Resolve the User ID from the comment's SitterProfile ID
         $sitterProfile = SitterProfile::find($comment->sitter_id);
         $sitterUserId = $sitterProfile ? $sitterProfile->user_id : null;
 
-        $comment->delete();
+        try {
+            $comment->delete();
 
-        if ($sitterUserId) {
-            return redirect()->route('owner.sitter.profile', $sitterUserId)
-                ->with('status', 'Comment deleted.');
+            if ($sitterUserId) {
+                return redirect()->route('owner.sitter.profile', $sitterUserId)
+                    ->with('status', 'Comment deleted.');
+            }
+
+            return back()->with('status', 'Comment deleted.');
+
+        } catch (\Exception $e) {
+            Log::error('Comment Delete Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
         }
-
-        return back()->with('status', 'Comment deleted.');
     }
 }

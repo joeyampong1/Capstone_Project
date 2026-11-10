@@ -968,7 +968,8 @@ return [
     'um_demote_title'     => '¿Degradar de Admin?',
     'um_demote_warning'   => 'Este usuario perderá todos los privilegios de administrador y se convertirá en Propietario.',
     'um_yes_demote'       => 'Sí, Degradar',
-
+    'um_back_to_active' => 'Volver a Activos',
+    'um_view_trash'     => 'Ver Papelera',
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -1254,6 +1255,7 @@ return [
     'cp_back_to_complaints'        => '← Volver a Quejas',
     'cp_role_owner'                => 'Dueño',
     'cp_role_sitter'               => 'Cuidador',
+    'cp_resolved_by' => 'Resuelto por: :name',
 
     // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
@@ -2055,6 +2057,14 @@ return [
     'pf_private_title' => 'Esta cuenta es privada',
     'pf_private_desc'  => ':name ha elegido mantener privados los detalles de su perfil. Solo los clientes anteriores pueden ver sus detalles completos, biografía e información de contacto.',
 
+    // Google Sign-In notice
+    'pf_google_password_notice' => 'Has iniciado sesión con Google. Tu contraseña es administrada por Google.',
+    'pf_password_hint' => 'Debe tener al menos 12 caracteres.',
+
+    'pf_google_delete_warning' => 'Has iniciado sesión con Google. Al hacer clic en "Eliminar cuenta" se desactivarán permanentemente tus datos.',
+
+    'pf_reset_link_sent' => 'Si la dirección de correo electrónico existe en nuestro sistema, hemos enviado un enlace de restablecimiento de contraseña.',
+
     'ss_title'                 => 'Ajustes del Sistema',
     'ss_subtitle'              => 'Gestiona tus preferencias de cuenta y configuraciones del sistema',
 
@@ -2124,7 +2134,7 @@ return [
     'ss_size_small'            => 'Pequeño',
     'ss_size_default'          => 'Predeterminado',
     'ss_size_large'            => 'Grande',
-    'ss_size_xl'               => 'Extra Grande',
+    'ss_size_xl'               =>  'Gran',
 
     'ss_change_lang_failed'    => 'Error al cambiar el idioma. Por favor intenta de nuevo.',
     'ss_network_error'         => 'Error de red. Por favor intenta de nuevo.',
@@ -2664,5 +2674,7 @@ return [
 
     'bc_cancel' => 'Cancelar',
     'db_error_friendly' => '¡Vaya! Algo salió mal por nuestra parte. Por favor, inténtalo de nuevo más tarde.',
+
+    'role_admin' => 'Administrador',
 ];
 

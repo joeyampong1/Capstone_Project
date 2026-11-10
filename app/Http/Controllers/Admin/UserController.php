@@ -22,11 +22,13 @@ class UserController extends Controller
         $statusFilter       = $request->query('status', 'all');
         $verificationFilter = $request->query('verification', 'all');
         $sortFilter         = $request->query('sort', 'newest');
+        $showTrashed        = $request->query('trashed') === 'true'; // ✅ FIX ISSUE #42
 
         // ==========================================
         // BASE QUERY
         // ==========================================
-        $query = User::query();
+        // ✅ FIX ISSUE #42: Show only trashed if 'trashed' parameter is present
+        $query = $showTrashed ? User::onlyTrashed() : User::query();
 
         // Search
         if ($search) {
@@ -92,7 +94,8 @@ class UserController extends Controller
             'roleFilter',
             'statusFilter',
             'verificationFilter',
-            'sortFilter'
+            'sortFilter',
+            'showTrashed' // ✅ Defined na karon
         ));
     }
 
@@ -123,18 +126,22 @@ class UserController extends Controller
 
         $reason = $request->input('reason', 'Suspended by admin.');
 
-        $user->status = 'suspended';
-        $user->save();
+        try {
+            $user->status = 'suspended';
+            $user->save();
 
-        // Optional: notify user
-        \App\Services\NotificationService::send(
-            userId:    $user->id,
-            type:      'account_suspended',
-            title:     'Account suspended',
-            message:   "Your account has been suspended. Reason: {$reason}",
-        );
+            \App\Services\NotificationService::send(
+                userId:    $user->id,
+                type:      'account_suspended',
+                title:     'Account suspended',
+                message:   "Your account has been suspended. Reason: {$reason}",
+            );
 
-        return back()->with('status', "{$user->f_name}'s account has been suspended.");
+            return back()->with('status', "{$user->f_name}'s account has been suspended.");
+        } catch (\Exception $e) {
+            Log::error('User Suspend Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -142,17 +149,22 @@ class UserController extends Controller
     // ==========================================
     public function activate(User $user)
     {
-        $user->status = 'active';
-        $user->save();
+        try {
+            $user->status = 'active';
+            $user->save();
 
-        \App\Services\NotificationService::send(
-            userId:    $user->id,
-            type:      'account_activated',
-            title:     'Account reactivated',
-            message:   'Your account has been reactivated. Welcome back!',
-        );
+            \App\Services\NotificationService::send(
+                userId:    $user->id,
+                type:      'account_activated',
+                title:     'Account reactivated',
+                message:   'Your account has been reactivated. Welcome back!',
+            );
 
-        return back()->with('status', "{$user->f_name}'s account has been activated.");
+            return back()->with('status', "{$user->f_name}'s account has been activated.");
+        } catch (\Exception $e) {
+            Log::error('User Activate Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -188,7 +200,8 @@ class UserController extends Controller
             return back()->with('status', "{$user->f_name}'s account has been banned.");
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to ban user: ' . $e->getMessage());
+            Log::error('User Ban Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
         }
     }
 
@@ -198,10 +211,15 @@ class UserController extends Controller
     public function restore(User $user)
     {
 
-        $user->status = 'active';
-        $user->save();
+        try {
+            $user->status = 'active';
+            $user->save();
 
-        return back()->with('status', "{$user->f_name}'s account has been restored.");
+            return back()->with('status', "{$user->f_name}'s account has been restored.");
+        } catch (\Exception $e) {
+            Log::error('User Restore Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
     // ==========================================
@@ -230,6 +248,11 @@ class UserController extends Controller
         if ($hasActiveBookings) {
             return back()->with('error', 'Cannot delete user with active bookings. Cancel or complete them first.');
         }
+
+        // ✅ FIX ISSUE #42: Free up the email so it can be used again
+        $user->update([
+            'email' => 'deleted_' . $user->id . '_' . uniqid() . '@petnanny.local',
+        ]);
 
         $name = $user->full_name ?: $user->email;
         $user->delete(); // soft delete (deleted_at timestamp)
@@ -311,50 +334,60 @@ class UserController extends Controller
             return back()->with('error', 'User is already an admin.');
         }
 
-        $user->role = 'admin';
-        $user->save();
+        try {
+            $user->role = 'admin';
+            $user->save();
 
-        Log::warning('User PROMOTED to admin', [
-            'admin_id' => Auth::id(),
-            'user_id'  => $user->id,
-            'email'    => $user->email,
-        ]);
+            Log::warning('User PROMOTED to admin', [
+                'admin_id' => Auth::id(),
+                'user_id'  => $user->id,
+                'email'    => $user->email,
+            ]);
 
-        return back()->with('status', "{$user->full_name} has been promoted to Administrator.");
+            return back()->with('status', "{$user->full_name} has been promoted to Administrator.");
+        } catch (\Exception $e) {
+            Log::error('User Promote Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
 
-// ========================================== //
-// DEMOTE — Admin → Owner                     //
-// ========================================== //
-public function demote(User $user)
-{
-    // Safety: cannot demote self
-    if ($user->id === Auth::id()) {
-        return back()->with('error', 'You cannot demote yourself.');
+    // ========================================== //
+    // DEMOTE — Admin → Owner                     //
+    // ========================================== //
+    public function demote(User $user)
+    {
+        // Safety: cannot demote self
+        if ($user->id === Auth::id()) {
+            return back()->with('error', 'You cannot demote yourself.');
+        }
+
+        // Safety: cannot demote if only admin left
+        if (User::where('role', 'admin')->count() <= 1) {
+            return back()->with('error', 'Cannot demote the only remaining admin.');
+        }
+
+        // Safety: not admin
+        if (! $user->isAdmin()) {
+            return back()->with('error', 'User is not an admin.');
+        }
+
+        try {
+            $user->role      = 'owner';
+            $user->is_sitter = false;
+            $user->save();
+
+            Log::warning('Admin DEMOTED to owner', [
+                'admin_id' => Auth::id(),
+                'user_id'  => $user->id,
+                'email'    => $user->email,
+            ]);
+
+            return back()->with('status', "{$user->full_name} has been demoted to Pet Owner.");
+        } catch (\Exception $e) {
+            Log::error('User Demote Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
+        }
     }
-
-    // Safety: cannot demote if only admin left
-    if (User::where('role', 'admin')->count() <= 1) {
-        return back()->with('error', 'Cannot demote the only remaining admin.');
-    }
-
-    // Safety: not admin
-    if (! $user->isAdmin()) {
-        return back()->with('error', 'User is not an admin.');
-    }
-
-    $user->role      = 'owner';
-    $user->is_sitter = false;
-    $user->save();
-
-    Log::warning('Admin DEMOTED to owner', [
-        'admin_id' => Auth::id(),
-        'user_id'  => $user->id,
-        'email'    => $user->email,
-    ]);
-
-    return back()->with('status', "{$user->full_name} has been demoted to Pet Owner.");
-}
 
     /**
      * Export users as CSV (Excel-compatible).
@@ -408,7 +441,8 @@ public function demote(User $user)
             default     => $query->latest(),
         };
 
-        $users = $query->get();
+        // ✅ FIX ISSUE #38: Get the count before chunking (without loading all records)
+        $totalUsers = $query->count();
 
         $filename = 'users_export_' . now()->format('Ymd_His') . '.csv';
 
@@ -419,7 +453,8 @@ public function demote(User $user)
             'Expires'             => '0',
         ];
 
-        return response()->stream(function () use ($users) {
+        // ✅ FIX ISSUE #38: Pass the query builder (not the loaded data) to the stream
+        return response()->stream(function () use ($query, $totalUsers) {
             $out = fopen('php://output', 'w');
 
             // UTF-8 BOM for Excel to detect encoding (important for ₱ symbol)
@@ -428,7 +463,7 @@ public function demote(User $user)
             // Meta info
             fputcsv($out, ['PetNanny — User Export']);
             fputcsv($out, ['Generated', now()->format('F j, Y g:i A')]);
-            fputcsv($out, ['Total Users', $users->count()]);
+            fputcsv($out, ['Total Users', $totalUsers]);
             fputcsv($out, []);
 
             // Header row
@@ -445,27 +480,40 @@ public function demote(User $user)
                 'Joined',
             ]);
 
-            // Data rows
-            foreach ($users as $u) {
-                $role = $u->isAdmin()
-                    ? 'Admin'
-                    : ($u->is_sitter ? 'Pet Sitter' : 'Pet Owner');
+            // ✅ FIX ISSUE #38: Process 500 records at a time to save memory
+            $query->chunk(500, function ($users) use ($out) {
+                foreach ($users as $u) {
+                    $role = $u->isAdmin()
+                        ? 'Admin'
+                        : ($u->is_sitter ? 'Pet Sitter' : 'Pet Owner');
 
-                fputcsv($out, [
-                    $u->id,
-                    $u->f_name ?? '',
-                    $u->l_name ?? '',
-                    $u->email ?? '',
-                    $u->contact_number ?? '',
-                    $role,
-                    $u->sitter_status ?? '—',
-                    $u->id_validation_status ?? '—',
-                    $u->status ?? 'active',
-                    optional($u->created_at)->format('Y-m-d'),
-                ]);
-            }
+                    fputcsv($out, [
+                        $u->id,
+                        $this->escapeCsvFormula($u->f_name ?? ''),
+                        $this->escapeCsvFormula($u->l_name ?? ''),
+                        $this->escapeCsvFormula($u->email ?? ''),
+                        $this->escapeCsvFormula($u->contact_number ?? ''),
+                        $role,
+                        $u->sitter_status ?? '—',
+                        $u->id_validation_status ?? '—',
+                        $u->status ?? 'active',
+                        optional($u->created_at)->format('Y-m-d'),
+                    ]);
+                }
+            });
 
             fclose($out);
         }, 200, $headers);
+    }
+    /**
+     * Escape potential CSV formula injection.
+     * Cells starting with =, +, -, @, \t, or \r are treated as formulas by Excel.
+     */
+    private function escapeCsvFormula($value)
+    {
+        if (is_string($value) && preg_match('/^[=+\-@\t\r]/', $value)) {
+            return "'" . $value;
+        }
+        return $value;
     }
 }

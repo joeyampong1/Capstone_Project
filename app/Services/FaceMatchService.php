@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Log;
 class FaceMatchService
 {
     /**
-     * Verify that the live face in the selfie matches the ID face.
+     * Verify that the face in the ID matches the face in the Selfie.
      *
-     * @param  string  $selfiePath  Relative path on 'public' disk (e.g. "selfies/xxx.jpg")
+     * @param  string  $idPath      Relative path on 'public' disk (e.g. "temp/id.jpg")
+     * @param  string  $selfiePath  Relative path on 'public' disk (e.g. "temp/selfie.jpg")
      * @return array{success: bool, match?: bool, distance?: float, confidence?: float, error?: string}
      */
-    public function verify(string $selfiePath): array
+    public function verify(string $idPath, string $selfiePath): array
     {
         $script = base_path('scripts/verify_face.py');
 
@@ -21,22 +22,30 @@ class FaceMatchService
             return ['success' => false, 'error' => 'verify_face.py not found'];
         }
 
-        // Resolve absolute path on 'public' disk
-        $absolutePath = storage_path("app/public/{$selfiePath}");
+        // Resolve absolute path for BOTH images
+        $absoluteIdPath = storage_path("app/public/{$idPath}");
+        $absoluteSelfiePath = storage_path("app/public/{$selfiePath}");
 
-        if (! file_exists($absolutePath)) {
-            Log::error('FaceMatch: selfie not found', ['path' => $absolutePath]);
+        if (! file_exists($absoluteIdPath)) {
+            Log::error('FaceMatch: ID not found', ['path' => $absoluteIdPath]);
+            return ['success' => false, 'error' => 'ID file not found'];
+        }
+
+        if (! file_exists($absoluteSelfiePath)) {
+            Log::error('FaceMatch: selfie not found', ['path' => $absoluteSelfiePath]);
             return ['success' => false, 'error' => 'Selfie file not found'];
         }
 
         // Python path (default: 'python' from PATH, override via .env PYTHON_PATH)
         $python = env('PYTHON_PATH', 'python');
 
+        // ✅ FIX ISSUE #45: Pass BOTH ID and Selfie arguments to the Python script
         $cmd = sprintf(
-            '%s %s %s 2>&1',
+            '%s %s %s %s 2>&1',
             $python,
             escapeshellarg($script),
-            escapeshellarg($absolutePath)
+            escapeshellarg($absoluteIdPath),
+            escapeshellarg($absoluteSelfiePath)
         );
 
         Log::info('FaceMatch: running', ['cmd' => $cmd]);

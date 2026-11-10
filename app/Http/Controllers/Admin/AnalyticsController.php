@@ -8,7 +8,6 @@ use App\Models\Complaint;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 
 class AnalyticsController extends Controller
 {
@@ -110,31 +109,47 @@ class AnalyticsController extends Controller
         // -------------------------------------------------------------
         // Pet Type (assumes pets.type exists — adjust if needed)
         // -------------------------------------------------------------
+        // -------------------------------------------------------------
+        // Pet Type (Fixed Issue #35)
+        // -------------------------------------------------------------
         $petType = ['dogs' => 0, 'cats' => 0, 'others' => 0];
 
-        if (Schema::hasColumn('pets', 'type')) {
-            $petCounts = \DB::table('pets')
-                ->selectRaw('LOWER(type) as t, COUNT(*) as c')
-                ->groupBy('t')
-                ->pluck('c', 't');
+        // Join pets with pet_types table to get the actual type name
+        $petCounts = \DB::table('pets')
+            ->join('pet_types', 'pets.pet_type_id', '=', 'pet_types.id')
+            ->selectRaw('LOWER(pet_types.name) as t, COUNT(*) as c')
+            ->groupBy('t')
+            ->pluck('c', 't');
 
-            foreach ($petCounts as $type => $count) {
-                if (str_contains($type, 'dog'))       $petType['dogs']   += $count;
-                elseif (str_contains($type, 'cat'))   $petType['cats']   += $count;
-                else                                  $petType['others'] += $count;
-            }
+        foreach ($petCounts as $type => $count) {
+            if (str_contains($type, 'dog'))       $petType['dogs']   += $count;
+            elseif (str_contains($type, 'cat'))   $petType['cats']   += $count;
+            else                                  $petType['others'] += $count;
         }
 
         // -------------------------------------------------------------
         // Schedule (from bookings.visit_time or schedule_times — best effort)
         // -------------------------------------------------------------
+        // -------------------------------------------------------------
+        // Schedule (Fixed Issue #35: Iterate through JSON schedule_times)
+        // -------------------------------------------------------------
         $schedule = ['morning' => 0, 'afternoon' => 0, 'evening' => 0];
 
-        if (Schema::hasColumn('bookings', 'visit_time')) {
-            $schedule['morning']   = Booking::whereTime('visit_time', '<', '12:00:00')->count();
-            $schedule['afternoon'] = Booking::whereTime('visit_time', '>=', '12:00:00')
-                                            ->whereTime('visit_time', '<', '18:00:00')->count();
-            $schedule['evening']   = Booking::whereTime('visit_time', '>=', '18:00:00')->count();
+        $bookingsWithTimes = Booking::whereNotNull('schedule_times')->pluck('schedule_times');
+
+        foreach ($bookingsWithTimes as $times) {
+            if (is_array($times)) {
+                foreach ($times as $time) {
+                    $hour = (int) explode(':', $time)[0];
+                    if ($hour < 12) {
+                        $schedule['morning']++;
+                    } elseif ($hour < 18) {
+                        $schedule['afternoon']++;
+                    } else {
+                        $schedule['evening']++;
+                    }
+                }
+            }
         }
 
         // -------------------------------------------------------------
@@ -142,31 +157,30 @@ class AnalyticsController extends Controller
         // -------------------------------------------------------------
         $complaintDistribution = [];
 
-        if (Schema::hasColumn('complaints', 'type')) {
-            $typeLabels = [
-                'missed_visit'  => ['label' => 'Missed Visit',  'color' => 'bg-amber-500'],
-                'poor_service'  => ['label' => 'Poor Service',  'color' => 'bg-red-500'],
-                'no_proof'      => ['label' => 'No Proof',      'color' => 'bg-blue-500'],
-                'rude_behavior' => ['label' => 'Rude Behavior', 'color' => 'bg-purple-500'],
-                'others'        => ['label' => 'Others',        'color' => 'bg-neutral-400'],
-            ];
+        $typeLabels = [
+            'missed_visit'  => ['label' => 'Missed Visit',  'color' => 'bg-amber-500'],
+            'poor_service'  => ['label' => 'Poor Service',  'color' => 'bg-red-500'],
+            'no_proof'      => ['label' => 'No Proof',      'color' => 'bg-blue-500'],
+            'rude_behavior' => ['label' => 'Rude Behavior', 'color' => 'bg-purple-500'],
+            'others'        => ['label' => 'Others',        'color' => 'bg-neutral-400'],
+        ];
 
-            $totalComplaintsForDist = max(1, Complaint::count());
+        $totalComplaintsForDist = max(1, Complaint::count());
 
-            $complaintDistribution = Complaint::selectRaw('type, COUNT(*) as total')
-                ->groupBy('type')
-                ->orderByDesc('total')
-                ->get()
-                ->map(function ($row) use ($typeLabels, $totalComplaintsForDist) {
-                    $meta = $typeLabels[$row->type] ?? ['label' => ucfirst($row->type), 'color' => 'bg-neutral-400'];
-                    return [
-                        'label' => $meta['label'],
-                        'color' => $meta['color'],
-                        'pct'   => round(($row->total / $totalComplaintsForDist) * 100, 1),
-                    ];
-                })
-                ->all();
-        }
+        $complaintDistribution = Complaint::selectRaw('complaint_type, COUNT(*) as total')
+            ->groupBy('complaint_type')
+            ->orderByDesc('total')
+            ->get()
+            ->map(function ($row) use ($typeLabels, $totalComplaintsForDist) {
+                $typeValue = $row->complaint_type;
+                $meta = $typeLabels[$typeValue] ?? ['label' => ucfirst(str_replace('_', ' ', $typeValue)), 'color' => 'bg-neutral-400'];
+                return [
+                    'label' => $meta['label'],
+                    'color' => $meta['color'],
+                    'pct'   => round(($row->total / $totalComplaintsForDist) * 100, 1),
+                ];
+            })
+        ->all();
 
         // -------------------------------------------------------------
         // Complaint Status

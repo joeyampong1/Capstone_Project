@@ -838,6 +838,8 @@ return [
     'um_demote_title'     => 'Demote from Admin?',
     'um_demote_warning'   => 'This user will lose all administrator privileges and become a Pet Owner.',
     'um_yes_demote'       => 'Yes, Demote',
+    'um_back_to_active' => 'Retour aux Actifs',
+    'um_view_trash'     => 'Voir la Corbeille',
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -1090,6 +1092,7 @@ return [
     'cp_back_to_complaints'        => 'Ã¢â€ Â Back to Complaints',
     'cp_role_owner'                => 'Owner',
     'cp_role_sitter'               => 'Sitter',
+    'cp_resolved_by' => 'Résolu par : :name',
     // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
     // ========================================== //
@@ -1880,6 +1883,15 @@ return [
     'pf_cover_alt'     => 'Couverture de :name',
     'pf_private_title' => 'Ce compte est privé',
     'pf_private_desc'  => ':name a choisi de garder les détails de son profil privés. Seuls les anciens clients peuvent voir tous les détails, la biographie et les informations de contact.',
+
+    // google login notice
+    'pf_google_password_notice' => 'Vous vous êtes connecté avec Google. Votre mot de passe est géré par Google.',
+    'pf_password_hint' => 'Doit contenir au moins 12 caractères.',
+
+    'pf_google_delete_warning' => 'Vous êtes connecté avec Google. Cliquer sur "Supprimer le compte" désactivera définitivement vos données.',
+
+    'pf_reset_link_sent' => 'Si l\'adresse e-mail existe dans notre système, nous avons envoyé un lien de réinitialisation du mot de passe.',
+
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -1949,7 +1961,7 @@ return [
     'ss_size_small'            => 'Small',
     'ss_size_default'          => 'Default',
     'ss_size_large'            => 'Large',
-    'ss_size_xl'               => 'Extra Large',
+    'ss_size_xl'               => 'Max',
     'ss_change_lang_failed'    => 'Failed to change language. Please try again.',
     'ss_network_error'         => 'Network error. Please try again.',
     // Privacy & Security
@@ -2469,4 +2481,5 @@ return [
     'bc_cancel' => 'Annuler',
     'db_error_friendly' => 'Oups ! Une erreur s\'est produite de notre côté. Veuillez réessayer plus tard.',
 
+    'role_admin' => 'Administrateur',
 ];

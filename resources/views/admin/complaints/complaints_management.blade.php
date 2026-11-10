@@ -64,6 +64,8 @@
                 'submitted_short'=> optional($c->created_at)->format('M d, Y'),
                 'admin_notes'   => $c->admin_notes ?? '',
                 'resolution'    => $c->resolution ?? '',
+                'resolved_at'   => optional($c->resolved_at)->format('M d, Y g:i A'),
+                'resolver_name' => $c->resolver ? ($c->resolver->full_name ?? $c->resolver->email) : null,
 
                 'complainant' => [
                     'id'       => $complainant?->id,
@@ -606,10 +608,36 @@
 
                             <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-2">{{ __('messages.complaint_resolution') }}</p>
-                                <textarea rows="2"
-                                          x-model="selected.resolution"
-                                          placeholder="{{ __('messages.complaint_resolution_ph') }}"
-                                          class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium resize-none"></textarea>
+
+                                {{-- ✅ FIX ISSUE #44: Show Audit Trail if already processed --}}
+                                <template x-if="['resolved', 'dismissed'].includes(selected.status)">
+                                    <div>
+                                        <p class="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line" x-text="selected.resolution || '—'"></p>
+
+                                        <div class="mt-3 pt-2 border-t border-gray-200 dark:border-neutral-700 text-[10px] text-green-600 dark:text-green-400 space-y-0.5">
+                                            <template x-if="selected.resolver_name">
+                                                <p>
+                                                    {{ __('messages.cp_resolved_by', ['name' => '']) }}
+                                                    <span x-text="selected.resolver_name" class="font-bold"></span>
+                                                </p>
+                                            </template>
+                                            <template x-if="selected.resolved_at">
+                                                <p>
+                                                    {{ __('messages.cp_resolved_on', ['date' => '']) }}
+                                                    <span x-text="selected.resolved_at"></span>
+                                                </p>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                {{-- Textarea if pending/under_review --}}
+                                <template x-if="['pending', 'under_review'].includes(selected.status)">
+                                    <textarea rows="2"
+                                              x-model="selected.resolution"
+                                              placeholder="{{ __('messages.complaint_resolution_ph') }}"
+                                              class="w-full rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2.5 sm:px-4 sm:py-2.5 text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary text-sm font-medium resize-none"></textarea>
+                                </template>
                             </div>
 
                             <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">

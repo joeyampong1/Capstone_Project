@@ -208,7 +208,8 @@
                         @foreach($evidencePaths as $idx => $path)
                             @php
                                 $type = $getFileType($path);
-                                $url = str_starts_with($path, 'http') ? $path : asset('storage/' . $path);
+                                // Use the secure route to serve the private file
+                                $url = route('complaints.evidence', ['complaint' => $complaint->id, 'index' => $idx]);
                             @endphp
 
                             @if($type === 'image')
@@ -279,8 +280,16 @@
                             </p>
                             <div class="p-3 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800">
                                 <p class="text-sm text-green-700 dark:text-green-300 leading-relaxed whitespace-pre-line">{{ $complaint->resolution }}</p>
-                                @if($complaint->resolved_at)
+
+                                {{-- ✅ FIX ISSUE #44: Show who resolved it --}}
+                                @if($complaint->resolver)
                                     <p class="text-[10px] text-green-600 dark:text-green-400 mt-2">
+                                        {{ __('messages.cp_resolved_by', ['name' => $complaint->resolver->full_name ?? $complaint->resolver->email]) }}
+                                    </p>
+                                @endif
+
+                                @if($complaint->resolved_at)
+                                    <p class="text-[10px] text-green-600 dark:text-green-400 mt-1">
                                         {{ __('messages.cp_resolved_on', ['date' => $complaint->resolved_at->format('M j, Y g:i A')]) }}
                                     </p>
                                 @endif

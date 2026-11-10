@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class ComplaintController extends Controller
 {
@@ -47,7 +48,7 @@ class ComplaintController extends Controller
         $user = Auth::user();
         $preselectedBookingId = $request->query('booking_id');
 
-        // Bookings nga involved ang user (as owner or sitter)
+        // Bookings involved with the user (as owner or sitter)
         $bookings = Booking::with(['pet.petType', 'owner', 'sitter'])
             ->where(function ($q) use ($user) {
                 $q->where('owner_id', $user->id)
@@ -80,19 +81,26 @@ class ComplaintController extends Controller
         $booking = Booking::with(['owner', 'sitter'])
             ->findOrFail($validated['booking_id']);
 
-        // Verify nga involve ang user ani nga booking
+        // Verify the user is involved in this booking
         abort_if(
             $booking->owner_id !== $user->id && $booking->sitter_id !== $user->id,
             403,
             'Unauthorized — you are not part of this booking.'
         );
 
-        // Determine ang respondent (counterpart)
+        // ✅ FIX ISSUE #33: Ensure booking status is valid (prevent backend bypass)
+        abort_if(
+            !in_array($booking->status, ['accepted', 'completed']),
+            400,
+            'You can only file a complaint for accepted or completed bookings.'
+        );
+
+        // Determine the respondent (counterpart)
         $respondentId = $booking->owner_id === $user->id
             ? $booking->sitter_id
             : $booking->owner_id;
 
-        // Prevent duplicate complaints sa parehas nga booking
+        // Prevent duplicate complaints for the same booking
         $existing = Complaint::where('booking_id', $booking->id)
             ->where('complainant_id', $user->id)
             ->whereIn('status', ['pending', 'under_review'])
@@ -110,7 +118,8 @@ class ComplaintController extends Controller
             $evidencePaths = [];
             if ($request->hasFile('evidence')) {
                 foreach ($request->file('evidence') as $file) {
-                    $evidencePaths[] = $file->store('complaints/evidence', 'public');
+                    // ✅ FIX ISSUE #33: Store in 'local' (private) disk instead of 'public'
+                    $evidencePaths[] = $file->store('complaints/evidence', 'local');
                 }
             }
 
@@ -140,8 +149,10 @@ class ComplaintController extends Controller
                 ->with('status', 'Complaint submitted successfully. Our team will review it shortly.');
         } catch (\Exception $e) {
             DB::rollBack();
+            // ✅ FIX ISSUE #31
+            Log::error('Complaint Store Error: ' . $e->getMessage());
             return back()
-                ->withErrors(['error' => 'Failed to submit complaint: ' . $e->getMessage()])
+                ->withErrors(['error' => __('messages.db_error_friendly')])
                 ->withInput();
         }
     }
@@ -152,7 +163,7 @@ class ComplaintController extends Controller
 
     public function show(Complaint $complaint)
     {
-        // Security: complainant, respondent, or admin ra
+        // Security: complainant, respondent, or admin only
         $user = Auth::user();
         abort_if(
             $complaint->complainant_id !== $user->id
@@ -165,5 +176,39 @@ class ComplaintController extends Controller
         $complaint->load(['booking.pet', 'complainant', 'respondent']);
 
         return view('complaints.show_complaint', compact('complaint'));
+    }
+
+    // ==========================================
+    // VIEW EVIDENCE — Serve private files securely
+    // ==========================================
+
+    public function viewEvidence(Complaint $complaint, $index)
+    {
+        $user = Auth::user();
+
+        // Security: Ensure the requester is authorized to view this complaint
+        abort_if(
+            $complaint->complainant_id !== $user->id
+            && $complaint->respondent_id !== $user->id
+            && !$user->isAdmin(),
+            403,
+            'Unauthorized.'
+        );
+
+        $paths = $complaint->evidence_paths ?? [];
+
+        if (!isset($paths[$index])) {
+            abort(404, 'Evidence not found.');
+        }
+
+        $path = $paths[$index];
+
+        // Check if file exists in private local disk
+        if (!Storage::disk('local')->exists($path)) {
+            abort(404, 'File no longer exists.');
+        }
+
+        // Return the file response securely
+        return Storage::disk('local')->response($path);
     }
 }

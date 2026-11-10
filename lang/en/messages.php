@@ -847,6 +847,8 @@ return [
     'um_demote_title'     => 'Demote from Admin?',
     'um_demote_warning'   => 'This user will lose all administrator privileges and become a Pet Owner.',
     'um_yes_demote'       => 'Yes, Demote',
+    'um_back_to_active' => 'Back to Active',
+    'um_view_trash'     => 'View Trash',
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -1099,6 +1101,7 @@ return [
     'cp_back_to_complaints'        => '⬅ Back to Complaints',
     'cp_role_owner'                => 'Owner',
     'cp_role_sitter'               => 'Sitter',
+    'cp_resolved_by' => 'Resolved by: :name',
     // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
     // ========================================== //
@@ -1750,6 +1753,7 @@ return [
     'pf_cover_alt'     => ":name's Cover",
     'pf_private_title' => 'This account is private',
     'pf_private_desc'  => ':name has chosen to keep their profile details private. Only previous clients can view their full details, bio, and contact information.',
+    'pf_reset_link_sent' => 'If the email address exists in our system, we have sent a password reset link.',
     // Edit page
     'pe_title'                 => 'Profile Settings',
     'pe_subtitle'              => 'Manage your account details and verification',
@@ -1869,7 +1873,8 @@ return [
     'pf_id_camera_title'     => 'Capture Your ID',
     'pf_selfie_camera_title' => 'Take a Selfie with ID',
     'pf_capture_photo'       => 'Capture',
-        // ===== PROFILE INCOMPLETE WARNING =====
+
+    // ===== PROFILE INCOMPLETE WARNING =====
     'pf_profile_incomplete_title' => 'Profile Incomplete',
     'pf_profile_incomplete_desc' => 'Please complete the following details before submitting your ID for verification:',
     'pf_missing_field' => 'Missing field',
@@ -1880,6 +1885,12 @@ return [
     'pf_gender' => 'Gender',
     'pf_contact_number' => 'Contact Number',
     'pf_address' => 'Address',
+
+    // Google Sign-In notice
+    'pf_google_password_notice' => 'You signed in with Google. Your password is securely managed by Google.',
+    'pf_password_hint' => 'Must be at least 12 characters.',
+
+    'pf_google_delete_warning' => 'You are logged in with Google. Clicking "Delete Account" will permanently deactivate your data.',
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -1949,7 +1960,7 @@ return [
     'ss_size_small'            => 'Small',
     'ss_size_default'          => 'Default',
     'ss_size_large'            => 'Large',
-    'ss_size_xl'               => 'Extra Large',
+    'ss_size_xl'               => 'Largest',
     'ss_change_lang_failed'    => 'Failed to change language. Please try again.',
     'ss_network_error'         => 'Network error. Please try again.',
     // Privacy & Security
@@ -2470,6 +2481,8 @@ return [
     'bc_total_label'  => 'Total:',
 
     // db error fallback message
-    'db_error_friendly' => 'Oops! Something went wrong on our end. Please try again later.'
+    'db_error_friendly' => 'Oops! Something went wrong on our end. Please try again later.',
+
+    'role_admin' => 'Admin',
 
 ];

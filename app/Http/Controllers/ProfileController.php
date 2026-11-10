@@ -55,20 +55,51 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
+
+        // FIX ISSUE #41: Google users don't have a password, so bypass validation
+        if (!$user->google_id && $user->password) {
+            $request->validateWithBag('userDeletion', [
+                'password' => ['required', 'current_password'],
+            ]);
+        }
 
         Auth::logout();
 
-        $user->delete();
+        // ✅ ANONYMIZATION: Wipe out PII (Personal Identifiable Information) before soft deleting
+        // This maintains financial/transactional integrity (bookings still have a valid user_id)
+        // while complying with Data Privacy (the real person can no longer be identified).
+        $user->update([
+            'f_name'                  => 'Deleted',
+            'm_name'                  => null,
+            'l_name'                  => 'User',
+            'email'                   => 'deleted_' . $user->id . '_' . uniqid() . '@petnanny.local',
+            'contact_number'          => null,
+            'address'                 => null,
+            'location'                => null,
+            'latitude'                => null,
+            'longitude'               => null,
+            'date_of_birth'           => null,
+            'gender'                  => null,
+            'profile_photo'           => null,
+            'profile_photo_public_id' => null,
+            'cover_photo'             => null,
+            'cover_photo_public_id'   => null,
+            'gov_id_path'             => null,
+            'gov_id_public_id'        => null,
+            'selfie_photo'            => null,
+            'selfie_photo_public_id'  => null,
+            'google_id'               => null,
+            'password'                => null,
+            'fcm_token'               => null,
+        ]);
+
+        $user->delete(); // Soft delete
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('/')->with('status', 'Your account and personal data have been permanently removed.');
     }
 
     // ========================================== //
@@ -229,6 +260,14 @@ class ProfileController extends Controller
             $user->gov_id_path      = $upload['public_id'];
             $user->gov_id_public_id = $upload['public_id'];
 
+            // ✅ FIX ISSUE #45: Reset verification if a new ID is uploaded
+            if ($user->id_validation_status === 'verified') {
+                $user->id_validation_status = 'unverified';
+                $user->face_match_score     = null;
+                $user->name_match           = null;
+                $user->birthdate_match      = null;
+            }
+
             \Log::info('ID uploaded to Cloudinary', [
                 'url'       => $upload['url'],
                 'public_id' => $upload['public_id'],
@@ -298,7 +337,13 @@ class ProfileController extends Controller
             // ✅ SAVE TO USER MODEL
             $user->selfie_photo           = $upload['public_id'];
             $user->selfie_photo_public_id = $upload['public_id'];
+
+            // ✅ FIX ISSUE #45: Reset verification if a new Selfie is uploaded
             $user->id_validation_status   = 'unverified';
+            $user->face_match_score       = null;
+            $user->name_match             = null;
+            $user->birthdate_match        = null;
+
             $user->save();
 
             return redirect()->route('profile.edit')->with('status', 'id-updated');
@@ -323,26 +368,30 @@ class ProfileController extends Controller
             }
 
             // ------------------------------------------------------------
-            // RUN FACE MATCH — download selfie from Cloudinary to temp
+            // RUN FACE MATCH — download BOTH ID and Selfie from Cloudinary
             // ------------------------------------------------------------
+            $localIdPath = null;
             $localSelfiePath = null;
-            $tempStoragePath = 'temp/selfies/' . uniqid() . '.jpg';
+            $tempIdStoragePath = 'temp/ids/' . uniqid() . '.jpg';
+            $tempSelfieStoragePath = 'temp/selfies/' . uniqid() . '.jpg';
 
             try {
-                // Generate signed URL for Cloudinary authenticated asset
-                $signedSelfieUrl = $this->cloudinary->getSignedUrl($user->selfie_photo_public_id);
+                // 1. Download ID Image
+                $signedIdUrl = $this->cloudinary->getSignedUrl($user->gov_id_public_id);
+                if (!$signedIdUrl) throw new \Exception('Failed to generate secure URL for ID.');
 
-                if (!$signedSelfieUrl) {
-                    throw new \Exception('Failed to generate secure URL for selfie.');
-                }
+                $localIdPath = $this->downloadToTemp($signedIdUrl);
+                Storage::disk('public')->put($tempIdStoragePath, file_get_contents($localIdPath));
+
+                // 2. Download Selfie Image
+                $signedSelfieUrl = $this->cloudinary->getSignedUrl($user->selfie_photo_public_id);
+                if (!$signedSelfieUrl) throw new \Exception('Failed to generate secure URL for selfie.');
 
                 $localSelfiePath = $this->downloadToTemp($signedSelfieUrl);
+                Storage::disk('public')->put($tempSelfieStoragePath, file_get_contents($localSelfiePath));
 
-                // FaceMatchService expects relative path on 'public' disk
-                // Move to storage temporarily
-                Storage::disk('public')->put($tempStoragePath, file_get_contents($localSelfiePath));
-
-                $result = $faceMatch->verify($tempStoragePath);
+                // 3. Compare BOTH faces
+                $result = $faceMatch->verify($tempIdStoragePath, $tempSelfieStoragePath);
 
             } catch (\Exception $e) {
                 \Log::error('Face match exception', ['error' => $e->getMessage()]);
@@ -351,12 +400,10 @@ class ProfileController extends Controller
                 ]);
             } finally {
                 // Cleanup temp files
-                if ($localSelfiePath && file_exists($localSelfiePath)) {
-                    @unlink($localSelfiePath);
-                }
-                if (Storage::disk('public')->exists($tempStoragePath)) {
-                    Storage::disk('public')->delete($tempStoragePath);
-                }
+                if ($localIdPath && file_exists($localIdPath)) @unlink($localIdPath);
+                if ($localSelfiePath && file_exists($localSelfiePath)) @unlink($localSelfiePath);
+                if (Storage::disk('public')->exists($tempIdStoragePath)) Storage::disk('public')->delete($tempIdStoragePath);
+                if (Storage::disk('public')->exists($tempSelfieStoragePath)) Storage::disk('public')->delete($tempSelfieStoragePath);
             }
 
             if (!$result['success']) {

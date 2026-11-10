@@ -17,6 +17,20 @@
             </div>
 
             <div class="grid grid-cols-1 sm:flex sm:items-center gap-2">
+                {{-- ✅ FIX ISSUE #42: Toggle Active / Trashed Users --}}
+                @if($showTrashed)
+                    <a href="{{ route('admin.users') }}"
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-neutral-600 hover:bg-neutral-700 text-white font-bold text-sm rounded-xl shadow-md transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        {{ __('messages.um_back_to_active') }}
+                    </a>
+                @else
+                    <a href="{{ route('admin.users', ['trashed' => 'true']) }}"
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 font-bold text-sm rounded-xl shadow-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        {{ __('messages.um_view_trash') }}
+                    </a>
+                @endif
                 <button type="button"
                         class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,20 +379,54 @@
                     </table>
                 </div>
 
-                @if($users->hasPages())
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-gray-100 dark:border-neutral-800">
-                        <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-                            {{ __('messages.um_showing', [
-                                'from'  => $users->firstItem(),
-                                'to'    => $users->lastItem(),
-                                'total' => $users->total(),
-                            ]) }}
-                        </p>
-                        <div class="flex items-center gap-1 overflow-x-auto">
-                            {{ $users->links() }}
-                        </div>
+                {{-- Pagination --}}
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-gray-100 dark:border-neutral-800">
+                    <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                        {{ __('messages.um_showing', [
+                            'from'  => $users->firstItem() ?? 0,
+                            'to'    => $users->lastItem() ?? 0,
+                            'total' => $users->total(),
+                        ]) }}
+                    </p>
+                    <div class="flex items-center gap-1 overflow-x-auto">
+                        @if ($users->onFirstPage())
+                            <span class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-400 whitespace-nowrap cursor-not-allowed">{{ __('messages.booking_previous') }}</span>
+                        @else
+                            <a href="{{ $users->previousPageUrl() }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition whitespace-nowrap">{{ __('messages.booking_previous') }}</a>
+                        @endif
+
+                        @php
+                            $current = $users->currentPage();
+                            $last    = $users->lastPage();
+                            $start   = max(1, $current - 2);
+                            $end     = min($last, $current + 2);
+                        @endphp
+
+                        @if ($start > 1)
+                            <a href="{{ $users->url(1) }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">1</a>
+                            @if ($start > 2)<span class="px-2 text-neutral-400">...</span>@endif
+                        @endif
+
+                        @for ($page = $start; $page <= $end; $page++)
+                            @if ($page == $current)
+                                <span class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-primary text-white">{{ $page }}</span>
+                            @else
+                                <a href="{{ $users->url($page) }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">{{ $page }}</a>
+                            @endif
+                        @endfor
+
+                        @if ($end < $last)
+                            @if ($end < $last - 1)<span class="px-2 text-neutral-400">...</span>@endif
+                            <a href="{{ $users->url($last) }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">{{ $last }}</a>
+                        @endif
+
+                        @if ($users->hasMorePages())
+                            <a href="{{ $users->nextPageUrl() }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition whitespace-nowrap">{{ __('messages.booking_next') }}</a>
+                        @else
+                            <span class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-400 whitespace-nowrap cursor-not-allowed">{{ __('messages.booking_next') }}</span>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
 
         </div>

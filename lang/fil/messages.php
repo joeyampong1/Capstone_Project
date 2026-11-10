@@ -803,6 +803,8 @@ return [
     'um_ban_reason'            => 'Dahilan ng Pag-ban',
     'um_ban_ph'                => 'hal., Maraming beripikadong reklamo ng maling pag-uugali.',
     'um_yes_ban'               => 'Oo, I-ban ang User',
+    'um_back_to_active' => 'Bumalik sa Aktibo',
+    'um_view_trash'     => 'Tingnan ang Basurahan',
     // ========================================== //
     // USER DETAILS (Admin)                        //
     // ========================================== //
@@ -1053,9 +1055,10 @@ return [
     'cp_back_to_complaints'        => '⬅ Bumalik sa Mga Reklamo',
     'cp_role_owner'                => 'Owner',
     'cp_role_sitter'               => 'Sitter',
+    'cp_resolved_by' => 'Ni-resolve ni: :name',
     // ========================================== //
     // OWNER / SITTER DASHBOARD                    //
-    // ========================================== //
+    // ========================================== //'cp_resolved_by' => 'Ni-resolve ni: :name',
     'od_title'                    => 'Home',
     'od_subtitle'                 => 'Tinitingnan ang pangunahing landing workspace presentation flow.',
     'od_mode_owner'               => 'Pet Owner',
@@ -1778,6 +1781,13 @@ return [
     'pf_private_title' => 'Pribado ang account na ito',
     'pf_private_desc'  => 'Pinili ni :name na panatilihing pribado ang kanyang mga detalye. Mga dating kliyente lamang ang maaaring makakita ng kanyang buong detalye, bio, at impormasyon sa pakikipag-ugnayan.',
 
+    //google login notice
+    'pf_google_password_notice' => 'Ikaw ay naka-login gamit ang Google. Ang iyong password ay pinamamahalaan ng Google.',
+    'pf_password_hint' => 'Dapat hindi bababa sa 12 characters.',
+
+    'pf_google_delete_warning' => 'Naka-login ka gamit ang Google. Ang pag-click sa "Delete Account" ay permanenteng mag-deactivate sa imong data.',
+
+    'pf_reset_link_sent' => 'Kung ang email address ay umiiral sa aming sistema, nagpadala kami ng password reset link.',
     // ========================================== //
     // SYSTEM SETTINGS                              //
     // ========================================== //
@@ -1841,7 +1851,7 @@ return [
     'ss_size_small'            => 'Maliit',
     'ss_size_default'          => 'Default',
     'ss_size_large'            => 'Malaki',
-    'ss_size_xl'               => 'Sobrang Laki',
+    'ss_size_xl'               => 'Pinakamalaki',
     'ss_change_lang_failed'    => 'Bigo ang pagpalit ng wika. Pakisubukan muli.',
     'ss_network_error'         => 'Network error. Pakisubukan muli.',
     'ss_privacy_security'      => 'Privacy at Seguridad',
@@ -2317,5 +2327,7 @@ return [
 
     'bc_cancel' => 'Kanselahin',
     'db_error_friendly' => 'Oops! May problema sa aming sistema. Pakisubukang muli mamaya.',
+
+    'role_admin' => 'Administrador',
 
     ];

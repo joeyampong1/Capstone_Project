@@ -16,12 +16,14 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    // ✅ FIX ISSUE #46: Throttle registration to prevent spam
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:6,1'); // 6 attempts per 1 minute
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-        Route::post('login', [AuthenticatedSessionController::class, 'store'])
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
         ->middleware('throttle:5,1'); // 5 attempts per 1 minute
 
     // ==========================================
@@ -36,7 +38,9 @@ Route::middleware('guest')->group(function () {
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
 
+    // ✅ FIX ISSUE #46: Throttle password reset links to prevent spam/email enumeration
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:6,1') // 6 attempts per 1 minute
         ->name('password.email');
 
     Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])

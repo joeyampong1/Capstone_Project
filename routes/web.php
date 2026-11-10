@@ -189,6 +189,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('settings.system_settings');
     })->name('settings.index');
 
+
     /*
     |--------------------------------------------------------------------------
     | ADMIN ROUTES
@@ -434,6 +435,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/complaints', [ComplaintController::class, 'store'])
         ->name('complaints.store');
+
+    Route::get('/complaints/{complaint}/evidence/{index}', [ComplaintController::class, 'viewEvidence'])
+        ->name('complaints.evidence');
 
     Route::get('/complaints/{complaint}', [ComplaintController::class, 'show'])
         ->name('complaints.show');

@@ -430,7 +430,7 @@
                              }">
                             <select @change="changeLocale($event.target.value)"
                                     :disabled="loading"
-                                    class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-w-[110px] sm:min-w-[140px] shrink-0 disabled:opacity-60 disabled:cursor-wait">
+                                    class="px-3 py-1 sm:py-1.5 rounded-lg border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-xs font-bold text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-w-[100px] shrink-0 disabled:opacity-60 disabled:cursor-wait">
                                 <option value="en"  {{ auth()->user()->locale === 'en'  ? 'selected' : '' }}>{{ __('messages.ss_lang_en') }}</option>
                                 <option value="fil" {{ auth()->user()->locale === 'fil' ? 'selected' : '' }}>{{ __('messages.ss_lang_fil') }}</option>
                                 <option value="es"  {{ auth()->user()->locale === 'es'  ? 'selected' : '' }}>{{ __('messages.ss_lang_es') }}</option>
@@ -470,7 +470,7 @@
                         </div>
                         <select x-model="fontSize"
                                 @change="changeSize($event.target.value)"
-                                class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-w-[110px] sm:min-w-[140px] shrink-0">
+                                class="px-3 py-1 sm:py-1.5 rounded-lg border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-xs font-bold text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-w-[100px] shrink-0">
                             <option value="small">{{ __('messages.ss_size_small') }}</option>
                             <option value="default">{{ __('messages.ss_size_default') }}</option>
                             <option value="large">{{ __('messages.ss_size_large') }}</option>
@@ -503,7 +503,7 @@
                                     },
                                     body: JSON.stringify({ profile_visibility: $event.target.value }),
                                 })"
-                                class="px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-w-[110px] sm:min-w-[140px] shrink-0">
+                                class="px-3 py-1 sm:py-1.5 rounded-lg border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-xs font-bold text-neutral-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-w-[100px] shrink-0">
                             <option value="public"  {{ auth()->user()->setting->profile_visibility === 'public'  ? 'selected' : '' }}>{{ __('messages.ss_vis_public') }}</option>
                             <option value="private" {{ auth()->user()->setting->profile_visibility === 'private' ? 'selected' : '' }}>{{ __('messages.ss_vis_private') }}</option>
                             <option value="hidden"  {{ auth()->user()->setting->profile_visibility === 'hidden'  ? 'selected' : '' }}>{{ __('messages.ss_vis_hidden') }}</option>
@@ -543,7 +543,7 @@
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_2fa') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_2fa_desc') }}</p>
                         </div>
-                        <button @click="alert('Two-Factor Authentication is coming soon!')" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold bg-primary text-white rounded-lg hover:bg-primary-600 transition min-w-[90px] sm:min-w-[100px] shrink-0">
+                        <button @click="alert('Two-Factor Authentication is coming soon!')" class="inline-flex items-center justify-center px-3 py-1 sm:py-1.5 text-xs font-bold bg-primary text-white rounded-lg hover:bg-primary-600 transition min-w-[100px] shrink-0">
                             {{ __('messages.ss_enable') }}
                         </button>
                     </div>
@@ -554,7 +554,7 @@
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_active_sessions') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_active_sessions_desc') }}</p>
                         </div>
-                        <button @click="alert('Active Sessions feature is coming soon!')" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
+                        <button @click="alert('Active Sessions feature is coming soon!')" class="inline-flex items-center justify-center px-3 py-1 sm:py-1.5 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[100px] shrink-0">
                             {{ __('messages.ss_view_all') }}
                         </button>
                     </div>
@@ -574,21 +574,30 @@
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_email_address') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ auth()->user()->email }}</p>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
+                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-3 py-1 sm:py-1.5 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[100px] shrink-0">
                             {{ __('messages.ss_change') }}
                         </a>
                     </div>
 
                     <!-- Password -->
-                    <div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
-                        <div class="min-w-0">
-                            <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_password') }}</p>
-                            <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_password_last_changed') }}</p>
+                    @if(!auth()->user()->google_id)
+                        <div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_password') }}</p>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_password_last_changed') }}</p>
+                            </div>
+                            <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-3 py-1 sm:py-1.5 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[100px] shrink-0">
+                                {{ __('messages.ss_update') }}
+                            </a>
                         </div>
-                        <a href="{{ route('profile.edit') }}" class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition min-w-[90px] sm:min-w-[100px] shrink-0">
-                            {{ __('messages.ss_update') }}
-                        </a>
-                    </div>
+                    @else
+                        <div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+                            <div class="min-w-0">
+                                <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_password') }}</p>
+                                <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.pf_google_password_notice') }}</p>
+                            </div>
+                        </div>
+                    @endif
 
                     <!-- Account Type -->
                     <div class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
@@ -604,7 +613,7 @@
                                 @endif
                             </p>
                         </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary shrink-0">
+                        <span class="inline-flex items-center justify-center px-3 py-1 sm:py-1.5 rounded-lg text-xs font-bold bg-primary/10 text-primary shrink-0 min-w-[100px]">
                             @if(auth()->user()->is_sitter)
                                 {{ __('messages.ss_level_x', ['level' => auth()->user()->sitter_level ?? 1]) }}
                             @elseif(auth()->user()->role === 'admin')
@@ -621,26 +630,11 @@
                             <p class="text-sm font-bold text-red-600 dark:text-red-400">{{ __('messages.ss_delete_account') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_delete_account_desc') }}</p>
                         </div>
-                        <button class="inline-flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-bold bg-red-500 hover:bg-red-600 text-white rounded-lg transition min-w-[100px] sm:min-w-[120px] shrink-0">
+                        <a href="{{ route('profile.edit') }}"
+                           class="inline-flex items-center justify-center px-3 py-1 sm:py-1.5 text-xs font-bold bg-red-500 hover:bg-red-600 text-white rounded-lg transition min-w-[100px] shrink-0">
                             {{ __('messages.ss_delete') }}
-                        </button>
+                        </a>
                     </div>
-                </div>
-
-                <!-- ========================================== -->
-                <!-- SAVE BUTTON                               -->
-                <!-- ========================================== -->
-                <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-2 pt-2">
-                    <button class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 border-2 border-gray-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 font-bold text-sm rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
-                        {{ __('messages.ss_cancel') }}
-                    </button>
-                    <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary-600 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-lg transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        {{ __('messages.ss_save_settings') }}
-                    </button>
-                </div>
 
             </div>
 

@@ -71,10 +71,15 @@ class NotificationService
         $year         = date('Y');
         $btnHtml      = '';
 
-        if ($actionUrl) {
+        // FIX ISSUE #39: Escape user inputs to prevent HTML injection
+        $safeTitle     = e($title);
+        $safeMessage   = nl2br(e($message)); // nl2br preserves line breaks
+        $safeActionUrl = $actionUrl ? e($actionUrl) : null;
+
+        if ($safeActionUrl) {
             $btnHtml = "
                 <div style='text-align: center; margin-top: 32px;'>
-                    <a href='{$actionUrl}' style='background-color: {$primaryColor}; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 15px; display: inline-block;'>
+                    <a href='{$safeActionUrl}' style='background-color: {$primaryColor}; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 15px; display: inline-block;'>
                         View Details
                     </a>
                 </div>
@@ -108,10 +113,10 @@ class NotificationService
                             <tr>
                                 <td style="padding: 40px 30px;">
                                     <h2 style="margin-top: 0; margin-bottom: 16px; color: {$darkText}; font-size: 22px; font-weight: 800;">
-                                        {$title}
+                                        {$safeTitle}
                                     </h2>
                                     <p style="margin: 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
-                                        {$message}
+                                        {$safeMessage}
                                     </p>
 
                                     {$btnHtml}
@@ -137,10 +142,11 @@ class NotificationService
         </html>
         HTML;
 
-        Mail::html($html, function ($msg) use ($user, $title) {
+        // FIX ISSUE #39: Use ->queue() to run in background
+        Mail::html($html, function ($msg) use ($user, $safeTitle) {
             $msg->to($user->email)
-                ->subject("PetNanny: {$title}");
-        });
+                ->subject("PetNanny: {$safeTitle}");
+        })->queue();
     }
 
     // ==========================================

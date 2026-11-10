@@ -256,20 +256,53 @@
                 </div>
 
                 {{-- Pagination --}}
-                @if($applicants->hasPages())
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-gray-100 dark:border-neutral-800">
-                        <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
-                            {{ __('messages.sv_showing', [
-                                'from'  => $applicants->firstItem(),
-                                'to'    => $applicants->lastItem(),
-                                'total' => $applicants->total(),
-                            ]) }}
-                        </p>
-                        <div class="flex items-center gap-1 overflow-x-auto">
-                            {{ $applicants->links() }}
-                        </div>
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-gray-100 dark:border-neutral-800">
+                    <p class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+                        {{ __('messages.sv_showing', [
+                            'from'  => $applicants->firstItem() ?? 0,
+                            'to'    => $applicants->lastItem() ?? 0,
+                            'total' => $applicants->total(),
+                        ]) }}
+                    </p>
+                    <div class="flex items-center gap-1 overflow-x-auto">
+                        @if ($applicants->onFirstPage())
+                            <span class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-400 whitespace-nowrap cursor-not-allowed">{{ __('messages.booking_previous') }}</span>
+                        @else
+                            <a href="{{ $applicants->previousPageUrl() }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition whitespace-nowrap">{{ __('messages.booking_previous') }}</a>
+                        @endif
+
+                        @php
+                            $current = $applicants->currentPage();
+                            $last    = $applicants->lastPage();
+                            $start   = max(1, $current - 2);
+                            $end     = min($last, $current + 2);
+                        @endphp
+
+                        @if ($start > 1)
+                            <a href="{{ $applicants->url(1) }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">1</a>
+                            @if ($start > 2)<span class="px-2 text-neutral-400">...</span>@endif
+                        @endif
+
+                        @for ($page = $start; $page <= $end; $page++)
+                            @if ($page == $current)
+                                <span class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-primary text-white">{{ $page }}</span>
+                            @else
+                                <a href="{{ $applicants->url($page) }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">{{ $page }}</a>
+                            @endif
+                        @endfor
+
+                        @if ($end < $last)
+                            @if ($end < $last - 1)<span class="px-2 text-neutral-400">...</span>@endif
+                            <a href="{{ $applicants->url($last) }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">{{ $last }}</a>
+                        @endif
+
+                        @if ($applicants->hasMorePages())
+                            <a href="{{ $applicants->nextPageUrl() }}" class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition whitespace-nowrap">{{ __('messages.booking_next') }}</a>
+                        @else
+                            <span class="px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium text-neutral-400 whitespace-nowrap cursor-not-allowed">{{ __('messages.booking_next') }}</span>
+                        @endif
                     </div>
-                @endif
+                </div>
             </div>
 
         </div>

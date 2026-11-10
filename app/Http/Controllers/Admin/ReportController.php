@@ -8,7 +8,6 @@ use App\Models\Complaint;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
@@ -45,8 +44,9 @@ class ReportController extends Controller
             'pending_verification' => User::where('id_validation_status', 'pending')->count(),
         ];
 
-        $hasTypeColumn = Schema::hasColumn('complaints', 'type');
-
+        // ==========================================
+        // COMPLAINT STATS (FIXED ISSUE #35)
+        // ==========================================
         $complaintStats = [
             'total'       => Complaint::count(),
             'pending'     => Complaint::where('status', 'pending')->count(),
@@ -55,16 +55,19 @@ class ReportController extends Controller
             'common_type' => null,
         ];
 
-        if ($hasTypeColumn) {
-            $row = Complaint::selectRaw('type, COUNT(*) as total')
-                ->groupBy('type')
-                ->orderByDesc('total')
-                ->first();
-            $complaintStats['common_type'] = $row?->type
-                ? ucwords(str_replace('_', ' ', $row->type))
-                : null;
-        }
+        // Use the actual 'complaint_type' column
+        $row = Complaint::selectRaw('complaint_type, COUNT(*) as total')
+            ->groupBy('complaint_type')
+            ->orderByDesc('total')
+            ->first();
 
+        $complaintStats['common_type'] = $row?->complaint_type
+            ? ucwords(str_replace('_', ' ', $row->complaint_type))
+            : null;
+
+        // ==========================================
+        // BOOKING TREND
+        // ==========================================
         $bookingTrend = collect(range(6, 0))->map(function ($i) {
             $month = Carbon::now()->subMonths($i);
             return [
@@ -75,6 +78,9 @@ class ReportController extends Controller
             ];
         })->all();
 
+        // ==========================================
+        // USER GROWTH
+        // ==========================================
         $totalUsers = max(1, User::count());
         $owners  = User::where('role', 'owner')->where('is_sitter', false)->count();
         $sitters = User::where('is_sitter', true)->count();
@@ -86,32 +92,32 @@ class ReportController extends Controller
             ['label' => 'Admins',      'count' => $admins,  'pct' => round(($admins  / $totalUsers) * 100, 1), 'color' => 'bg-primary'],
         ];
 
-        $complaintDistribution = [];
+        // ==========================================
+        // COMPLAINT DISTRIBUTION (FIXED ISSUE #35)
+        // ==========================================
+        $totalComplaints = max(1, Complaint::count());
+        $typeLabels = [
+            'missed_visit'  => ['label' => 'Missed Visit',  'color' => 'bg-amber-500'],
+            'poor_service'  => ['label' => 'Poor Service',  'color' => 'bg-red-500'],
+            'no_proof'      => ['label' => 'No Proof',      'color' => 'bg-blue-500'],
+            'rude_behavior' => ['label' => 'Rude Behavior', 'color' => 'bg-purple-500'],
+            'others'        => ['label' => 'Others',        'color' => 'bg-neutral-400'],
+        ];
 
-        if ($hasTypeColumn) {
-            $totalComplaints = max(1, Complaint::count());
-            $typeLabels = [
-                'missed_visit'  => ['label' => 'Missed Visit',  'color' => 'bg-amber-500'],
-                'poor_service'  => ['label' => 'Poor Service',  'color' => 'bg-red-500'],
-                'no_proof'      => ['label' => 'No Proof',      'color' => 'bg-blue-500'],
-                'rude_behavior' => ['label' => 'Rude Behavior', 'color' => 'bg-purple-500'],
-                'others'        => ['label' => 'Others',        'color' => 'bg-neutral-400'],
-            ];
-
-            $complaintDistribution = Complaint::selectRaw('type, COUNT(*) as total')
-                ->groupBy('type')
-                ->orderByDesc('total')
-                ->get()
-                ->map(function ($row) use ($typeLabels, $totalComplaints) {
-                    $meta = $typeLabels[$row->type] ?? ['label' => ucfirst($row->type), 'color' => 'bg-neutral-400'];
-                    return [
-                        'label' => $meta['label'],
-                        'color' => $meta['color'],
-                        'pct'   => round(($row->total / $totalComplaints) * 100, 1),
-                    ];
-                })
-                ->all();
-        }
+        $complaintDistribution = Complaint::selectRaw('complaint_type, COUNT(*) as total')
+            ->groupBy('complaint_type')
+            ->orderByDesc('total')
+            ->get()
+            ->map(function ($row) use ($typeLabels, $totalComplaints) {
+                $typeValue = $row->complaint_type;
+                $meta = $typeLabels[$typeValue] ?? ['label' => ucfirst(str_replace('_', ' ', $typeValue)), 'color' => 'bg-neutral-400'];
+                return [
+                    'label' => $meta['label'],
+                    'color' => $meta['color'],
+                    'pct'   => round(($row->total / $totalComplaints) * 100, 1),
+                ];
+            })
+            ->all();
 
         $recentReports = [];
         $reportHistory = collect();
@@ -137,20 +143,33 @@ class ReportController extends Controller
     {
         $format = $request->query('format', 'pdf');   // pdf | excel | csv
         $type   = $request->query('type', 'all');     // all | booking | user | complaint
+        $role   = $request->query('role');            // admin | owner | sitter (NEW)
         $from   = $request->query('from');
         $to     = $request->query('to');
 
         if (in_array($format, ['excel', 'csv'])) {
-            return $this->exportCsv($type, $from, $to);
+            return $this->exportCsv($type, $role, $from, $to);
         }
 
-        // PDF — use a print-optimized HTML view (browser can Save as PDF)
-        return $this->exportPdfView($type, $from, $to);
+        return $this->exportPdfView($type, $role, $from, $to);
     }
 
     /* --------------------------------------------------------------
      |  CSV (opens in Excel / Google Sheets)
      |--------------------------------------------------------------*/
+
+    /**
+     * Escape potential CSV formula injection.
+     * Cells starting with =, +, -, @, \t, or \r are treated as formulas by Excel.
+     */
+    private function escapeCsvFormula($value)
+    {
+        if (is_string($value) && preg_match('/^[=+\-@\t\r]/', $value)) {
+            return "'" . $value;
+        }
+        return $value;
+    }
+
     private function exportCsv(string $type, ?string $from, ?string $to): StreamedResponse
     {
         $filename = 'report_' . $type . '_' . now()->format('Ymd_His') . '.csv';
@@ -189,8 +208,8 @@ class ReportController extends Controller
                         foreach ($users as $u) {
                             fputcsv($out, [
                                 $u->id,
-                                trim(($u->f_name ?? '') . ' ' . ($u->l_name ?? '')),
-                                $u->email,
+                                $this->escapeCsvFormula(trim(($u->f_name ?? '') . ' ' . ($u->l_name ?? ''))),
+                                $this->escapeCsvFormula($u->email),
                                 $u->is_sitter ? 'Sitter' : ucfirst($u->role ?? 'owner'),
                                 $u->id_validation_status === 'verified' ? 'Yes' : 'No',
                                 $u->status,
@@ -215,9 +234,9 @@ class ReportController extends Controller
                         foreach ($bookings as $b) {
                             fputcsv($out, [
                                 $b->id,
-                                trim(($b->owner->f_name  ?? '') . ' ' . ($b->owner->l_name  ?? '')),
-                                trim(($b->sitter->f_name ?? '') . ' ' . ($b->sitter->l_name ?? '')),
-                                $b->pet->name ?? '—',
+                                $this->escapeCsvFormula(trim(($b->owner->f_name  ?? '') . ' ' . ($b->owner->l_name  ?? ''))),
+                                $this->escapeCsvFormula(trim(($b->sitter->f_name ?? '') . ' ' . ($b->sitter->l_name ?? ''))),
+                                $this->escapeCsvFormula($b->pet->name ?? '—'),
                                 $b->status,
                                 $b->subtotal ?? $b->total_amount ?? 0,
                                 optional($b->created_at)->format('Y-m-d'),
@@ -241,7 +260,7 @@ class ReportController extends Controller
                         foreach ($complaints as $c) {
                             fputcsv($out, [
                                 $c->id,
-                                $c->description ?? $c->subject ?? '—',
+                                $this->escapeCsvFormula($c->description ?? $c->subject ?? '—'),
                                 $c->status,
                                 optional($c->created_at)->format('Y-m-d'),
                             ]);
@@ -256,25 +275,35 @@ class ReportController extends Controller
     /* --------------------------------------------------------------
      |  PDF — print-optimized HTML view
      |--------------------------------------------------------------*/
-    private function exportPdfView(string $type, ?string $from, ?string $to)
+    private function exportPdfView(string $type, ?string $role, ?string $from, ?string $to)
     {
-        $users      = in_array($type, ['all', 'user'])      ? User::query()
-                        ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
-                        ->when($to,   fn ($q) => $q->where('created_at', '<=', $to . ' 23:59:59'))
-                        ->orderBy('id')->get() : collect();
+        // ✅ FIX ISSUE #38 & ROLE FILTER: Add limit and role filter
+        $users = in_array($type, ['all', 'user']) ? User::query()
+            ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
+            ->when($to,   fn ($q) => $q->where('created_at', '<=', $to . ' 23:59:59'))
+            ->when($role, function($q) use ($role) {
+                if ($role === 'admin') {
+                    $q->where('role', 'admin');
+                } elseif ($role === 'sitter') {
+                    $q->where('is_sitter', true);
+                } elseif ($role === 'owner') {
+                    $q->where('role', 'owner')->where('is_sitter', false);
+                }
+            })
+            ->orderBy('id')->limit(1000)->get() : collect();
 
         $bookings   = in_array($type, ['all', 'booking'])   ? Booking::with(['owner', 'sitter', 'pet'])
                         ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
                         ->when($to,   fn ($q) => $q->where('created_at', '<=', $to . ' 23:59:59'))
-                        ->orderBy('id')->get() : collect();
+                        ->orderBy('id')->limit(1000)->get() : collect();
 
         $complaints = in_array($type, ['all', 'complaint']) ? Complaint::query()
                         ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
                         ->when($to,   fn ($q) => $q->where('created_at', '<=', $to . ' 23:59:59'))
-                        ->orderBy('id')->get() : collect();
+                        ->orderBy('id')->limit(1000)->get() : collect();
 
         return view('admin.reports.pdf', compact(
-            'type', 'from', 'to', 'users', 'bookings', 'complaints'
+            'type', 'role', 'from', 'to', 'users', 'bookings', 'complaints'
         ));
     }
 }

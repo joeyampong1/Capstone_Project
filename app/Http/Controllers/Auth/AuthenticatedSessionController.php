@@ -47,6 +47,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // FIX ISSUE #40: Clear FCM token before logging out
+        $user = $request->user();
+        if ($user) {
+            $user->update(['fcm_token' => null]);
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

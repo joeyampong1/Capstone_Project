@@ -373,6 +373,26 @@
 
                 // Run setup
                 setupFCM();
+
+                // ✅ FIX ISSUE #40: Delete FCM token on logout
+                window.handleLogout = function(event) {
+                    event.preventDefault();
+                    const form = event.target;
+
+                    if (typeof messaging !== 'undefined') {
+                        // Delete token from Firebase browser cache
+                        messaging.deleteToken().then(() => {
+                            console.log('FCM Token deleted successfully.');
+                            form.submit(); // Proceed with normal logout
+                        }).catch((err) => {
+                            console.error('Error deleting FCM token:', err);
+                            form.submit(); // Proceed even if deletion fails
+                        });
+                    } else {
+                        form.submit();
+                    }
+                    return false;
+                };
             </script>
             @endauth
 
