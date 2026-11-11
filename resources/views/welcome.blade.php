@@ -28,27 +28,10 @@
         <title>{{ config('app.name', 'PetNanny') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,900" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?font-family=figtree:400,500,600,700,900&display=swap" rel="stylesheet" />
 
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @else
-            <script src="https://cdn.tailwindcss.com"></script>
-            <script>
-                tailwind.config = {
-                    theme: {
-                        extend: {
-                            fontFamily: { sans: ['Figtree', 'sans-serif'] },
-                            colors: {
-                                primary: { 50: '#fef3ed', 100: '#fce3d4', 200: '#f8c5a8', 300: '#f5a67d', 400: '#f18851', 500: '#f07a3a', 600: '#d8652a', 700: '#b85222', 800: '#943f1a', 900: '#703012', DEFAULT: '#f07a3a' },
-                                accent: { 50: '#edf7f3', 100: '#d4eee6', 200: '#a9ddcc', 300: '#7ecbb3', 400: '#53ba99', 500: '#39ac8c', 600: '#2d8a70', 700: '#216854', 800: '#154638', 900: '#0a231c', DEFAULT: '#39ac8c' },
-                                secondary: { DEFAULT: '#f3ede6' }
-                            }
-                        }
-                    }
-                }
-            </script>
-        @endif
+        {{-- ✅ FIX ISSUE #48: Direct Vite Build (No more CDN fallback) --}}
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
 
     <body class="bg-secondary dark:bg-neutral-900 text-gray-800 dark:text-gray-100 flex min-h-screen flex-col font-sans selection:bg-primary-200">

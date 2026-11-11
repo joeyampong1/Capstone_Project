@@ -26,7 +26,7 @@ class Visit extends Model
         'notes',
         'photo_proof_path',
         'photo_proof_paths',
-        'photo_proof_public_ids',   // ← NEW (Cloudinary tracking)
+        'photo_proof_public_ids',
         'photo_timestamp',
     ];
 
@@ -40,7 +40,7 @@ class Visit extends Model
         'photo_timestamp'           => 'datetime',
         'completed_tasks'           => 'array',
         'photo_proof_paths'         => 'array',
-        'photo_proof_public_ids'    => 'array',   // ← NEW
+        'photo_proof_public_ids'    => 'array',
         'lateness_minutes'          => 'integer',
         'duration_minutes'          => 'integer',
         'late_deduction_percentage' => 'decimal:2',
@@ -101,8 +101,7 @@ class Visit extends Model
     }
 
     // ==========================================
-    // ACCESSOR — All raw photo paths (legacy + new)
-    // for delete/management logic (raw values).
+    // ACCESSOR — All raw photo paths
     // ==========================================
     public function getAllPhotosAttribute(): array
     {
@@ -112,7 +111,7 @@ class Visit extends Model
             $paths = [];
         }
 
-        // Include legacy single photo kung naa
+        // Include legacy single photo if it exists
         if ($this->photo_proof_path && !in_array($this->photo_proof_path, $paths)) {
             array_unshift($paths, $this->photo_proof_path);
         }
@@ -126,9 +125,7 @@ class Visit extends Model
     }
 
     // ==========================================
-    // ACCESSOR — Resolved photo URLs (Cloudinary o local)
-    // for BLADE display only.
-    // Returns: array of full URLs (https://res.cloudinary.com/... O asset('storage/...'))
+    // ACCESSOR — Resolved photo URLs for display
     // ==========================================
     public function getPhotoProofUrlsAttribute(): array
     {

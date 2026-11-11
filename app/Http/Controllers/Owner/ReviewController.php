@@ -9,6 +9,7 @@ use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReviewController extends Controller
 {
@@ -91,7 +92,8 @@ class ReviewController extends Controller
             return back()->with('status', 'Thank you! Your review has been submitted.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to submit review: ' . $e->getMessage());
+            Log::error('Review Store Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
         }
     }
 
@@ -123,7 +125,8 @@ class ReviewController extends Controller
             return back()->with('status', 'Review deleted.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Failed to delete review: ' . $e->getMessage());
+            Log::error('Review Delete Error: ' . $e->getMessage());
+            return back()->with('error', __('messages.db_error_friendly'));
         }
     }
 

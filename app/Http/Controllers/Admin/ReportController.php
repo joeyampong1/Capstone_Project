@@ -170,7 +170,7 @@ class ReportController extends Controller
         return $value;
     }
 
-    private function exportCsv(string $type, ?string $from, ?string $to): StreamedResponse
+    private function exportCsv(string $type, ?string $role, ?string $from, ?string $to): StreamedResponse
     {
         $filename = 'report_' . $type . '_' . now()->format('Ymd_His') . '.csv';
 
@@ -181,7 +181,7 @@ class ReportController extends Controller
             'Expires'             => '0',
         ];
 
-        return response()->stream(function () use ($type, $from, $to) {
+        return response()->stream(function () use ($type, $role, $from, $to) {
             $out = fopen('php://output', 'w');
 
             // UTF-8 BOM so Excel detects encoding properly (important for ₱ symbol)
@@ -190,6 +190,7 @@ class ReportController extends Controller
             // ---- HEADER ----
             fputcsv($out, ['PetNanny — System Report']);
             fputcsv($out, ['Type',      ucfirst($type)]);
+            fputcsv($out, ['Role',      ucfirst($role ?? 'All')]); // Added role info
             fputcsv($out, ['From',      $from ?: '—']);
             fputcsv($out, ['To',        $to   ?: '—']);
             fputcsv($out, ['Generated', now()->format('F j, Y g:i A')]);
@@ -203,14 +204,27 @@ class ReportController extends Controller
                 User::query()
                     ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
                     ->when($to,   fn ($q) => $q->where('created_at', '<=', $to . ' 23:59:59'))
+                    // ✅ FIX: Add role filter here
+                    ->when($role, function($q) use ($role) {
+                        if ($role === 'admin') {
+                            $q->where('role', 'admin');
+                        } elseif ($role === 'sitter') {
+                            $q->where('is_sitter', true);
+                        } elseif ($role === 'owner') {
+                            $q->where('role', 'owner')->where('is_sitter', false);
+                        }
+                    })
                     ->orderBy('id')
                     ->chunk(500, function ($users) use ($out) {
                         foreach ($users as $u) {
+                            // ✅ FIX: Properly label Admin, Sitter, and Owner
+                            $roleLabel = $u->isAdmin() ? 'Admin' : ($u->is_sitter ? 'Sitter' : 'Owner');
+
                             fputcsv($out, [
                                 $u->id,
                                 $this->escapeCsvFormula(trim(($u->f_name ?? '') . ' ' . ($u->l_name ?? ''))),
                                 $this->escapeCsvFormula($u->email),
-                                $u->is_sitter ? 'Sitter' : ucfirst($u->role ?? 'owner'),
+                                $roleLabel,
                                 $u->id_validation_status === 'verified' ? 'Yes' : 'No',
                                 $u->status,
                                 optional($u->created_at)->format('Y-m-d'),
@@ -223,6 +237,7 @@ class ReportController extends Controller
 
             // ---- BOOKINGS ----
             if (in_array($type, ['all', 'booking'])) {
+                // ... (parehas ra sa imong daan nga code) ...
                 fputcsv($out, ['=== BOOKINGS ===']);
                 fputcsv($out, ['ID', 'Owner', 'Sitter', 'Pet', 'Status', 'Total', 'Created']);
 
@@ -249,6 +264,7 @@ class ReportController extends Controller
 
             // ---- COMPLAINTS ----
             if (in_array($type, ['all', 'complaint'])) {
+                // ... (parehas ra sa imong daan nga code) ...
                 fputcsv($out, ['=== COMPLAINTS ===']);
                 fputcsv($out, ['ID', 'Description', 'Status', 'Created']);
 
