@@ -37,3 +37,7 @@ test_ocr.php
 /storage/app/firebase_credentials.json
  
  
+# Temporary Dev & Debug Files
+fix-*.php
+cookies.txt
+login_response.html
