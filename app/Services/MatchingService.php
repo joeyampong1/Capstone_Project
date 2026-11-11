@@ -235,7 +235,7 @@ class MatchingService
     // C — Capability to Handle the Pet (binary)
     // Sitter must accept BOTH pet type AND size
     // ═══════════════════════════════════════════════════
-    private function scoreCapability($p, Pet $pet): float
+    private function scoreCapability(\App\Models\SitterProfile $p, Pet $pet): float
     {
         $types = $p->preferred_pet_types ?? [];
         $sizes = $p->preferred_pet_sizes ?? [];
@@ -250,7 +250,7 @@ class MatchingService
     // ═══════════════════════════════════════════════════
     // H — Pet Health & Vaccination Compatibility (binary)
     // ═══════════════════════════════════════════════════
-    private function scoreHealth($p, Pet $pet): float
+    private function scoreHealth(\App\Models\SitterProfile $p, Pet $pet): float
     {
         $accepted = $p->accepted_health_conditions ?? [];
         $vax      = $pet->vaccination_status ?? 'none';
@@ -271,7 +271,7 @@ class MatchingService
     // ═══════════════════════════════════════════════════
     // T — Temperament Compatibility (binary)
     // ═══════════════════════════════════════════════════
-    private function scoreTemperament($p, Pet $pet): float
+    private function scoreTemperament(\App\Models\SitterProfile $p, Pet $pet): float
     {
         $accepted = $p->accepted_temperaments ?? [];
 
@@ -284,7 +284,7 @@ class MatchingService
     // ═══════════════════════════════════════════════════
     // HAVERSINE — distance in km
     // ═══════════════════════════════════════════════════
-    private function haversineKm($lat1, $lng1, $lat2, $lng2): ?float
+    private function haversineKm(?float $lat1, ?float $lng1, ?float $lat2, ?float $lng2): ?float
     {
         if ($lat1 === null || $lng1 === null || $lat2 === null || $lng2 === null) {
             return null;

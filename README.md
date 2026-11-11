@@ -1,59 +1,179 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🐾 PetNanny: Web-based Responsive System for On-Demand Pet Sitting
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+PetNanny is a comprehensive web-based platform designed to connect pet owners with trusted pet sitters. It features secure ID verification, real-time booking management, complaint handling, and a weighted matching algorithm to find the perfect sitter for your furry family.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🛠️ Tech Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+*   **Backend:** Laravel 11.x (PHP 8.2+)
+*   **Frontend:** Blade, Tailwind CSS, Vite, Alpine.js
+*   **Database:** MySQL / MariaDB
+*   **AI & Machine Learning:** Python 3.10+, dlib, OpenCV (Facial Recognition & Liveness)
+*   **Third-Party Integrations:** Firebase (FCM), Cloudinary (CDN), OCR Space (Text Extraction), Google OAuth, Brevo (SMTP)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🧠 Core Algorithms & Services
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Weighted Matching Algorithm (Multi-Criteria Decision-Making)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The platform uses a custom **Weighted Scoring Algorithm** (derived from the capstone's Table 7) to rank pet sitters. It calculates a match percentage based on 7 factors, utilizing the **Haversine Formula** for geospatial distance.
 
-## Laravel Sponsors
+**Formula:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+`Score = (Wv × V) + (We × E) + (Wr × R) + (Wc × C) + (Wd × D) + (Wh × H) + (Wt × T)`
 
-### Premium Partners
+**Weight Distribution (Total = 100%):**
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Factor | Weight | Computation |
+|--------|--------|-------------|
+| **V** (Verified ID) | 20% | Binary: 1 or 0 |
+| **D** (Distance) | 20% | Haversine Formula: `minDistance / actualDistance` |
+| **R** (Rating) | 15% | `rating / 5.0` |
+| **C** (Capability) | 15% | Binary: matches pet type & size |
+| **E** (Experience) | 15% | `experience_years / maxExperience` |
+| **H** (Health Compatibility) | 10% | Binary: matches special needs / vaccination |
+| **T** (Temperament Compatibility) | 5% | Binary: matches pet temperament |
 
-## Contributing
+### 2. Face Matching & ID Verification
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The system performs facial recognition to verify the user's identity by comparing the uploaded Government ID against their live selfie.
 
-## Code of Conduct
+*   **Technology:** Python, `dlib`, `face_recognition`, OpenCV.
+*   **Process:** The `FaceMatchService` triggers a Python script (`verify_face.py`) which extracts 128-D facial embeddings.
+*   **Formula:** Uses **Euclidean Distance** to calculate the similarity between the two faces. A lower distance indicates a higher confidence match.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3. OCR Text Extraction (Optical Character Recognition)
 
-## Security Vulnerabilities
+Extracts user details (Name, ID Number, Date of Birth) from uploaded IDs.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+*   **API:** OCR Space API.
+*   **Process:** The `OcrService` uses a multi-attempt fallback mechanism (testing Engine 1 & 2, with 0°, 90°, and 270° image rotations) to ensure the highest text extraction score. It uses **Regular Expressions (Regex)** and a custom **OCR Misread Correction** algorithm to fix common text errors (e.g., "OR" to "JR", "0" to "O").
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 📋 Prerequisites
+
+Before installing, make sure you have the following on your machine:
+
+*   PHP >= 8.2
+*   Composer
+*   Node.js & NPM
+*   MySQL or MariaDB
+*   Python >= 3.10
+*   **CMake** & **Visual Studio Build Tools (C++)**: required for compiling `dlib` on Windows
+
+---
+
+## 🚀 Installation & Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/joeyampong1/Capstone_Project.git
+cd Capstone_Project
+```
+
+### 2. Install PHP & Node Dependencies
+
+```bash
+composer install
+npm install
+```
+
+### 3. Environment Setup
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+Open `.env` and configure the following:
+
+*   **Database:** `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+*   **Admin account:** `ADMIN_EMAIL`, `ADMIN_PASSWORD`
+*   **API keys:** Firebase (FCM), Cloudinary, OCR Space, Google OAuth, Brevo (SMTP)
+
+### 4. Python Setup (Face Verification)
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+> **Note:** On Linux/macOS, activate the virtual environment with `source venv/bin/activate`.
+> Installing `dlib` requires **CMake** and **Visual Studio Build Tools (C++)** on Windows.
+
+### 5. Database & Storage
+
+```bash
+php artisan migrate --seed
+php artisan storage:link
+```
+
+### 6. Run the Application
+
+Open two terminals:
+
+```bash
+# Terminal 1: frontend assets
+npm run dev
+```
+
+```bash
+# Terminal 2: Laravel server
+php artisan serve
+```
+
+Then visit **http://127.0.0.1:8000**.
+
+---
+
+## 👑 Admin Account
+
+The default admin account is automatically generated during database seeding, based on the credentials in your `.env` file. To log in, use the `ADMIN_EMAIL` and `ADMIN_PASSWORD` you configured **before** running `php artisan migrate --seed`.
+
+> **Note:** The dummy credentials used for development are `example@gmail.com` and `example@password`. Never use these in production.
+
+### Creating a Custom Admin Manually
+
+You can also create an admin account through Tinker:
+
+```bash
+php artisan tinker
+```
+
+```php
+\App\Models\User::create([
+    'f_name'   => 'Admin',
+    'l_name'   => 'User',
+    'email'    => 'admin@example.com',
+    'password' => bcrypt('your-secure-password'),
+    'role'     => 'admin', // adjust to match your users table
+]);
+```
+
+---
+
+## 🧪 Useful Commands
+
+```bash
+php artisan migrate:fresh --seed   # Reset and reseed the database
+php artisan view:clear             # Clear compiled Blade views
+php artisan optimize:clear         # Clear all cached files
+npm run build                      # Build assets for production
+```
+
+---
+
+## 👥 Authors
+
+*   **Joey Ampong**: [@joeyampong1](https://github.com/joeyampong1)
+
+---
+
+## 📄 License
+
+This project was developed as a capstone project. All rights reserved.
