@@ -287,11 +287,14 @@
                     <h2 class="text-sm font-black text-[#1B3B36] dark:text-white uppercase tracking-wider mb-4 sm:mb-6">
                         {{ __('messages.ss_preferences') }}
                     </h2>
+
                     <!-- Push Notifications -->
                     <div x-data="{
                             enabled: {{ auth()->user()->push_notifications_enabled ? 'true' : 'false' }},
-                            toggle() {
+                            async toggle() {
                                 this.enabled = !this.enabled;
+
+                                // 1. Save boolean state to Laravel database
                                 fetch('{{ route('settings.ui-preferences') }}', {
                                     method: 'PATCH',
                                     headers: {
@@ -301,9 +304,54 @@
                                     },
                                     body: JSON.stringify({ push_notifications_enabled: this.enabled }),
                                 });
+
+                                // 2. If turned ON, request browser permission and get FCM Token
+                                if (this.enabled) {
+                                    try {
+                                        const permission = await Notification.requestPermission();
+                                        if (permission === 'granted') {
+
+                                            // Initialize Firebase
+                                            const app = firebase.apps.length ? firebase.app() : firebase.initializeApp({
+                                                apiKey: "AIzaSyD_k_OfmwBLaQBLQEKhDKbNSiirFizKb4",
+                                                authDomain: "petnanny-51b57.firebaseapp.com",
+                                                projectId: "petnanny-51b57",
+                                                storageBucket: "petnanny-51b57.firebasestorage.app",
+                                                messagingSenderId: "864638678858",
+                                                appId: "1:864638678858:web:16b61f47459aa2db4b73b3"
+                                            });
+
+                                            const messaging = firebase.messaging();
+
+                                            // GET TOKEN using the VAPID Key
+                                            const currentToken = await messaging.getToken({
+                                                vapidKey: 'BPO0ySzFpof1CThButW2kyaPc19y9iV5eA6YCzEQyZLFo_itZM_H390VF4hnU1OuFIJ01uSWK32TKbW4UnpX2P0'
+                                            });
+
+                                            if (currentToken) {
+                                                console.log('FCM Token:', currentToken);
+
+                                                // Send token to backend to save in DB
+                                                fetch('{{ route('settings.save-token') }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Content-Type': 'application/json',
+                                                    },
+                                                    body: JSON.stringify({ fcm_token: currentToken }),
+                                                });
+                                            } else {
+                                                console.log('No registration token available.');
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.error('Error getting FCM token:', error);
+                                    }
+                                }
                             }
-                         }"
-                         class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+                        }"
+                        class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
+
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_push_notifications') }}</p>
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_push_desc') }}</p>
@@ -312,6 +360,7 @@
                             <input type="checkbox" class="sr-only peer" :checked="enabled" @change="toggle()">
                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </label>
+
                     </div>
 
                     <!-- Email Notifications -->

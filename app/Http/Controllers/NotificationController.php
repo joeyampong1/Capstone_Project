@@ -158,11 +158,16 @@ class NotificationController extends Controller
     // ==========================================
     public function saveFcmToken(Request $request)
     {
-        $request->validate(['token' => 'required|string']);
+        // Check for token in request (either 'token' or 'fcm_token')
+        $token = $request->input('token') ?? $request->input('fcm_token');
+
+        if (!$token) {
+            return response()->json(['success' => false, 'message' => 'Token is required.'], 422);
+        }
 
         if (auth()->check()) {
-            auth()->user()->update(['fcm_token' => $request->token]);
-            return response()->json(['success' => true]);
+            auth()->user()->update(['fcm_token' => $token]);
+            return response()->json(['success' => true, 'message' => 'FCM Token saved.']);
         }
 
         return response()->json(['success' => false], 401);

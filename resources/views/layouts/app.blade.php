@@ -336,6 +336,22 @@
 
                 const messaging = firebase.messaging();
 
+                // Handle incoming messages when the app is in the foreground
+                messaging.onMessage((payload) => {
+                    console.log('[Foreground] Message received: ', payload);
+
+                    if (Notification.permission === 'granted') {
+                        const notificationTitle = payload.notification?.title || 'PetNanny Notification';
+                        const notificationOptions = {
+                            body: payload.notification?.body || 'You have a new notification.',
+                            icon: '/assets/logo/PetNanny_Logo.png',
+                            data: payload.data
+                        };
+
+                        new Notification(notificationTitle, notificationOptions);
+                    }
+                });
+
                 async function setupFCM() {
                     try {
                         const permission = await Notification.requestPermission();
@@ -372,7 +388,7 @@
                 }
 
                 // Run setup
-                setupFCM();
+                // setupFCM(); // Commented out. Token generation is handled by the Settings toggle switch.
 
                 // ✅ FIX ISSUE #40: Delete FCM token on logout
                 window.handleLogout = function(event) {

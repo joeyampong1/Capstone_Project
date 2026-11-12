@@ -127,6 +127,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/fcm-token', [App\Http\Controllers\NotificationController::class, 'saveFcmToken'])->name('fcm.token');
 
+    Route::post('/settings/save-token', [App\Http\Controllers\NotificationController::class, 'saveFcmToken'])->name('settings.save-token');
+
     // ============================================================
     // ONBOARDING (All authenticated users)
     // ============================================================
