@@ -9,11 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Add new name columns (nullable para dili maapektuhan ang existing data)
+            // Add new name columns (nullable so existing data is not affected)
             $table->string('f_name', 50)->nullable()->after('id');
             $table->string('l_name', 50)->nullable()->after('f_name');
             $table->string('m_name', 50)->nullable()->after('l_name');
-            
+
             // DO NOT DROP 'name' COLUMN YET!
             // $table->dropColumn('name');
         });

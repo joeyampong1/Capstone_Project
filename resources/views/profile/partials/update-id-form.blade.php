@@ -565,7 +565,7 @@
         {{-- STEP 3: SUBMIT FOR VERIFICATION                               --}}
         {{-- ============================================================ --}}
         @php
-            // Check kung kompleto ang profile
+            // Check if profile is complete
             $profileComplete = auth()->user()->f_name
                 && auth()->user()->l_name
                 && auth()->user()->date_of_birth

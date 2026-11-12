@@ -608,7 +608,7 @@
                         // Find if user already reacted with this SAME emoji
                         const sameEmoji = msg.reactions.find(r => r.emoji === emoji && r.user_reacted);
 
-                        // Find if user reacted with ANY emoji (para tangtangon)
+                        // Find if user reacted with ANY emoji
                         const myPreviousReaction = msg.reactions.find(r => r.user_reacted);
 
                         if (sameEmoji) {

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            // Store ang schedule pattern: ["08:00", "18:00"]
+            // Store the schedule pattern: ["08:00", "18:00"]
             $table->json('schedule_times')->nullable()->after('total_visits');
         });
     }

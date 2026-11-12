@@ -12,10 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Diri i-save ang FCM token gikan sa browser
+            // Save the FCM token from the browser here
             $table->string('fcm_token')->nullable()->after('remember_token');
 
-            // Para sa settings toggles nimo
             $table->boolean('push_notifications_enabled')->default(true)->after('fcm_token');
             $table->boolean('email_notifications_enabled')->default(true)->after('push_notifications_enabled');
         });

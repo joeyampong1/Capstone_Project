@@ -40,7 +40,7 @@ use App\Http\Controllers\ComplaintController;
 */
 
 Route::get('/', function () {
-    // Fetch top 2 verified, public sitters para sa landing page
+    // Fetch top 2 verified, public sitters for the landing page
     $topSitters = \App\Models\User::query()
         ->where('is_sitter', true)
         ->where('sitter_status', 'approved')

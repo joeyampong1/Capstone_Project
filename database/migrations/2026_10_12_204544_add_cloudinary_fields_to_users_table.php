@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            // Cover photo (bag-o — wala pa sa DB)
+            // Cover photo (new — not yet in DB)
             if (!Schema::hasColumn('users', 'cover_photo')) {
                 $table->string('cover_photo')->nullable()->after('profile_photo');
             }

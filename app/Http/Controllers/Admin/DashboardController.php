@@ -31,7 +31,7 @@ class DashboardController extends Controller
         // ==========================================
         $activeBookings      = Booking::where('status', 'accepted')->count();
         $pendingComplaints   = Complaint::whereIn('status', ['pending', 'under_review'])->count();
-        $pendingClaims       = 0;   // Wala pay Claims module — i-update later
+        $pendingClaims       = 0; // No Claims module yet — update later
         $averageRating       = (float) (Review::avg('rating') ?? 0);
         $totalReviews        = Review::count();
 

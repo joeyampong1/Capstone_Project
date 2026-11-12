@@ -50,12 +50,12 @@
             ? \App\Models\Review::where('sitter_id', $sitterProfile->id)->count()
             : 0;
 
-        // Average rating — computed directly gikan sa reviews table
+        // Average rating — computed directly from reviews table
         $averageRating = $sitterProfile
             ? round((float) \App\Models\Review::where('sitter_id', $sitterProfile->id)->avg('rating'), 1)
             : 0.0;
 
-        // Fallback sa sitter_profiles.average_ratings kung wala review
+        // Fallback to sitter_profiles.average_ratings if no review
         if ($reviewsCount === 0 && $sitterProfile) {
             $averageRating = (float) ($sitterProfile->average_ratings ?? 0);
         }

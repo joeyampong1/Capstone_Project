@@ -92,10 +92,10 @@
                             $statusBadgeLabel = ucfirst($booking->status);
                         }
 
-                        // Check kung naay existing review
+                        // Check if an existing review exists
                         $hasReview = $booking->review()->exists();
 
-                        // ✅ Check kung TANAN visits completed na
+                        // ✅ Check if ALL visits are completed
                         $allVisitsCompleted = $totalVisits > 0
                             && $completedVisits === $totalVisits
                             && $booking->status === 'completed';

@@ -396,7 +396,7 @@
                 },
 
                 clearPhoto() {
-                    // Reset sa existing photo kung naa (dili null)
+                    // Reset to existing photo if available (not null)
                     const existing = (config && config.existingPhoto) || null;
                     this.photoPreview = existing;
                     this.photoName = '';

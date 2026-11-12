@@ -371,7 +371,7 @@ class TaskController extends Controller
             ->count();
 
         if ($remaining === 0 && $booking->status === 'accepted') {
-            // ✅ FIX ISSUE #31: Try-Catch (bisan gitawag ra ni sa sulod sa complete method)
+            // ✅ FIX ISSUE #31: Try-Catch (even though this is only called within the complete method)
             try {
                 $booking->update(['status' => 'completed']);
 
@@ -382,7 +382,6 @@ class TaskController extends Controller
                 );
             } catch (\Exception $e) {
                 Log::error('Task CheckBookingCompletion Error: ' . $e->getMessage());
-                // Ayaw na nato i-return diri kay naa na sa parent method ang return
             }
         }
     }

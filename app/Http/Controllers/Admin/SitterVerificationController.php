@@ -24,7 +24,7 @@ class SitterVerificationController extends Controller
         $dateSort   = $request->query('date', 'latest');
         $experience = $request->query('experience', 'all');
 
-        // Base query — users nga naay sitter profile (nag-apply)
+        // Base query — users with a sitter profile (applicants)
         $query = User::query()
             ->whereNotNull('sitter_applied_at')
             ->whereHas('sitterProfile')
@@ -37,7 +37,7 @@ class SitterVerificationController extends Controller
         // Filter by status
         if ($status !== 'all') {
             if ($status === 'pending') {
-                // pending OR NULL (kay wala pa na-set)
+                // pending OR NULL (because it is not set yet)
                 $query->where(function ($q) {
                     $q->where('sitter_status', 'pending')
                     ->orWhereNull('sitter_status');
@@ -194,7 +194,7 @@ class SitterVerificationController extends Controller
     // ==========================================
     // APPROVE
     // ==========================================
-    public function approve(Request $request, $id)
+    public function approve(Request $request, int $id)
     {
         $user = User::findOrFail($id);
 
@@ -240,7 +240,7 @@ class SitterVerificationController extends Controller
     // ==========================================
     // REJECT
     // ==========================================
-    public function reject(Request $request, $id)
+    public function reject(Request $request, int $id)
     {
         $user = User::findOrFail($id);
 
@@ -285,9 +285,9 @@ class SitterVerificationController extends Controller
     }
 
     // ==========================================
-    // DOWNLOAD — single file o ZIP bundle
+    // DOWNLOAD — single file or ZIP bundle
     // ==========================================
-    public function download($id)
+    public function download(int $id)
     {
         $user = User::with('sitterProfile')->findOrFail($id);
         $profile = $user->sitterProfile;

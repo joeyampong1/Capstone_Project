@@ -162,7 +162,7 @@ class ReportController extends Controller
      * Escape potential CSV formula injection.
      * Cells starting with =, +, -, @, \t, or \r are treated as formulas by Excel.
      */
-    private function escapeCsvFormula($value)
+        private function escapeCsvFormula(mixed $value)
     {
         if (is_string($value) && preg_match('/^[=+\-@\t\r]/', $value)) {
             return "'" . $value;
@@ -237,7 +237,6 @@ class ReportController extends Controller
 
             // ---- BOOKINGS ----
             if (in_array($type, ['all', 'booking'])) {
-                // ... (parehas ra sa imong daan nga code) ...
                 fputcsv($out, ['=== BOOKINGS ===']);
                 fputcsv($out, ['ID', 'Owner', 'Sitter', 'Pet', 'Status', 'Total', 'Created']);
 
@@ -264,7 +263,6 @@ class ReportController extends Controller
 
             // ---- COMPLAINTS ----
             if (in_array($type, ['all', 'complaint'])) {
-                // ... (parehas ra sa imong daan nga code) ...
                 fputcsv($out, ['=== COMPLAINTS ===']);
                 fputcsv($out, ['ID', 'Description', 'Status', 'Created']);
 

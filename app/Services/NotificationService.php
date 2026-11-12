@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Models\Booking;
+use App\Models\Visit;
+use App\Models\SupportMessage;
 use Illuminate\Support\Facades\Mail;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FcmNotification;
@@ -22,7 +25,7 @@ class NotificationService
         ?string $actionUrl = null,
         ?int $actorId = null,
         array $meta = [],
-        bool $sendEmail = true // <--- BAG-O NGA PARAMETER
+        bool $sendEmail = true
     ): Notification {
 
         // 1. SAVE TO DATABASE (Bell Icon)
@@ -57,7 +60,7 @@ class NotificationService
             }
         }
 
-        // 3. RETURN PARA SA BELL ICON
+        // 3. RETURN FOR BELL ICON
         return $notification;
     }
 
@@ -211,10 +214,10 @@ class NotificationService
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Booking (NAA EMAIL)
+    // DOMAIN EVENTS — Booking (Email + Push)
     // ==========================================
 
-    public static function bookingCreated(User $owner, User $sitter, $booking): void
+    public static function bookingCreated(User $owner, User $sitter, Booking $booking): void
     {
         self::send(
             userId:    $sitter->id,
@@ -227,7 +230,7 @@ class NotificationService
         );
     }
 
-    public static function bookingConfirmed(User $sitter, User $owner, $booking): void
+    public static function bookingConfirmed(User $sitter, User $owner, Booking $booking): void
     {
         self::send(
             userId:    $owner->id,
@@ -240,7 +243,7 @@ class NotificationService
         );
     }
 
-    public static function bookingCancelled(User $canceller, User $recipient, $booking): void
+    public static function bookingCancelled(User $canceller, User $recipient, Booking $booking): void
     {
         self::send(
             userId:    $recipient->id,
@@ -253,7 +256,7 @@ class NotificationService
         );
     }
 
-    public static function bookingCompleted(User $sitter, User $owner, $booking): void
+    public static function bookingCompleted(User $sitter, User $owner, Booking $booking): void
     {
         self::send(
             userId:    $owner->id,
@@ -267,10 +270,10 @@ class NotificationService
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Visits (PUSH RA / NO EMAIL)
+    // DOMAIN EVENTS — Visits (PUSH ONLY / NO EMAIL)
     // ==========================================
 
-    public static function visitCheckIn(User $sitter, User $owner, $visit): void
+    public static function visitCheckIn(User $sitter, User $owner, Visit $visit): void
     {
         self::send(
             userId:    $owner->id,
@@ -284,7 +287,7 @@ class NotificationService
         );
     }
 
-    public static function visitCheckOut(User $sitter, User $owner, $visit): void
+    public static function visitCheckOut(User $sitter, User $owner, Visit $visit): void
     {
         $duration = $visit->duration_minutes ? " ({$visit->duration_minutes} min)" : '';
         self::send(
@@ -299,7 +302,7 @@ class NotificationService
         );
     }
 
-    public static function visitCompleted(User $sitter, User $owner, $visit): void
+    public static function visitCompleted(User $sitter, User $owner, Visit $visit): void
     {
         self::send(
             userId:    $owner->id,
@@ -313,22 +316,22 @@ class NotificationService
         );
     }
 
-    public static function bookingReadyForReview(User $owner, $booking, User $sitter): void
+    public static function bookingReadyForReview(User $owner, Booking $booking, User $sitter): void
     {
         self::send(
             userId:    $owner->id,
             type:      'booking_ready_for_review',
             title:     'Ready to rate your sitter ⭐',
-            message:   "Tanang visits ni {$sitter->f_name} sa booking {$booking->booking_reference} kay complete na. Leave a review!",
+            message:   "All visits by {$sitter->f_name} for booking {$booking->booking_reference} are complete. Leave a review!",
             actionUrl: route('tasks.monitor'),
             actorId:   $sitter->id,
             meta:      ['booking_id' => $booking->id, 'sitter_id' => $sitter->id],
-            sendEmail: true, // Pwede nimo i-true kay importante ni para sa owner
+            sendEmail: true,
         );
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Messaging (PUSH RA / NO EMAIL)
+    // DOMAIN EVENTS — Messaging (PUSH ONLY / NO EMAIL)
     // ==========================================
 
     public static function newMessage(User $recipient, User $sender, string $preview): void
@@ -376,7 +379,7 @@ class NotificationService
     }
 
     // ==========================================
-    // DOMAIN EVENTS — Applications & Verification (NAA EMAIL)
+    // DOMAIN EVENTS — Applications & Verification
     // ==========================================
 
     public static function sitterApplicationSubmitted(User $applicant): void
@@ -479,41 +482,6 @@ class NotificationService
         );
     }
 
-    // public static function claimFiled(User $claimant, string $type): void
-    // {
-    //     self::notifyAdmins(
-    //         type:      Notification::TYPE_CLAIM_FILED,
-    //         title:     'New protection claim',
-    //         message:   "{$claimant->f_name} submitted a claim ({$type})",
-    //         actionUrl: route('admin.claims'),
-    //     );
-    // }
-
-    // public static function claimApproved(User $claimant, float $amount): void
-    // {
-    //     self::send(
-    //         userId:    $claimant->id,
-    //         type:      Notification::TYPE_CLAIM_APPROVED,
-    //         title:     'Claim approved ✅',
-    //         message:   'Your protection claim was approved for ₱' . number_format($amount, 2),
-    //         actionUrl: route('complaints.index'),
-    //         meta:      ['amount' => $amount],
-    //         sendEmail: true,
-    //     );
-    // }
-
-    // public static function claimRejected(User $claimant, string $reason = ''): void
-    // {
-    //     self::send(
-    //         userId:    $claimant->id,
-    //         type:      Notification::TYPE_CLAIM_REJECTED,
-    //         title:     'Claim rejected',
-    //         message:   $reason ?: 'Your protection claim was rejected.',
-    //         actionUrl: route('complaints.index'),
-    //         sendEmail: true,
-    //     );
-    // }
-
     // ==========================================
     // SYSTEM
     // ==========================================
@@ -527,7 +495,7 @@ class NotificationService
     // DOMAIN EVENTS — Help & Support Messages
     // ==========================================
 
-    public static function supportMessageReplied(User $recipient, User $admin, $supportMessage): void
+    public static function supportMessageReplied(User $recipient, User $admin, SupportMessage $supportMessage): void
     {
         $isResolved = $supportMessage->status === 'resolved';
 
@@ -547,7 +515,7 @@ class NotificationService
         );
     }
 
-    public static function supportMessageSubmitted(User $user, $supportMessage): void
+    public static function supportMessageSubmitted(User $user, SupportMessage $supportMessage): void
     {
         $typeLabel = $supportMessage->type === 'report' ? 'Problem Report' : 'Contact Message';
 

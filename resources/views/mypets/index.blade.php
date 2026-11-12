@@ -20,7 +20,7 @@
     </x-slot>
 
     @php
-        // Build ang data array para ma-pass sa Alpine
+        // Build the data array to pass to Alpine
         $petsData = $pets->map(function ($pet) {
             $emoji = match($pet->petType?->name ?? '') {
                 'Dog'     => '🐶',

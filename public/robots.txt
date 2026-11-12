@@ -1,2 +1,12 @@
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /profile/
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+
+# Allow crawling of public pages
+Allow: /
+Allow: /find-sitter

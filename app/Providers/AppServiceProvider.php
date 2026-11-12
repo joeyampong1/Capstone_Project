@@ -4,29 +4,32 @@ namespace App\Providers;
 
 use App\Models\ChatMessage;
 use App\Models\Notification;
+use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         // ==========================================
-        // Share badge counts across all views
+        // Share badge counts across specific layouts only
         // ==========================================
-        View::composer('*', function ($view) {
+        View::composer([
+            'layouts.app',
+            'layouts.admin',
+            'layouts.owner',
+            'layouts.sitter'
+            // Update this array with your actual layout file names
+            // (e.g., 'layouts.main', 'layouts.master', 'partials.navbar').
+        ], function ($view) {
             if (!Auth::check()) {
                 return;
             }
@@ -34,41 +37,41 @@ class AppServiceProvider extends ServiceProvider
             $userId = Auth::id();
             $user = Auth::user();
 
-            // Messages count
-            $unreadMessagesCount = ChatMessage::where('receiver_id', $userId)
-                ->where('is_read', false)
-                ->count();
+            // Cache the badge counts for 1 minute (60 seconds) to reduce database queries.
+            $counts = Cache::remember("user_badge_counts_{$userId}", 60, function () use ($userId, $user) {
+                $unreadMessagesCount = ChatMessage::where('receiver_id', $userId)
+                    ->where('is_read', false)
+                    ->count();
 
-            // Notifications count
-            $unreadNotificationsCount = Notification::where('user_id', $userId)
-                ->where(function ($q) {
-                    $q->where('is_read', false)
-                      ->orWhereNull('read_at');
-                })
-                ->count();
+                $unreadNotificationsCount = Notification::where('user_id', $userId)
+                    ->where(function ($q) {
+                        $q->where('is_read', false)
+                          ->orWhereNull('read_at');
+                    })
+                    ->count();
 
-            // Bookings count — depends on role
-            $pendingBookingsCount = 0;
+                $pendingBookingsCount = 0;
 
-            if (class_exists(\App\Models\Booking::class)) {
-                if ($user->is_sitter) {
-                    // Sitter: pending bookings that need to be accepted or declined
-                    $pendingBookingsCount = \App\Models\Booking::where('sitter_id', $userId)
-                        ->where('status', 'pending')
-                        ->count();
-                } else {
-                    // Owner: pending + accepted upcoming bookings
-                    $pendingBookingsCount = \App\Models\Booking::where('owner_id', $userId)
-                        ->whereIn('status', ['pending', 'accepted']) // FIXED ISSUE #36: Changed 'confirmed' to 'accepted'
-                        ->count();
+                if (class_exists(Booking::class)) {
+                    if ($user->is_sitter) {
+                        $pendingBookingsCount = Booking::where('sitter_id', $userId)
+                            ->where('status', 'pending')
+                            ->count();
+                    } else {
+                        $pendingBookingsCount = Booking::where('owner_id', $userId)
+                            ->whereIn('status', ['pending', 'accepted'])
+                            ->count();
+                    }
                 }
-            }
 
-            $view->with([
-                'unreadMessagesCount'      => $unreadMessagesCount,
-                'unreadNotificationsCount' => $unreadNotificationsCount,
-                'pendingBookingsCount'     => $pendingBookingsCount,
-            ]);
+                return [
+                    'unreadMessagesCount'      => $unreadMessagesCount,
+                    'unreadNotificationsCount' => $unreadNotificationsCount,
+                    'pendingBookingsCount'     => $pendingBookingsCount,
+                ];
+            });
+
+            $view->with($counts);
         });
     }
 }

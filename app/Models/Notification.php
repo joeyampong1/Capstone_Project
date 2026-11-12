@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
 
 class Notification extends Model
 {
@@ -64,7 +65,7 @@ class Notification extends Model
     public const TYPE_CLAIM_REJECTED = 'claim_rejected';
 
     public const TYPE_SYSTEM = 'system';
-    
+
     public const TYPE_SUPPORT_REPLIED    = 'support_replied';
     public const TYPE_SUPPORT_SUBMITTED  = 'support_submitted';
 
@@ -77,33 +78,33 @@ class Notification extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // ✅ Actor relationship removed — gigamit na nato ang data JSON
+    // ✅ Actor relationship removed — using data JSON now
 
     // ==========================================
     // SCOPES
     // ==========================================
 
-    public function scopeForUser($query, ?int $userId = null)
+    public function scopeForUser(Builder $query, ?int $userId = null): Builder
     {
         return $query->where('user_id', $userId ?? auth()->id());
     }
 
-    public function scopeUnread($query)
+    public function scopeUnread(Builder $query): Builder
     {
         return $query->where('is_read', false)->whereNull('read_at');
     }
 
-    public function scopeRead($query)
+    public function scopeRead(Builder $query): Builder
     {
         return $query->where('is_read', true);
     }
 
-    public function scopeLatest($query)
+    public function scopeLatest(Builder $query): Builder
     {
         return $query->orderByDesc('created_at');
     }
 
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
     }

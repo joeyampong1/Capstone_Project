@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\PetType;
 use App\Models\Availability;
-use App\Models\Booking; // <--- IDUGANG KINI
+use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 
 class SitterProfileController extends Controller
 {
-    public function show($id)
+    public function show(int $id)
     {
         // Eager load 'setting' relationship
         $sitter = User::with(['sitterProfile', 'pets', 'setting'])->findOrFail($id);

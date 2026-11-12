@@ -53,10 +53,10 @@ class LoginRequest extends FormRequest
 
         // 2. ✅ ISSUE #6 FIX: Check user status
         if (Auth::user()->status !== 'active') {
-            // Force logout kay banned/suspended ang account
+            // Force logout because the account is banned/suspended
             Auth::logout();
 
-            // Invalidate session para malimpyo
+            // Invalidate session to clear it
             $this->session()->invalidate();
             $this->session()->regenerateToken();
 
@@ -70,7 +70,7 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // 3. Clear rate limiter kung successful ug active
+        // 3. Clear rate limiter if successful and active
         RateLimiter::clear($this->throttleKey());
     }
 

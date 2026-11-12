@@ -410,7 +410,7 @@
     @php
         $user = auth()->user();
 
-        // Check kung kompleto ang profile
+        // Check if the profile is complete
         $profileComplete = $user->f_name
             && $user->l_name
             && $user->date_of_birth

@@ -240,7 +240,7 @@ class ProfileController extends Controller
                 return back()->withErrors($validator)->withInput();
             }
 
-            // Save ID type kung gi-submit
+            // Save ID type if submitted
             if ($request->filled('id_type')) {
                 $user->id_type = $request->input('id_type');
             }
@@ -562,13 +562,13 @@ class ProfileController extends Controller
      */
     private function deleteOldImage(?string $path, ?string $publicId): void
     {
-        // Kung naay public_id, i-delete gikan sa Cloudinary
+
         if ($publicId) {
             $this->cloudinary->delete($publicId);
             return;
         }
 
-        // Fallback para sa daang local storage images
+        // Fallback for old local storage images
         if ($path && !str_starts_with($path, 'http') && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 
 class Booking extends Model
@@ -36,9 +36,9 @@ class Booking extends Model
         'status',
         'cancellation_reason',
         'cancelled_by',
-        'cancelled_at'    => 'datetime',
-        'completed_at'    => 'datetime',
-        'paid_at'         => 'datetime',
+        'cancelled_at',
+        'completed_at',
+        'paid_at',
     ];
 
     // ==========================================
@@ -46,7 +46,7 @@ class Booking extends Model
     // ==========================================
     protected $casts = [
         'tasks'           => 'array',
-        'schedule_times'  => 'array',        // ← BAG-O
+        'schedule_times'  => 'array',
         'start_date'      => 'date',
         'end_date'        => 'date',
         'base_rate'       => 'decimal:2',
@@ -56,6 +56,9 @@ class Booking extends Model
         'sitter_earnings' => 'decimal:2',
         'visit_per_day'   => 'integer',
         'total_visits'    => 'integer',
+        'cancelled_at'    => 'datetime',
+        'completed_at'    => 'datetime',
+        'paid_at'         => 'datetime',
     ];
 
     // ==========================================
@@ -89,27 +92,27 @@ class Booking extends Model
     // SCOPES
     // ==========================================
 
-    public function scopePending($query)
+    public function scopePending(Builder $query): Builder
     {
         return $query->where('status', 'pending');
     }
 
-    public function scopeAccepted($query)
+    public function scopeAccepted(Builder $query): Builder
     {
         return $query->where('status', 'accepted');
     }
 
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', 'completed');
     }
 
-    public function scopeForOwner($query, int $ownerId)
+    public function scopeForOwner(Builder $query, int $ownerId): Builder
     {
         return $query->where('owner_id', $ownerId);
     }
 
-    public function scopeForSitter($query, int $sitterId)
+    public function scopeForSitter(Builder $query, int $sitterId): Builder
     {
         return $query->where('sitter_id', $sitterId);
     }
@@ -148,7 +151,7 @@ class Booking extends Model
     // ==========================================
 
     /**
-     * Generate unique booking reference
+     * Generate unique booking reference.
      * Format: BK-YYYYMMDD-XXXX (e.g., BK-20260915-0001)
      */
     public static function generateReference(): string
@@ -169,12 +172,12 @@ class Booking extends Model
             $newNumber = 1;
         }
 
-        // Pad sa 4 digits
+        // Pad to 4 digits
         return $prefix . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
     }
 
     /**
-     * Calculate pricing based sa booking details
+     * Calculate pricing based on booking details.
      *
      * @return array{
      *     days: int,
@@ -216,7 +219,7 @@ class Booking extends Model
         // Total amount owner pays
         $totalAmount = $subtotal + $foodCost;
 
-        // Sitter earnings (same as total, unless naay platform fee in the future)
+        // Sitter earnings (same as total, unless there is a platform fee in the future)
         $sitterEarnings = $totalAmount;
 
         return [
@@ -324,7 +327,7 @@ class Booking extends Model
     }
 
     /**
-     * Check kung tanan visits completed na
+     * Check if all visits are completed.
      */
     public function getIsFullyCompletedAttribute(): bool
     {
@@ -344,6 +347,4 @@ class Booking extends Model
     {
         return $this->review()->exists();
     }
-
-
 }

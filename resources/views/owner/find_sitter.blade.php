@@ -89,7 +89,7 @@
                         <form method="GET" action="{{ route('find.sitter') }}"
                             class="bg-white dark:bg-neutral-900 p-2 sm:p-2.5 rounded-2xl shadow-xl shadow-neutral-200/50 dark:shadow-neutral-950/50 border border-neutral-100 dark:border-neutral-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 max-w-2xl w-full">
 
-                            <!-- Service Location (editable, default gikan sa profile) -->
+                            <!-- Service Location (editable, default from profile) -->
                             <div class="flex items-center gap-2 pl-2 flex-1 w-full sm:w-auto border-b sm:border-b-0 sm:border-r border-neutral-100 dark:border-neutral-800 pb-2 sm:pb-0">
                                 <svg class="w-5 h-5 text-neutral-400 dark:text-neutral-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>

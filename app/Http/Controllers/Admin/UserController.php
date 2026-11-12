@@ -95,7 +95,7 @@ class UserController extends Controller
             'statusFilter',
             'verificationFilter',
             'sortFilter',
-            'showTrashed' // ✅ Defined na karon
+            'showTrashed'
         ));
     }
 
@@ -269,7 +269,7 @@ class UserController extends Controller
     // ==========================================
     // RESTORE DELETED — Recover soft-deleted user
     // ==========================================
-    public function restoreDeleted($id)
+    public function restoreDeleted(int $id)
     {
         $user = User::withTrashed()->findOrFail($id);
         $user->restore();
@@ -285,7 +285,7 @@ class UserController extends Controller
     // ==========================================
     // FORCE DELETE — Permanently remove user
     // ==========================================
-    public function forceDelete($id)
+    public function forceDelete(int $id)
     {
         $user = User::withTrashed()->findOrFail($id);
 
@@ -509,7 +509,7 @@ class UserController extends Controller
      * Escape potential CSV formula injection.
      * Cells starting with =, +, -, @, \t, or \r are treated as formulas by Excel.
      */
-    private function escapeCsvFormula($value)
+    private function escapeCsvFormula(mixed $value)
     {
         if (is_string($value) && preg_match('/^[=+\-@\t\r]/', $value)) {
             return "'" . $value;

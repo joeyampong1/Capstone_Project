@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-            // Add new columns kung wala pa
+            // Add new columns if they don't exist
             if (!Schema::hasColumn('bookings', 'food_preference')) {
                 $table->string('food_preference')->nullable()->after('base_rate');
             }

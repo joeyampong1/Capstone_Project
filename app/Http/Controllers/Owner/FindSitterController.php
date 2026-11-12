@@ -16,14 +16,14 @@ class FindSitterController extends Controller
         $owner = auth()->user();
         $pets  = Pet::where('user_id', $owner->id)->get();
 
-        // Kung naay pet selected → gamita ang full weighted matching algorithm
+        // If a pet is selected → use the full weighted matching algorithm
         if ($request->filled('pet_id')) {
             $pet = Pet::where('user_id', $owner->id)
                       ->findOrFail($request->integer('pet_id'));
 
             $sitters = $this->matcher->findMatches($pet, $owner, 30);
         } else {
-            // Default: general ranking (walay pet-specific factors)
+            // Default: general ranking (no pet-specific factors)
             $sitters = $this->matcher->findGeneralMatches($owner, 30);
         }
 

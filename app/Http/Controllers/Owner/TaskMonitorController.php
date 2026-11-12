@@ -18,7 +18,7 @@ class TaskMonitorController extends Controller
     {
         $user = Auth::user();
 
-        // Bookings nga accepted or completed ra — kay kadtong pending wala pay visits
+        // Only accepted or completed bookings — pending ones have no visits yet
         $bookings = Booking::with([
                 'sitter.sitterProfile',
                 'pet.petType',
@@ -38,7 +38,7 @@ class TaskMonitorController extends Controller
 
     public function show(Booking $booking)
     {
-        // Security: owner ra sa booking ang makakita
+        // Security: only the booking owner can view this
         abort_if(
             $booking->owner_id !== Auth::id(),
             403,
@@ -56,7 +56,7 @@ class TaskMonitorController extends Controller
 
     public function visitDetail(Visit $visit)
     {
-        // Security: owner ra sa booking ang makakita
+        // Security: only the booking owner can view this
         abort_if(
             $visit->booking->owner_id !== Auth::id(),
             403,

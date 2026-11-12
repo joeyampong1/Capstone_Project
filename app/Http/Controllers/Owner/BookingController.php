@@ -137,7 +137,7 @@ class BookingController extends Controller
                 ->withInput();
         }
 
-        // Validate: count sa schedule_times dapat equal sa visit_per_day
+        // Validate: count of schedule_times must equal visit_per_day
         if (count($validated['schedule_times']) !== (int) $validated['visit_per_day']) {
             return back()
                 ->withErrors(['schedule_times' => 'Number of times must match visits per day.'])

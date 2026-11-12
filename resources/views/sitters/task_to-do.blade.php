@@ -374,7 +374,7 @@
              // Append sa existing selection
              this.selectedFiles = [...this.selectedFiles, ...newFiles];
 
-             // Sync ang input files via DataTransfer
+             // Sync input files via DataTransfer
              try {
                  const dt = new DataTransfer();
                  this.selectedFiles.forEach(f => dt.items.add(f));

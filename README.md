@@ -92,6 +92,7 @@ php artisan key:generate
 Open `.env` and configure the following:
 
 *   **Database:** `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+*   **Queue & Cache:** `QUEUE_CONNECTION=database`, `CACHE_STORE=database`
 *   **Admin account:** `ADMIN_EMAIL`, `ADMIN_PASSWORD`
 *   **API keys:** Firebase (FCM), Cloudinary, OCR Space, Google OAuth, Brevo (SMTP)
 
@@ -115,19 +116,29 @@ php artisan storage:link
 
 ### 6. Run the Application
 
-Open two terminals:
+Open **three separate terminals** in the project root:
+
+**Terminal 1: Frontend assets**
 
 ```bash
-# Terminal 1: frontend assets
 npm run dev
 ```
 
+**Terminal 2: Laravel server**
+
 ```bash
-# Terminal 2: Laravel server
 php artisan serve
 ```
 
+**Terminal 3: Queue worker (emails & notifications)**
+
+```bash
+php artisan queue:work
+```
+
 Then visit **http://127.0.0.1:8000**.
+
+> **Important:** This system uses the `database` driver for queues. If the queue worker (Terminal 3) is not running, background jobs such as emails and push notifications will stay in the `jobs` table and will **not** be processed.
 
 ---
 
@@ -151,7 +162,7 @@ php artisan tinker
     'l_name'   => 'User',
     'email'    => 'admin@example.com',
     'password' => bcrypt('your-secure-password'),
-    'role'     => 'admin', // adjust to match your users table
+    'role'     => 'admin',
 ]);
 ```
 
@@ -163,8 +174,49 @@ php artisan tinker
 php artisan migrate:fresh --seed   # Reset and reseed the database
 php artisan view:clear             # Clear compiled Blade views
 php artisan optimize:clear         # Clear all cached files
+php artisan queue:restart          # Restart queue workers after code changes
 npm run build                      # Build assets for production
 ```
+
+---
+
+## ⚙️ Production Deployment (Queue Worker)
+
+This system uses the `database` driver for Queues and Cache. In production, background tasks (sending emails, push notifications, processing images) **will not run automatically** without a queue worker. You must set up one of the following on your live server:
+
+### Option 1: Supervisor (Recommended for VPS / Ubuntu)
+
+Supervisor keeps `php artisan queue:work` running in the background and restarts it automatically if it crashes. Example config (`/etc/supervisor/conf.d/petnanny-worker.conf`), updating the paths to match your server:
+
+```ini
+[program:petnanny-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /path-to-your-project/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+autostart=true
+autorestart=true
+numprocs=1
+user=www-data
+redirect_stderr=true
+stdout_logfile=/path-to-your-project/storage/logs/worker.log
+```
+
+Then start it:
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start petnanny-worker:*
+```
+
+### Option 2: Cron Job (For Shared Hosting / cPanel)
+
+If your host does not allow long-running processes, add a Cron Job that runs every minute. Update the path to match your server's directory:
+
+```bash
+* * * * * cd /path-to-your-project && php artisan queue:work --stop-when-empty >> /dev/null 2>&1
+```
+
+> **After every deployment**, run `php artisan queue:restart` so the workers load the latest code.
 
 ---
 

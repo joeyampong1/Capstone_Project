@@ -22,7 +22,7 @@ class AvailabilityController extends Controller
     {
         $sitterProfile = $this->getSitterProfile();
 
-        // Safety: Kung wala pay sitter profile, empty data
+        // Safety: If no sitter profile exists, return empty data
         if (!$sitterProfile) {
             return view('sitters.sitter_availability', [
                 'availabilities' => collect(),
@@ -65,7 +65,7 @@ class AvailabilityController extends Controller
 
     public function store(Request $request)
     {
-        // STEP 1: Check kung naay sitter profile ang user
+        // STEP 1: Check if the user has a sitter profile
         $sitterProfile = $this->getSitterProfile();
 
         if (!$sitterProfile) {
@@ -102,7 +102,7 @@ class AvailabilityController extends Controller
 
         // STEP 4: Save
         Availability::create([
-            'sitter_id' => $sitterProfile->id,  // <-- sitter_profiles.id na!
+            'sitter_id' => $sitterProfile->id,
             'date' => $request->date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
@@ -113,7 +113,7 @@ class AvailabilityController extends Controller
             ->with('status', 'Availability added successfully!');
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $sitterProfile = $this->getSitterProfile();
 
