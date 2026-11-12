@@ -367,9 +367,7 @@ class ProfileController extends Controller
                 ]);
             }
 
-            // ------------------------------------------------------------
-            // RUN FACE MATCH — download BOTH ID and Selfie from Cloudinary
-            // ------------------------------------------------------------
+            $result = null;
             $localIdPath = null;
             $localSelfiePath = null;
             $tempIdStoragePath = 'temp/ids/' . uniqid() . '.jpg';
@@ -394,10 +392,9 @@ class ProfileController extends Controller
                 $result = $faceMatch->verify($tempIdStoragePath, $tempSelfieStoragePath);
 
             } catch (\Exception $e) {
-                \Log::error('Face match exception', ['error' => $e->getMessage()]);
-                return back()->withErrors([
-                    'selfie_photo' => 'Face verification failed: ' . $e->getMessage(),
-                ]);
+                // If API fails, log the error and proceed to manual review.
+                // Do not block the submission.
+                \Log::error('Face match exception, proceeding to manual review', ['error' => $e->getMessage()]);
             } finally {
                 // Cleanup temp files
                 if ($localIdPath && file_exists($localIdPath)) @unlink($localIdPath);
@@ -406,17 +403,15 @@ class ProfileController extends Controller
                 if (Storage::disk('public')->exists($tempSelfieStoragePath)) Storage::disk('public')->delete($tempSelfieStoragePath);
             }
 
-            if (!$result['success']) {
-                return back()->withErrors([
-                    'selfie_photo' => 'Face verification failed: ' . ($result['error'] ?? 'unknown error'),
-                ]);
+            // Store face match results (if available)
+            if ($result && $result['success']) {
+                $user->face_match_score        = $result['confidence'];
+                $user->face_detected_on_id     = true;
+                $user->face_detected_on_selfie = true;
+                $user->id_expired              = false;
+            } else {
+                $user->face_match_score = null; // Null if API fails
             }
-
-            // Store face match results
-            $user->face_match_score        = $result['confidence'];
-            $user->face_detected_on_id     = true;
-            $user->face_detected_on_selfie = true;
-            $user->id_expired              = false;
 
             // Name match
             $ocrName   = strtoupper($user->ocr_result['name'] ?? '');
@@ -445,15 +440,8 @@ class ProfileController extends Controller
             $user->document_authenticity = null;
             $user->liveness_detection    = null;
 
-            // Handle match / no match
-            if (!$result['match']) {
-                $user->id_validation_status = 'rejected';
-                $user->save();
-                return back()->withErrors([
-                    'selfie_photo' => 'Face does not match the ID. Distance: ' . $result['distance'],
-                ]);
-            }
-
+            // Do not auto-reject on face match failure.
+            // Set to pending for manual admin review.
             $user->id_validation_status = 'pending';
             $user->save();
 
@@ -463,7 +451,34 @@ class ProfileController extends Controller
                 'face_score'=> $user->face_match_score,
             ]);
 
+            // Send email notification to user upon successful submission
+             try {
+                \App\Services\NotificationService::idVerificationSubmitted($user);
+            } catch (\Throwable $e) {
+                \Log::error('Failed to send ID submission notification: ' . $e->getMessage());
+            }
+
             return redirect()->route('profile.edit')->with('status', 'submitted');
+        }
+
+        // ==========================================
+        // Step 5: Reset Verification (Retry Button)
+        // ==========================================
+        if ($action === 'reset_verification') {
+            $user->id_validation_status = 'unverified';
+
+            $user->gov_id_path = null;
+            $user->gov_id_public_id = null;
+            $user->selfie_photo = null;
+            $user->selfie_photo_public_id = null;
+            $user->ocr_result = null;
+
+            $user->face_match_score     = null;
+            $user->name_match           = null;
+            $user->birthdate_match      = null;
+            $user->save();
+
+            return redirect()->route('profile.edit')->with('status', 'verification-reset');
         }
 
         return back()->withErrors(['error' => 'Invalid action.']);

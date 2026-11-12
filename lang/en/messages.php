@@ -655,6 +655,7 @@ return [
     'idv_reject_warning'       => 'This will notify the user that their verification was rejected. They can try again with clearer photos.',
     'idv_cancel'               => 'Cancel',
     'idv_yes_reject'           => 'Yes, Reject',
+    'idv_na'                   => 'N/A',
 
     // ==========================================
     // 📬 ADMIN — SUPPORT INBOX & MESSAGES
@@ -1560,6 +1561,7 @@ return [
     'pf_open_camera'           => 'Open Camera',
     'pf_choose_gallery'        => 'Choose from Gallery',
     'pf_retry_camera'          => 'Retake',
+    'pf_retake'             => 'Retake',
     'pf_retry_gallery'         => 'Choose Different',
     'pf_camera_denied'         => 'Camera access denied. Please allow camera permissions or use the gallery instead.',
     'pf_camera_title'          => 'Capture Photo',

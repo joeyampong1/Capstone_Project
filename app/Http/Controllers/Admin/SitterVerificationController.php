@@ -98,6 +98,9 @@ class SitterVerificationController extends Controller
         $applicantsData = $applicants->map(function ($user) {
             $profile = $user->sitterProfile;
 
+            // 👇 1. INITIALIZE CLOUDINARY SERVICE HERE 👇
+            $cloudinary = app(\App\Services\CloudinaryService::class);
+
             // Documents — handle both string and array (JSON)
             $documents = [];
             if ($profile?->certificates_path) {
@@ -111,7 +114,7 @@ class SitterVerificationController extends Controller
                     $documents[] = [
                         'name' => 'Sitter Certificate ' . ($index + 1),
                         'type' => strtoupper($ext ?: 'FILE'),
-                        'url'  => Storage::disk('public')->url($path),
+                        'url'  => $cloudinary->getSignedUrl($path), // 👈 ADDED SIGNED URL FOR CERTIFICATES TOO
                     ];
                 }
             }
@@ -135,6 +138,10 @@ class SitterVerificationController extends Controller
                 'applied_at'        => ($user->sitter_applied_at ?? $user->updated_at)?->format('M d, Y') ?? 'N/A',
                 'status'            => $user->sitter_status ?? 'pending',
                 'profile_photo'     => $user->profile_photo,
+
+                // ✅ FIX ISSUE #43: Use signed URLs for gov_id and selfie
+                'gov_id_url'        => $cloudinary->getSignedUrl($user->gov_id_public_id),
+                'selfie_url'        => $cloudinary->getSignedUrl($user->selfie_photo_public_id),
 
                 'experience_years'  => $profile?->experience_years ?? 0,
                 'bio'               => $profile?->bio ?? '',

@@ -655,6 +655,9 @@ return [
     'idv_reject_warning'       => 'Aabisuhan nito ang user na na-reject ang kanilang verification. Maaari silang mag-subukang muli gamit ang mas malinaw na mga larawan.',
     'idv_cancel'               => 'Kanselahin',
     'idv_yes_reject'           => 'Oo, I-reject',
+    'idv_na'                   => 'Wala',
+    'idv_view_size'            => 'Tingnan ang Buong Laki',
+    'idv_download_file'        => 'I-download',
 
     // ==========================================
     // 📬 ADMIN — SUPPORT INBOX & MESSAGES
@@ -1560,6 +1563,7 @@ return [
     'pf_open_camera'           => 'Buksan ang Camera',
     'pf_choose_gallery'        => 'Pumili mula sa Gallery',
     'pf_retry_camera'          => 'Kunan Muli',
+    'pf_retake'                => 'Kunan Muli',
     'pf_retry_gallery'         => 'Pumili ng Iba',
     'pf_camera_denied'         => 'Hindi pinayagan ang access sa camera. Mangyaring payagan ang mga pahintulot sa camera o gamitin ang gallery sa halip.',
     'pf_camera_title'          => 'Kunan ng Larawan',

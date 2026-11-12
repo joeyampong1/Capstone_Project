@@ -655,6 +655,9 @@ return [
     'idv_reject_warning'       => 'Cela informera l\'utilisateur que sa vérification a été rejetée. Il peut réessayer avec des photos plus claires.',
     'idv_cancel'               => 'Annuler',
     'idv_yes_reject'           => 'Oui, Rejeter',
+    'idv_na'                   => 'N/D',
+    'idv_view_size'            => 'Voir en taille réelle',
+    'idv_download_file'        => 'Télécharger',
 
     // ==========================================
     // 📬 ADMIN — SUPPORT INBOX & MESSAGES
@@ -1560,6 +1563,7 @@ return [
     'pf_open_camera'           => 'Ouvrir l\'Appareil Photo',
     'pf_choose_gallery'        => 'Choisir dans la Galerie',
     'pf_retry_camera'          => 'Reprendre',
+    'pf_retake'                => 'Reprendre',
     'pf_retry_gallery'         => 'Choisir un Autre',
     'pf_camera_denied'         => 'Accès à l\'appareil photo refusé. Veuillez autoriser les permissions de l\'appareil photo ou utiliser la galerie à la place.',
     'pf_camera_title'          => 'Prendre une Photo',

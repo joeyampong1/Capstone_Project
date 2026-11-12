@@ -682,10 +682,12 @@
                     <p class="text-xs sm:text-sm text-red-600 dark:text-red-400 max-w-sm">
                         {{ __('messages.pf_failed_desc') }}
                     </p>
-                    <a href="#" onclick="document.getElementById('retry_form').submit()"
-                       class="text-sm font-bold text-primary hover:underline">
+
+                    <button type="submit" name="action" value="reset_verification"
+                            class="mt-2 text-sm font-bold text-primary hover:underline">
                         {{ __('messages.pf_retry') }}
-                    </a>
+                    </button>
+
                 </div>
             </div>
         @endif

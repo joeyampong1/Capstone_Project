@@ -47,4 +47,9 @@ return [
         'redirect'      => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    // Python path for face matching script
+    'python' => [
+        'path' => env('PYTHON_PATH', 'python'),
+    ],
+
 ];

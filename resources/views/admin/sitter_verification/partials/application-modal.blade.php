@@ -156,6 +156,45 @@
 
             {{-- CENTER: DOCUMENTS --}}
             <div class="lg:col-span-1 space-y-4">
+
+                <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.pf_id_verification') }}</p>
+
+                    <div class="space-y-4">
+                        {{-- Government ID --}}
+                        <div>
+                            <p class="text-[11px] font-bold text-neutral-600 dark:text-neutral-300 mb-2">{{ __('messages.admin_government_id') }}</p>
+                            <template x-if="selected.gov_id_url">
+                                <a :href="selected.gov_id_url" target="_blank" class="block relative group">
+                                    <img :src="selected.gov_id_url" alt="{{ __('messages.admin_government_id') }}" class="w-full h-auto max-h-48 object-contain rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+                                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition rounded-lg">
+                                        <span class="text-white text-xs font-bold">{{ __('messages.cp_evidence_click') }}</span>
+                                    </div>
+                                </a>
+                            </template>
+                            <template x-if="!selected.gov_id_url">
+                                <p class="text-xs text-neutral-400 italic">{{ __('messages.idv_no_id_image') }}</p>
+                            </template>
+                        </div>
+
+                        {{-- Selfie --}}
+                        <div>
+                            <p class="text-[11px] font-bold text-neutral-600 dark:text-neutral-300 mb-2">{{ __('messages.pf_step_selfie_id') }}</p>
+                            <template x-if="selected.selfie_url">
+                                <a :href="selected.selfie_url" target="_blank" class="block relative group">
+                                    <img :src="selected.selfie_url" alt="{{ __('messages.pf_step_selfie_id') }}" class="w-full h-auto max-h-48 object-contain rounded-lg border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-900">
+                                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition rounded-lg">
+                                        <span class="text-white text-xs font-bold">{{ __('messages.cp_evidence_click') }}</span>
+                                    </div>
+                                </a>
+                            </template>
+                            <template x-if="!selected.selfie_url">
+                                <p class="text-xs text-neutral-400 italic">{{ __('messages.idv_no_selfie_image') }}</p>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
                     <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.sv_supporting_docs') }}</p>
                     <div class="space-y-2 sm:space-y-3">

@@ -655,6 +655,9 @@ return [
     'idv_reject_warning'       => 'Esto notificará al usuario que su verificación fue rechazada. Puede intentarlo de nuevo con fotos más claras.',
     'idv_cancel'               => 'Cancelar',
     'idv_yes_reject'           => 'Sí, rechazar',
+    'idv_na'                   => 'N/D',
+    'idv_view_size'            => 'Ver tamaño completo',
+    'idv_download_file'        => 'Descargar',
 
     // ==========================================
     // 📬 ADMIN — SUPPORT INBOX & MESSAGES
@@ -1560,6 +1563,7 @@ return [
     'pf_open_camera'           => 'Abrir cámara',
     'pf_choose_gallery'        => 'Elegir de la galería',
     'pf_retry_camera'          => 'Volver a tomar',
+    'pf_retake'                => 'Volver a tomar',
     'pf_retry_gallery'         => 'Elegir otra',
     'pf_camera_denied'         => 'Acceso a cámara denegado. Permita el acceso o use la galería.',
     'pf_camera_title'          => 'Tomar foto',

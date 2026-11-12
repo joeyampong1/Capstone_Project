@@ -6,13 +6,6 @@ use Illuminate\Support\Facades\Log;
 
 class FaceMatchService
 {
-    /**
-     * Verify that the face in the ID matches the face in the Selfie.
-     *
-     * @param  string  $idPath      Relative path on 'public' disk (e.g. "temp/id.jpg")
-     * @param  string  $selfiePath  Relative path on 'public' disk (e.g. "temp/selfie.jpg")
-     * @return array{success: bool, match?: bool, distance?: float, confidence?: float, error?: string}
-     */
     public function verify(string $idPath, string $selfiePath): array
     {
         $script = base_path('scripts/verify_face.py');
@@ -22,26 +15,26 @@ class FaceMatchService
             return ['success' => false, 'error' => 'verify_face.py not found'];
         }
 
-        // Resolve absolute path for BOTH images
-        $absoluteIdPath = storage_path("app/public/{$idPath}");
-        $absoluteSelfiePath = storage_path("app/public/{$selfiePath}");
+        // Resolve absolute paths (Supports both Local Storage and Cloudinary URLs)
+        $absoluteIdPath = $this->resolveImagePath($idPath, 'id');
+        $absoluteSelfiePath = $this->resolveImagePath($selfiePath, 'selfie');
 
-        if (! file_exists($absoluteIdPath)) {
-            Log::error('FaceMatch: ID not found', ['path' => $absoluteIdPath]);
-            return ['success' => false, 'error' => 'ID file not found'];
+        if (!$absoluteIdPath) {
+            Log::error('FaceMatch: ID image not found or failed to download', ['path' => $idPath]);
+            return ['success' => false, 'error' => 'ID image could not be retrieved.'];
         }
 
-        if (! file_exists($absoluteSelfiePath)) {
-            Log::error('FaceMatch: selfie not found', ['path' => $absoluteSelfiePath]);
-            return ['success' => false, 'error' => 'Selfie file not found'];
+        if (!$absoluteSelfiePath) {
+            Log::error('FaceMatch: Selfie image not found or failed to download', ['path' => $selfiePath]);
+            return ['success' => false, 'error' => 'Selfie image could not be retrieved.'];
         }
 
         // Python path (default: 'python' from PATH, override via .env PYTHON_PATH)
-        $python = env('PYTHON_PATH', 'python');
+        $python = config('services.python.path', 'python');
 
-        // ✅ FIX ISSUE #45: Pass BOTH ID and Selfie arguments to the Python script
+        // Pass BOTH ID and Selfie arguments to the Python script
         $cmd = sprintf(
-            '%s %s %s %s 2>&1',
+            '"%s" %s %s %s 2>&1',
             $python,
             escapeshellarg($script),
             escapeshellarg($absoluteIdPath),
@@ -50,7 +43,6 @@ class FaceMatchService
 
         Log::info('FaceMatch: running', ['cmd' => $cmd]);
 
-        // Use Symfony Process for better error handling and timeouts
         try {
             $process = \Symfony\Component\Process\Process::fromShellCommandline($cmd);
             $process->setTimeout(60); // Abort if execution exceeds 1 minute
@@ -59,11 +51,16 @@ class FaceMatchService
             $output = $process->getOutput() ?: $process->getErrorOutput();
         } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException $e) {
             \Log::error('FaceMatch: Python script timed out');
+            $this->cleanupTempFiles($absoluteIdPath, $absoluteSelfiePath);
             return ['success' => false, 'error' => 'Face verification timed out. Please try again.'];
         } catch (\Exception $e) {
             \Log::error('FaceMatch: Execution error', ['error' => $e->getMessage()]);
+            $this->cleanupTempFiles($absoluteIdPath, $absoluteSelfiePath);
             return ['success' => false, 'error' => 'System error during verification.'];
         }
+
+        // Clean up temporary downloaded files (if any)
+        $this->cleanupTempFiles($absoluteIdPath, $absoluteSelfiePath);
 
         if (empty($output)) {
             return ['success' => false, 'error' => 'No output from Python script'];
@@ -87,5 +84,50 @@ class FaceMatchService
         }
 
         return $result;
+    }
+
+    /**
+     * Resolve image path. If it's a remote URL (Cloudinary), download it temporarily.
+     */
+    private function resolveImagePath(string $path, string $type): ?string
+    {
+        // Check if it's a URL (Cloudinary)
+        if (str_starts_with($path, 'http')) {
+            $tempPath = storage_path('app/temp/' . uniqid() . '_' . $type . '.jpg');
+
+            // Ensure temp directory exists
+            if (!is_dir(dirname($tempPath))) {
+                mkdir(dirname($tempPath), 0755, true);
+            }
+
+            // Download the image
+            try {
+                $content = @file_get_contents($path);
+                if ($content !== false) {
+                    file_put_contents($tempPath, $content);
+                    return $tempPath;
+                }
+            } catch (\Exception $e) {
+                Log::error('FaceMatch: Failed to download image from URL', ['url' => $path, 'error' => $e->getMessage()]);
+            }
+            return null;
+        }
+
+        // Local storage
+        $localPath = storage_path("app/public/{$path}");
+        return file_exists($localPath) ? $localPath : null;
+    }
+
+    /**
+     * Delete temporary downloaded files to save storage space.
+     */
+    private function cleanupTempFiles(string $idPath, string $selfiePath): void
+    {
+        if (str_contains($idPath, 'app/temp/') && file_exists($idPath)) {
+            @unlink($idPath);
+        }
+        if (str_contains($selfiePath, 'app/temp/') && file_exists($selfiePath)) {
+            @unlink($selfiePath);
+        }
     }
 }

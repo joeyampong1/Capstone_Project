@@ -149,7 +149,7 @@ class NotificationService
         Mail::html($html, function ($msg) use ($user, $safeTitle) {
             $msg->to($user->email)
                 ->subject("PetNanny: {$safeTitle}");
-        })->queue();
+        });
     }
 
     // ==========================================
@@ -209,7 +209,15 @@ class NotificationService
         $admins = User::where('role', 'admin')->pluck('id');
 
         foreach ($admins as $adminId) {
-            self::send($adminId, $type, $title, $message, $actionUrl, null, $meta);
+            self::send(
+                userId: $adminId,
+                type: $type,
+                title: $title,
+                message: $message,
+                actionUrl: $actionUrl,
+                meta: $meta,
+                sendEmail: true
+            );
         }
     }
 
@@ -384,12 +392,23 @@ class NotificationService
 
     public static function sitterApplicationSubmitted(User $applicant): void
     {
+        // 1. Notify Admins
         self::notifyAdmins(
             type:      Notification::TYPE_SITTER_APPLIED,
             title:     'New sitter application',
             message:   "{$applicant->f_name} applied to be a pet sitter",
             actionUrl: route('admin.verification.sitter'),
             meta:      ['applicant_id' => $applicant->id],
+        );
+
+        // 2. ✅ Notify the User (Send Email)
+        self::send(
+            userId:    $applicant->id,
+            type:      Notification::TYPE_SITTER_APPLIED,
+            title:     'Sitter Application Submitted',
+            message:   'Your application to become a pet sitter has been received. Our admin team will review it within 1-2 business days.',
+            actionUrl: route('sitter.application'),
+            sendEmail: true, // Send email to user
         );
     }
 
@@ -419,12 +438,23 @@ class NotificationService
 
     public static function idVerificationSubmitted(User $applicant): void
     {
+        // 1. Notify Admins
         self::notifyAdmins(
-            type:      Notification::TYPE_SITTER_APPLIED,
+            type:      Notification::TYPE_SITTER_APPLIED, // Or create a new Type_ID_SUBMITTED
             title:     'ID verification submitted',
             message:   "{$applicant->f_name} submitted ID for verification",
             actionUrl: route('admin.verification.id'),
             meta:      ['applicant_id' => $applicant->id],
+        );
+
+        // 2. ✅ Notify the User (Send Email)
+        self::send(
+            userId:    $applicant->id,
+            type:      'id_submitted',
+            title:     'ID Verification Submitted',
+            message:   'Your ID and selfie have been successfully submitted. We are currently reviewing your documents (1-2 business days).',
+            actionUrl: route('profile.edit'),
+            sendEmail: true, // Send email to user
         );
     }
 

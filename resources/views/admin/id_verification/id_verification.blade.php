@@ -56,12 +56,12 @@
             'status'     => $u->id_validation_status,
             'status_label'=> $statusLabel($u->id_validation_status),
             'initials'   => $initials($u->full_name),
-            'name'       => $u->full_name ?: '—',
-            'email'      => $u->email ?? '—',
-            'phone'      => $u->contact_number ?? '—',
+            'name'       => $u->full_name ?: __('messages.idv_na'),
+            'email'      => $u->email ?? __('messages.idv_na'),
+            'phone'      => $u->contact_number ?? __('messages.idv_na'),
             'role'       => $u->id_role,
             'role_label' => $roleLabel($u->id_role),
-            'registered' => optional($u->created_at)->format('F j, Y') ?? '—',
+            'registered' => optional($u->created_at)->format('F j, Y') ?? __('messages.idv_na'),
             'id_type'    => match($u->id_type) {
                 'passport'        => __('messages.pf_id_passport'),
                 'drivers_license' => __('messages.pf_id_drivers_license'),
@@ -70,9 +70,9 @@
                 'voters_id'       => __('messages.pf_id_voters'),
                 'national_id'     => __('messages.pf_id_national'),
                 'other'           => __('messages.pf_id_other'),
-                default           => $u->id_type ?? '—',
+                default           => $u->id_type ?? __('messages.idv_na'),
             },
-            'id_number'  => $ocr['id_number'] ?? '—',
+            'id_number'  => $ocr['id_number'] ?? __('messages.idv_na'),
             'id_front'   => $u->gov_id_signed_url,
             'selfie'     => $u->selfie_signed_url,
             'api' => [
@@ -326,8 +326,8 @@
                                                 {{ $initials($u->full_name) }}
                                             </div>
                                             <div class="min-w-0">
-                                                <p class="font-bold text-[#1B3B36] dark:text-white truncate">{{ $u->full_name ?: '—' }}</p>
-                                                <p class="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ $u->email }}</p>
+                                                <p class="font-bold text-[#1B3B36] dark:text-white truncate">{{ $u->full_name ?: __('messages.idv_na') }}</p>
+                                                <p class="text-[10px] sm:text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ $u->email ?: __('messages.idv_na') }}</p>
                                             </div>
                                         </div>
                                     </td>
@@ -507,7 +507,7 @@
                                                     <button type="button"
                                                             @click.stop="window.open(selected.id_front, '_blank')"
                                                             class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
-                                                            title="View Full Size">
+                                                            title="{{ __('messages.cp_evidence_click') }}"
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                                         </svg>
@@ -517,7 +517,7 @@
                                                     download="id_front.jpg"
                                                     @click.stop
                                                     class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
-                                                    title="Download">
+                                                    title="{{ __('messages.idv_download_file') }}"
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                                         </svg>
@@ -548,7 +548,7 @@
                                                     <button type="button"
                                                             @click.stop="window.open(selected.selfie, '_blank')"
                                                             class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
-                                                            title="View Full Size">
+                                                            title="{{ __('messages.cp_evidence_click') }}"
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                                         </svg>
@@ -558,7 +558,7 @@
                                                     download="selfie.jpg"
                                                     @click.stop
                                                     class="p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition pointer-events-auto"
-                                                    title="Download">
+                                                    title="{{ __('messages.idv_download') }}"
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                                         </svg>
@@ -625,50 +625,56 @@
                                 </template>
                             </div>
 
-                            <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
+                           <div class="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-neutral-700">
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400 mb-3">{{ __('messages.idv_api_title') }}</p>
                                 <div class="space-y-3 text-sm">
 
+                                    {{-- Face Match --}}
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_face_match') }}</span>
                                         <span class="font-bold shrink-0"
-                                              :class="parseFloat(selected?.api?.face_match ?? 0) >= 80 ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'"
-                                              x-text="selected?.api?.face_match != null ? (parseFloat(selected.api.face_match) + '%') : '—'"></span>
+                                                :class="parseFloat(selected?.api?.face_match ?? 0) >= 60 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                                x-text="parseFloat(selected?.api?.face_match ?? 0) + '%'"></span>
                                     </div>
 
+                                    {{-- Document Authenticity --}}
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_doc_auth') }}</span>
                                         <span class="font-bold shrink-0"
-                                              :class="['passed','pass','yes','true','matched'].includes(String(selected?.api?.doc_auth ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : (String(selected?.api?.doc_auth ?? '').toLowerCase() === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-neutral-500')"
-                                              x-text="selected?.api?.doc_auth ? String(selected.api.doc_auth).charAt(0).toUpperCase() + String(selected.api.doc_auth).slice(1) : '—'"></span>
+                                                :class="selected?.api?.doc_auth ? (['passed','pass','yes','true','matched'].includes(String(selected.api.doc_auth).toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : 'text-neutral-400 dark:text-neutral-500'"
+                                                x-text="selected?.api?.doc_auth ? String(selected.api.doc_auth).toUpperCase() : @js(__('messages.idv_na'))"></span>
                                     </div>
 
+                                    {{-- Liveness Detection --}}
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_liveness') }}</span>
                                         <span class="font-bold shrink-0"
-                                              :class="['passed','pass','yes','true'].includes(String(selected?.api?.liveness ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : (String(selected?.api?.liveness ?? '').toLowerCase() === 'failed' ? 'text-red-600 dark:text-red-400' : 'text-neutral-500')"
-                                              x-text="selected?.api?.liveness ? String(selected.api.liveness).charAt(0).toUpperCase() + String(selected.api.liveness).slice(1) : '—'"></span>
+                                                :class="selected?.api?.liveness ? (['passed','pass','yes','true'].includes(String(selected.api.liveness).toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : 'text-neutral-400 dark:text-neutral-500'"
+                                                x-text="selected?.api?.liveness ? String(selected.api.liveness).toUpperCase() : @js(__('messages.idv_na'))"></span>
                                     </div>
 
+                                    {{-- ID Expired --}}
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_id_expired') }}</span>
                                         <span class="font-bold shrink-0"
-                                              :class="['yes','true','1'].includes(String(selected?.api?.id_expired ?? '').toLowerCase()) ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'"
-                                              x-text="selected?.api?.id_expired == null ? '—' : (['yes','true','1'].includes(String(selected.api.id_expired).toLowerCase()) ? '{{ __('messages.idv_yes') }}' : '{{ __('messages.idv_no') }}')"></span>
+                                                :class="selected?.api?.id_expired ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'"
+                                                x-text="selected?.api?.id_expired ? @js(__('messages.idv_yes')) : @js(__('messages.idv_no'))"></span>
                                     </div>
 
+                                    {{-- Name Match --}}
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_name_match') }}</span>
                                         <span class="font-bold shrink-0"
-                                              :class="['passed','pass','yes','true','matched','match'].includes(String(selected?.api?.name_match ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-                                              x-text="selected?.api?.name_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.name_match).toLowerCase()) ? '{{ __('messages.idv_matched') }}' : '{{ __('messages.idv_not_matched') }}') : '—'"></span>
+                                                :class="selected?.api?.name_match ? (['passed','pass','yes','true','matched','match'].includes(String(selected.api.name_match).toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : 'text-neutral-400 dark:text-neutral-500'"
+                                                x-text="selected?.api?.name_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.name_match).toLowerCase()) ? @js(__('messages.idv_matched')) : @js(__('messages.idv_not_matched'))) : @js(__('messages.idv_na'))"></span>
                                     </div>
 
+                                    {{-- Birthdate Match --}}
                                     <div class="flex items-center justify-between gap-2">
                                         <span class="text-neutral-600 dark:text-neutral-400">{{ __('messages.idv_birthdate_match') }}</span>
                                         <span class="font-bold shrink-0"
-                                              :class="['passed','pass','yes','true','matched','match'].includes(String(selected?.api?.birthdate_match ?? '').toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-                                              x-text="selected?.api?.birthdate_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.birthdate_match).toLowerCase()) ? '{{ __('messages.idv_matched') }}' : '{{ __('messages.idv_not_matched') }}') : '—'"></span>
+                                                :class="selected?.api?.birthdate_match ? (['passed','pass','yes','true','matched','match'].includes(String(selected.api.birthdate_match).toLowerCase()) ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400') : 'text-neutral-400 dark:text-neutral-500'"
+                                                x-text="selected?.api?.birthdate_match ? (['matched','match','passed','pass','yes','true'].includes(String(selected.api.birthdate_match).toLowerCase()) ? @js(__('messages.idv_matched')) : @js(__('messages.idv_not_matched'))) : @js(__('messages.idv_na'))"></span>
                                     </div>
 
                                 </div>

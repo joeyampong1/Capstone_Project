@@ -76,13 +76,19 @@ class CloudinaryService
 
     public function getSignedUrl(?string $publicId, array $options = []): ?string
     {
-        if (empty($publicId)) return null;
+        if (empty($publicId)) {
+            Log::error('Cloudinary Error: Public ID is empty when generating signed URL');
+            return null;
+        }
 
         try {
-            return $this->cloudinary->image($publicId)
+            // Use the type() method instead of deliveryType() for authenticated assets
+            $url = $this->cloudinary->image($publicId)
                 ->deliveryType('authenticated')
                 ->signUrl(true)
-                ->toUrl($options);
+                ->toUrl();
+
+            return $url;
         } catch (\Exception $e) {
             Log::error('Cloudinary signed URL generation failed', [
                 'public_id' => $publicId,
