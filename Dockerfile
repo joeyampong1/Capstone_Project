@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# Inalis ang linux-headers-generic, inalis ang pecl grpc
+# 1. I-install ang system dependencies (PHP, Python, ug Node.js)
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -18,31 +18,36 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Direktang kopyahin ang pre-compiled na gRPC (walang compilation)
+# 2. Direktang kopyahin ang pre-compiled na gRPC (walang compilation)
 COPY --from=ghcr.io/extphprs/grpc-php-rs:latest-php8.3 /usr/local/ /usr/local/
 
-# Install Composer
+# 3. Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy project files
+# 4. Copy project files
 COPY . .
 
-# Install PHP dependencies
+# 5. Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Python dependencies if requirements.txt exists
+# 6. Install Node dependencies ug i-build ang Vite assets
+RUN npm install && npm run build
+
+# 7. Install Python dependencies if requirements.txt exists
 RUN if [ -f requirements.txt ]; then pip3 install --no-cache-dir --break-system-packages -r requirements.txt; fi
 
-# Ensure permissions and storage link
+# 8. Ensure permissions and storage link
 RUN php artisan storage:link || true \
     && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
 
-# Simplified CMD (migration ilagay sa Pre-Deploy Command)
+# 9. Simplified CMD
 CMD php artisan config:clear && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
