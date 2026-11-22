@@ -295,12 +295,12 @@ class MatchingService
      */
     private function scoreCapability(\App\Models\SitterProfile $p, Pet $pet): float
     {
-        $types = $p->preferred_pet_types ?? [];
-        $sizes = $p->preferred_pet_sizes ?? [];
+        $types = array_map('intval', $p->preferred_pet_types ?? []);
+        $sizes = array_map(fn ($s) => strtolower(trim((string) $s)), $p->preferred_pet_sizes ?? []);
 
         // Empty list means no restriction (accepts all)
-        $typeOk = empty($types) || in_array($pet->pet_type_id, $types);
-        $sizeOk = empty($sizes) || in_array($pet->size, $sizes);
+        $typeOk = empty($types) || in_array((int) $pet->pet_type_id, $types, true);
+        $sizeOk = empty($sizes) || in_array(strtolower(trim((string) $pet->size)), $sizes, true);
 
         return ($typeOk && $sizeOk) ? 1.0 : 0.0;
     }
@@ -363,6 +363,10 @@ class MatchingService
            + cos(deg2rad((float) $lat1)) * cos(deg2rad((float) $lat2))
            * sin($dLng / 2) ** 2;
 
-        return $R * 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $a = max(0.0, min(1.0, $a));
+
+        return $R * 2 * atan2(sqrt($a), sqrt(max(0.0, 1.0 - $a)));
     }
 }
+
+// Prescriptive Analytics: The MatchingService class implements a weighted matching algorithm to score and rank potential sitters for a pet owner based on multiple criteria, including verified ID, distance, ratings, experience, capability to handle the pet, health compatibility, and temperament compatibility. The class uses normalization techniques and Bayesian averaging to ensure fair scoring across candidates.

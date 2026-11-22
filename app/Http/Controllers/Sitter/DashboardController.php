@@ -151,6 +151,12 @@ class DashboardController extends Controller
             ->count();
 
         // ==========================================
+        // 7. PRESCRIPTIVE ANALYTICS (Visit Priority & Recommendations)
+        // ==========================================
+        $sitterPrescriptive = (new \App\Services\SitterPrescriptiveService())
+            ->prioritizeVisitsAndAdvise($user, $sitterProfile, $upcomingVisits);
+
+        // ==========================================
         // PASS TO VIEW
         // ==========================================
         return view('sitters.sitter_dashboard', compact(
@@ -173,7 +179,8 @@ class DashboardController extends Controller
             'totalVisits',
             'activeBookings',
             'uniqueOwners',
-            'totalVisitsLast30Days'
+            'totalVisitsLast30Days',
+            'sitterPrescriptive',
         ));
     }
 

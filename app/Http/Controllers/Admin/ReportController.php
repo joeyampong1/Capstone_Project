@@ -28,12 +28,25 @@ class ReportController extends Controller
             'pending_complaints'  => Complaint::where('status', 'pending')->count(),
         ];
 
+        $topSitterRow = Booking::selectRaw('sitter_id, COUNT(*) as total')
+            ->where('status', 'completed')
+            ->whereNotNull('sitter_id')
+            ->groupBy('sitter_id')
+            ->orderByDesc('total')
+            ->first();
+
+        $topSitterName = null;
+        if ($topSitterRow && ($topSitterUser = User::find($topSitterRow->sitter_id))) {
+            $topSitterName = trim(($topSitterUser->f_name ?? '') . ' ' . ($topSitterUser->l_name ?? ''))
+                ?: $topSitterUser->email;
+        }
+
         $bookingStats = [
             'total'           => Booking::count(),
             'completed'       => Booking::where('status', 'completed')->count(),
             'cancelled'       => Booking::where('status', 'cancelled')->count(),
             'pending'         => Booking::where('status', 'pending')->count(),
-            'top_sitter_name' => null,
+            'top_sitter_name' => $topSitterName,
         ];
 
         $userStats = [
@@ -122,6 +135,19 @@ class ReportController extends Controller
         $recentReports = [];
         $reportHistory = collect();
 
+        $reportKpis = [
+            'cancellation_rate' => $bookingStats['total'] > 0
+                ? round(($bookingStats['cancelled'] / $bookingStats['total']) * 100, 1)
+                : 0,
+        ];
+
+        $prescriptive = (new \App\Services\AdminPrescriptiveService())
+            ->generateRecommendations(
+                $reportKpis,
+                ['pending' => $userStats['pending_verification']],
+                ['pending' => $complaintStats['pending']]
+            );
+
         return view('admin.reports.reports', compact(
             'stats',
             'bookingStats',
@@ -132,6 +158,7 @@ class ReportController extends Controller
             'complaintDistribution',
             'recentReports',
             'reportHistory',
+            'prescriptive',
         ));
     }
 

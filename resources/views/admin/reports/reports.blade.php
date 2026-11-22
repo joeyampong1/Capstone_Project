@@ -488,6 +488,60 @@
                 @endif
             </div>
 
+<!-- ⑥.5 PRESCRIPTIVE RECOMMENDATIONS -->
+            @isset($prescriptive)
+                <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-6 mb-4 sm:mb-6">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-sm text-[#1B3B36] dark:text-white">
+                            {{ __('messages.prescriptive_recommendations_title') }}
+                        </h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            {{ __('messages.prescriptive_recommendations_desc') }}
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        @foreach ($prescriptive['recommendations'] ?? [] as $rec)
+                            @php
+                                $priority = $rec['priority'] ?? 'Low';
+
+                                $badgeStyle = match ($priority) {
+                                    'High'   => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+                                    'Medium' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+                                    default  => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+                                };
+
+                                $priorityLabel = match ($priority) {
+                                    'High'   => __('messages.prescriptive_priority_high'),
+                                    'Medium' => __('messages.prescriptive_priority_medium'),
+                                    default  => __('messages.prescriptive_priority_low'),
+                                };
+
+                                $titleKey  = $rec['title_key']  ?? null;
+                                $reasonKey = $rec['reason_key'] ?? null;
+                                $actionKey = $rec['action_key'] ?? null;
+
+                                $recTitle  = $titleKey  ? __($titleKey, $rec['params'] ?? [])  : ($rec['title'] === 'Platform Operations Healthy' ? __('messages.prescriptive_healthy_title') : $rec['title']);
+                                $recReason = $reasonKey ? __($reasonKey, $rec['params'] ?? []) : ($rec['title'] === 'Platform Operations Healthy' ? __('messages.prescriptive_healthy_reason') : $rec['reason']);
+                                $recAction = $actionKey ? __($actionKey, $rec['params'] ?? []) : ($rec['title'] === 'Platform Operations Healthy' ? __('messages.prescriptive_healthy_action') : $rec['action']);
+                            @endphp
+                            <div class="rounded-xl border border-gray-100 dark:border-neutral-800 p-3.5 bg-neutral-50/70 dark:bg-neutral-800/40">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-bold text-xs sm:text-sm text-[#1B3B36] dark:text-white">{{ $recTitle }}</span>
+                                    <span class="px-2.5 py-0.5 text-[10px] sm:text-xs font-bold rounded-full shrink-0 {{ $badgeStyle }}">
+                                        {{ $priorityLabel }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-300 mt-1">{{ $recReason }}</p>
+                                <p class="text-xs font-semibold text-primary mt-1">
+                                    {{ __('messages.prescriptive_recommended_action') }}: {{ $recAction }}
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endisset
+
             <!-- ⑦ INFORMATION CARD -->
             <div class="bg-blue-50 dark:bg-blue-950/20 rounded-2xl border border-blue-200 dark:border-blue-800/50 p-4 sm:p-6">
                 <div class="flex items-start gap-3">

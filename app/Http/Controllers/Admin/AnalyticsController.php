@@ -326,6 +326,12 @@ class AnalyticsController extends Controller
             'Active sitters: <span class="font-bold text-[#1B3B36] dark:text-white">' . $activeSitters . '</span> (' . $kpis['verified_sitter_pct'] . '% verified).',
         ];
 
+        // -------------------------------------------------------------
+        // Prescriptive Analytics (Weighted Risk & Action Recommendations)
+        // -------------------------------------------------------------
+        $prescriptive = (new \App\Services\AdminPrescriptiveService())
+            ->generateRecommendations($kpis, $verification, $complaintStatus);
+
         return view('admin.analytics.analytics', compact(
             'range',
             'kpis',
@@ -342,6 +348,7 @@ class AnalyticsController extends Controller
             'recentActivities',
             'health',
             'insights',
+            'prescriptive'
         ));
     }
 

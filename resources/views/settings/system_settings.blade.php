@@ -406,9 +406,16 @@
                     <!-- Dark Mode -->
                     <div x-data="{
                             dark: {{ auth()->user()->setting->dark_mode ? 'true' : 'false' }},
+                            init() {
+                                this.dark = document.documentElement.classList.contains('dark');
+                            },
+                            syncFromEvent(isDark) {
+                                this.dark = Boolean(isDark);
+                            },
                             toggle() {
                                 this.dark = !this.dark;
                                 document.documentElement.classList.toggle('dark', this.dark);
+                                window.dispatchEvent(new CustomEvent('theme-toggled', { detail: { dark: this.dark } }));
                                 fetch('{{ route('settings.ui-preferences') }}', {
                                     method: 'PATCH',
                                     headers: {
@@ -420,6 +427,7 @@
                                 });
                             }
                          }"
+                         @theme-toggled.window="syncFromEvent($event.detail.dark)"
                          class="flex items-center justify-between gap-3 py-2.5 sm:py-3 border-b border-gray-100 dark:border-neutral-800">
                         <div class="min-w-0">
                             <p class="text-sm font-bold text-[#1B3B36] dark:text-white">{{ __('messages.ss_dark_mode') }}</p>

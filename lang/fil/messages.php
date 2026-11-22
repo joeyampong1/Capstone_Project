@@ -187,6 +187,13 @@ return [
     'admin_users'                   => 'Mga User',
     'admin_reports'                 => 'Mga Ulat',
 
+    'sd_prescriptive_title'           => 'Mga Matalinong Rekomendasyon at Prayoridad ng Pagbisita',
+    'sd_prescriptive_desc'            => 'Mga naka-prayoridad na paparating na pagbisita ayon sa pagka-apurado ng iskedyul at halaga ng kita, kasama ang mga tip para sa sitter.',
+    'sd_prescriptive_next_step'       => 'Susunod na Hakbang',
+    'sd_prescriptive_prioritized_title' => 'Mga Naka-prayoridad na Paparating na Pagbisita',
+    'sd_prescriptive_urgent'          => 'Apurahan',
+    'sd_prescriptive_score'           => 'Puntos',
+
     // ==========================================
     // 🏡 ADMIN — HOME (Creative Homepage)
     // ==========================================
@@ -300,6 +307,14 @@ return [
     'analytics_platform_insights'  => 'Mga Insight ng Platform',
     'analytics_last_updated'       => 'Huling Na-update:',
     'analytics_auto_refresh'       => 'Awtomatikong nagre-refresh tuwing 5 minuto',
+
+    'prescriptive_analytics_title'   => 'Mga Prescriptive na Rekomendasyon at Prayoridad sa Panganib ng Sitter',
+    'prescriptive_analytics_desc'    => 'Mga hakbang na nakabase sa bigat ng desisyon mula sa cancellation rate, nakabinbing reklamo, backlog sa beripikasyon, at risk score ng sitter.',
+    'prescriptive_col_sitter'        => 'Sitter',
+    'prescriptive_col_completed'     => 'Nakumpleto',
+    'prescriptive_col_cancelled'     => 'Kinansela',
+    'prescriptive_col_complaints'    => 'Mga Reklamo',
+    'prescriptive_col_risk_score'    => 'Risk Score',
 
     // ==========================================
     // 📅 ADMIN — BOOKING MANAGEMENT
@@ -820,6 +835,17 @@ return [
     'report_pdf_no'              => 'Hindi',
     'report_pdf_empty'           => 'Walang rekord na nahanap para sa napiling filter.',
     'report_pdf_footer'          => 'PetNanny Admin System - Ulat na nagawa noong :date',
+
+    'prescriptive_recommendations_title' => 'Mga Prescriptive na Rekomendasyon',
+    'prescriptive_recommendations_desc'  => 'Mga rekomendasyong nakabase sa panuntunan para sa pagdedesisyon mula sa kasalukuyang pagkansela ng booking, nakabinbing beripikasyon, at bukas na mga reklamo.',
+    'prescriptive_recommended_action'      => 'Inirerekomendang Aksyon',
+
+    'prescriptive_priority_high'   => 'Mataas',
+    'prescriptive_priority_medium' => 'Katamtaman',
+    'prescriptive_priority_low'    => 'Mababa',
+    'prescriptive_healthy_title'   => 'Maayos ang Operasyon ng Platform',
+    'prescriptive_healthy_reason'  => 'Walang kritikal na pagtaas sa mga kanselasyon, reklamo, o nakabinbing beripikasyon.',
+    'prescriptive_healthy_action'  => 'Panatilihin ang regular na pagbabantay at hikayatin ang aktibong availability ng mga sitter.',
 
     // ==========================================
     // 🐾 ADMIN — SITTER VERIFICATION
@@ -2251,6 +2277,12 @@ return [
     'sd_last_30_days'          => 'Huling 30 araw',
     'sd_owner_default'         => 'May-ari',
     'sd_pet_default'           => 'Alagang Hayop',
+    'sd_visit_priority_title'           => 'Mga Matalinong Rekomendasyon at Prayoridad ng Pagbisita',
+    'sd_visit_priority_desc'            => 'Mga naka-prayoridad na paparating na pagbisita ayon sa pagka-apurado ng iskedyul at halaga ng kita, kasama ang mga tip para sa sitter.',
+    'sd_visit_priority_next_step'       => 'Susunod na Hakbang',
+    'sd_visit_priority_prioritized_title' => 'Mga Naka-prayoridad na Paparating na Pagbisita',
+    'sd_visit_priority_urgent'          => 'Apurahan',
+    'sd_visit_priority_score'           => 'Puntos',
 
     // ==========================================
     // 📋 SITTER — TASK INDEX

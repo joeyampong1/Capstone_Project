@@ -334,6 +334,89 @@
 
             </div>
 
+<!-- ========================================== -->
+            <!-- PRESCRIPTIVE ANALYTICS (Visit Priority & Tips)-->
+            <!-- ========================================== -->
+            @isset($sitterPrescriptive)
+                <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-100 dark:border-neutral-800 p-4 sm:p-5 mt-4 sm:mt-6 hover:shadow-md transition">
+                    <div class="mb-4">
+                        <h3 class="text-sm font-black text-[#1B3B36] dark:text-white">
+                            {{ __('messages.sd_visit_priority_title') }}
+                        </h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            {{ __('messages.sd_visit_priority_desc') }}
+                        </p>
+                    </div>
+
+                    {{-- Actionable Sitter Recommendations --}}
+                    <div class="space-y-3 mb-5">
+                        @foreach ($sitterPrescriptive['recommendations'] ?? [] as $tip)
+                            @php
+                                $priority = $tip['priority'] ?? 'Low';
+
+                                $badgeStyle = match ($priority) {
+                                    'High'   => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+                                    'Medium' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+                                    default  => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+                                };
+
+                                $priorityLabel = match ($priority) {
+                                    'High'   => __('messages.prescriptive_priority_high'),
+                                    'Medium' => __('messages.prescriptive_priority_medium'),
+                                    default  => __('messages.prescriptive_priority_low'),
+                                };
+                            @endphp
+                            <div class="rounded-xl border border-gray-100 dark:border-neutral-800 p-3.5 bg-neutral-50/70 dark:bg-neutral-800/40">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-bold text-xs sm:text-sm text-[#1B3B36] dark:text-white">{{ $tip['title'] }}</span>
+                                    <span class="px-2.5 py-0.5 text-[10px] sm:text-xs font-bold rounded-full shrink-0 {{ $badgeStyle }}">
+                                        {{ $priorityLabel }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-300 mt-1">{{ $tip['reason'] }}</p>
+                                <p class="text-xs font-semibold text-primary mt-1">
+                                    {{ __('messages.sd_visit_priority_next_step') }}: {{ $tip['action'] }}
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Prioritized Upcoming Visits --}}
+                    @if (!empty($sitterPrescriptive['prioritized_visits']) && count($sitterPrescriptive['prioritized_visits']) > 0)
+                        <div class="space-y-2">
+                            <div class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-neutral-400">
+                                {{ __('messages.sd_visit_priority_prioritized_title') }}
+                            </div>
+                            @foreach ($sitterPrescriptive['prioritized_visits'] as $visit)
+                                @php
+                                    $sched = $visit->scheduled_datetime ? \Carbon\Carbon::parse($visit->scheduled_datetime) : null;
+                                @endphp
+                                <div class="flex items-center justify-between gap-3 rounded-xl border border-gray-100 dark:border-neutral-800 px-3.5 py-2.5 text-xs">
+                                    <div class="min-w-0">
+                                        <span class="font-bold text-[#1B3B36] dark:text-white">
+                                            {{ $visit->booking->pet->name ?? __('messages.sd_pet_default') }}
+                                        </span>
+                                        @if ($sched)
+                                            <span class="text-neutral-400">
+                                                - {{ $sched->format('M j, g:i A') }}
+                                            </span>
+                                        @endif
+                                        @if (!empty($visit->is_urgent))
+                                            <span class="ml-1.5 px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300 text-[10px] font-bold">
+                                                {{ __('messages.sd_visit_priority_urgent') }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="font-black text-primary shrink-0">
+                                        {{ __('messages.sd_visit_priority_score') }}: {{ $visit->priority_score }}
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            @endisset
+
         </div>
     </div>
 </x-app-layout>

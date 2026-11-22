@@ -187,6 +187,13 @@ return [
     'admin_users'                   => 'Users',
     'admin_reports'                 => 'Reports',
 
+    'sd_prescriptive_title'           => 'Recommandations Intelligentes et Priorité des Visites',
+    'sd_prescriptive_desc'            => 'Visites à venir classées par urgence d’horaire et valeur de gains, ainsi que des conseils pratiques pour le pet sitter.',
+    'sd_prescriptive_next_step'       => 'Prochaine Étape',
+    'sd_prescriptive_prioritized_title' => 'Visites à Venir Priorisées',
+    'sd_prescriptive_urgent'          => 'Urgent',
+    'sd_prescriptive_score'           => 'Score',
+
     // ==========================================
     // 🏡 ADMIN — HOME (Creative Homepage)
     // ==========================================
@@ -300,6 +307,14 @@ return [
     'analytics_platform_insights'  => 'Platform Insights',
     'analytics_last_updated'       => 'Last Updated:',
     'analytics_auto_refresh'       => 'Auto-refresh every 5 minutes',
+
+    'prescriptive_analytics_title'   => 'Recommandations Prescriptives et Priorité de Risque des Pet Sitters',
+    'prescriptive_analytics_desc'    => 'Actions pondérées d’aide à la décision selon le taux d’annulation, les réclamations en attente, le retard de vérification et le score de risque du sitter.',
+    'prescriptive_col_sitter'        => 'Pet Sitter',
+    'prescriptive_col_completed'     => 'Terminées',
+    'prescriptive_col_cancelled'     => 'Annulées',
+    'prescriptive_col_complaints'    => 'Réclamations',
+    'prescriptive_col_risk_score'    => 'Score de Risque',
 
     // ==========================================
     // 📅 ADMIN — BOOKING MANAGEMENT
@@ -820,6 +835,17 @@ return [
     'report_pdf_no'              => 'Non',
     'report_pdf_empty'           => 'Aucun enregistrement trouvé pour les filtres sélectionnés.',
     'report_pdf_footer'          => 'Système d\'Administration PetNanny - Rapport généré le :date',
+
+    'prescriptive_recommendations_title' => 'Recommandations Prescriptives',
+    'prescriptive_recommendations_desc'  => 'Recommandations d’aide à la décision basées sur des règles selon les annulations de réservations actuelles, les vérifications en attente et les réclamations ouvertes.',
+    'prescriptive_recommended_action'      => 'Action Recommandée',
+
+    'prescriptive_priority_high'   => 'Élevée',
+    'prescriptive_priority_medium' => 'Moyenne',
+    'prescriptive_priority_low'    => 'Faible',
+    'prescriptive_healthy_title'   => 'Opérations de la Plateforme Saines',
+    'prescriptive_healthy_reason'  => 'Aucun pic critique d’annulations, de réclamations ou de vérifications en attente.',
+    'prescriptive_healthy_action'  => 'Maintenir une surveillance régulière et encourager la disponibilité active des pet sitters.',
 
     // ==========================================
     // 🐾 ADMIN — SITTER VERIFICATION
@@ -2252,6 +2278,12 @@ return [
     'sd_last_30_days'          => '30 derniers jours',
     'sd_owner_default'         => 'Propriétaire',
     'sd_pet_default'           => 'Animal',
+    'sd_visit_priority_title'           => 'Recommandations Intelligentes et Priorité des Visites',
+    'sd_visit_priority_desc'            => 'Visites à venir classées par urgence d’horaire et valeur de gains, ainsi que des conseils pratiques pour le pet sitter.',
+    'sd_visit_priority_next_step'       => 'Prochaine Étape',
+    'sd_visit_priority_prioritized_title' => 'Visites à Venir Priorisées',
+    'sd_visit_priority_urgent'          => 'Urgent',
+    'sd_visit_priority_score'           => 'Score',
 
     // ==========================================
     // 📋 SITTER — TASK INDEX

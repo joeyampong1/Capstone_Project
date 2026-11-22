@@ -175,6 +175,7 @@
                                 toggle() {
                                     this.dark = !this.dark;
                                     document.documentElement.classList.toggle('dark', this.dark);
+                                    window.dispatchEvent(new CustomEvent('theme-toggled', { detail: { dark: this.dark } }));
                                     fetch('{{ route('settings.ui-preferences') }}', {
                                         method: 'PATCH',
                                         headers: {

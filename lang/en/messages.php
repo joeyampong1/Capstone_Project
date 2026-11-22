@@ -187,6 +187,13 @@ return [
     'admin_users'                   => 'Users',
     'admin_reports'                 => 'Reports',
 
+    'sd_prescriptive_title'           => 'Smart Recommendations & Visit Priority',
+    'sd_prescriptive_desc'            => 'Prioritized upcoming visits by schedule urgency and earning value, plus actionable sitter tips.',
+    'sd_prescriptive_next_step'       => 'Next Step',
+    'sd_prescriptive_prioritized_title' => 'Prioritized Upcoming Visits',
+    'sd_prescriptive_urgent'          => 'Urgent',
+    'sd_prescriptive_score'           => 'Score',
+
     // ==========================================
     // 🏡 ADMIN — HOME (Creative Homepage)
     // ==========================================
@@ -300,6 +307,14 @@ return [
     'analytics_platform_insights'  => 'Platform Insights',
     'analytics_last_updated'       => 'Last Updated:',
     'analytics_auto_refresh'       => 'Auto-refresh every 5 minutes',
+
+    'prescriptive_analytics_title'   => 'Prescriptive Recommendations & Sitter Risk Priority',
+    'prescriptive_analytics_desc'    => 'Weighted decision-support actions based on cancellation rate, pending complaints, verification backlog, and sitter risk score.',
+    'prescriptive_col_sitter'        => 'Sitter',
+    'prescriptive_col_completed'     => 'Completed',
+    'prescriptive_col_cancelled'     => 'Cancelled',
+    'prescriptive_col_complaints'    => 'Complaints',
+    'prescriptive_col_risk_score'    => 'Risk Score',
 
     // ==========================================
     // 📅 ADMIN — BOOKING MANAGEMENT
@@ -656,6 +671,8 @@ return [
     'idv_cancel'               => 'Cancel',
     'idv_yes_reject'           => 'Yes, Reject',
     'idv_na'                   => 'N/A',
+    'idv_view_size'            => 'View Full Size',
+    'idv_download_file'        => 'Download',
 
     // ==========================================
     // 📬 ADMIN — SUPPORT INBOX & MESSAGES
@@ -818,6 +835,17 @@ return [
     'report_pdf_no'              => 'No',
     'report_pdf_empty'           => 'No records found for the selected filters.',
     'report_pdf_footer'          => 'PetNanny Admin System - Report generated on :date',
+
+    'prescriptive_recommendations_title' => 'Prescriptive Recommendations',
+    'prescriptive_recommendations_desc'  => 'Rule-based decision-support recommendations derived from current booking cancellations, pending verifications, and open complaints.',
+    'prescriptive_recommended_action'      => 'Recommended Action',
+
+    'prescriptive_priority_high'   => 'High',
+    'prescriptive_priority_medium' => 'Medium',
+    'prescriptive_priority_low'    => 'Low',
+    'prescriptive_healthy_title'   => 'Platform Operations Healthy',
+    'prescriptive_healthy_reason'  => 'No critical spikes in cancellations, complaints, or verification backlogs.',
+    'prescriptive_healthy_action'  => 'Maintain routine monitoring and encourage active sitter availability.',
 
     // ==========================================
     // 🐾 ADMIN — SITTER VERIFICATION
@@ -1311,7 +1339,7 @@ return [
     'cs_cancel'          => 'Cancel',
     'cs_send'            => 'Send Message',
 
-        // ==========================================
+    // ==========================================
     // 🔍 OWNER — FIND SITTER
     // ==========================================
     'fs_title'              => 'Find a Sitter',
@@ -2249,6 +2277,12 @@ return [
     'sd_last_30_days'          => 'Last 30 days',
     'sd_owner_default'         => 'Owner',
     'sd_pet_default'           => 'Pet',
+    'sd_visit_priority_title'           => 'Smart Recommendations & Visit Priority',
+    'sd_visit_priority_desc'            => 'Prioritized upcoming visits by schedule urgency and earning value, plus actionable sitter tips.',
+    'sd_visit_priority_next_step'       => 'Next Step',
+    'sd_visit_priority_prioritized_title' => 'Prioritized Upcoming Visits',
+    'sd_visit_priority_urgent'          => 'Urgent',
+    'sd_visit_priority_score'           => 'Score',
 
     // ==========================================
     // 📋 SITTER — TASK INDEX

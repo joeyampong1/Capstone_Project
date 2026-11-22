@@ -187,6 +187,13 @@ return [
     'admin_users'                   => 'Usuarios',
     'admin_reports'                 => 'Reportes',
 
+    'sd_prescriptive_title'           => 'Recomendaciones Inteligentes y Prioridad de Visitas',
+    'sd_prescriptive_desc'            => 'Próximas visitas priorizadas según urgencia de horario y valor de ganancia, además de consejos prácticos para el cuidador.',
+    'sd_prescriptive_next_step'       => 'Siguiente Paso',
+    'sd_prescriptive_prioritized_title' => 'Próximas Visitas Priorizadas',
+    'sd_prescriptive_urgent'          => 'Urgente',
+    'sd_prescriptive_score'           => 'Puntuación',
+
     // ==========================================
     // 🏡 ADMIN — HOME (Creative Homepage)
     // ==========================================
@@ -300,6 +307,14 @@ return [
     'analytics_platform_insights'  => 'Información de la Plataforma',
     'analytics_last_updated'       => 'Última Actualización:',
     'analytics_auto_refresh'       => 'Actualización automática cada 5 minutos',
+
+    'prescriptive_analytics_title'   => 'Recomendaciones Prescriptivas y Prioridad de Riesgo de Cuidadores',
+    'prescriptive_analytics_desc'    => 'Acciones ponderadas de apoyo a la decisión según la tasa de cancelación, quejas pendientes, verificaciones pendientes y puntuación de riesgo del cuidador.',
+    'prescriptive_col_sitter'        => 'Cuidador',
+    'prescriptive_col_completed'     => 'Completadas',
+    'prescriptive_col_cancelled'     => 'Canceladas',
+    'prescriptive_col_complaints'    => 'Quejas',
+    'prescriptive_col_risk_score'    => 'Puntuación de Riesgo',
 
     // ==========================================
     // 📅 ADMIN — BOOKING MANAGEMENT
@@ -820,6 +835,17 @@ return [
     'report_pdf_no'              => 'No',
     'report_pdf_empty'           => 'No se encontraron registros para los filtros seleccionados.',
     'report_pdf_footer'          => 'PetNanny Admin System — Reporte generado el :date',
+
+    'prescriptive_recommendations_title' => 'Recomendaciones Prescriptivas',
+    'prescriptive_recommendations_desc'  => 'Recomendaciones de apoyo a la toma de decisiones basadas en reglas a partir de cancelaciones de reservas actuales, verificaciones pendientes y quejas abiertas.',
+    'prescriptive_recommended_action'      => 'Acción Recomendada',
+
+    'prescriptive_priority_high'   => 'Alta',
+    'prescriptive_priority_medium' => 'Media',
+    'prescriptive_priority_low'    => 'Baja',
+    'prescriptive_healthy_title'   => 'Operaciones de la Plataforma Saludables',
+    'prescriptive_healthy_reason'  => 'No hay picos críticos en cancelaciones, quejas ni verificaciones pendientes.',
+    'prescriptive_healthy_action'  => 'Mantener el monitoreo rutinario y fomentar la disponibilidad activa de cuidadores.',
 
     // ==========================================
     // 🐾 ADMIN — SITTER VERIFICATION
@@ -2252,6 +2278,12 @@ return [
     'sd_last_30_days'          => 'Últimos 30 días',
     'sd_owner_default'         => 'Dueño',
     'sd_pet_default'           => 'Mascota',
+    'sd_visit_priority_title'           => 'Recomendaciones Inteligentes y Prioridad de Visitas',
+    'sd_visit_priority_desc'            => 'Próximas visitas priorizadas según urgencia de horario y valor de ganancia, además de consejos prácticos para el cuidador.',
+    'sd_visit_priority_next_step'       => 'Siguiente Paso',
+    'sd_visit_priority_prioritized_title' => 'Próximas Visitas Priorizadas',
+    'sd_visit_priority_urgent'          => 'Urgente',
+    'sd_visit_priority_score'           => 'Puntuación',
 
     // ==========================================
     // 📋 SITTER — TASK INDEX

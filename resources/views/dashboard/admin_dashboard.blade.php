@@ -13,7 +13,7 @@
                 <span class="text-xs sm:text-sm text-neutral-500 dark:text-neutral-400 font-medium">{{ __('messages.admin_filter_label') }}</span>
                 <select x-model="selectedMonth"
                         class="rounded-xl border border-gray-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-xs sm:text-sm font-medium text-[#1B3B36] dark:text-white focus:border-primary focus:ring-primary">
-                    {{-- Loop gikan January kutob sa KASAMTANGAN nga bulan --}}
+                    {{-- Loop from January to the current month --}}
                     @for($i = 0; $i < now()->month; $i++)
                         @php $month = now()->startOfYear()->addMonths($i); @endphp
                         <option value="{{ $month->format('F Y') }}" @selected($month->isSameMonth(now()))>
@@ -510,6 +510,99 @@
                 </div>
 
             </div>
+
+<!-- PRESCRIPTIVE ANALYTICS (Recommendations & Sitter Risk Priority) -->
+            @isset($prescriptive)
+                <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-6 mb-4 sm:mb-6">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-sm text-[#1B3B36] dark:text-white">
+                            {{ __('messages.prescriptive_analytics_title') }}
+                        </h3>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-0.5">
+                            {{ __('messages.prescriptive_analytics_desc') }}
+                        </p>
+                    </div>
+
+                    {{-- Actionable Recommendations --}}
+                    <div class="space-y-3 mb-5">
+                        @foreach ($prescriptive['recommendations'] ?? [] as $rec)
+                            @php
+                                $priority = $rec['priority'] ?? 'Low';
+
+                                $badgeStyle = match ($priority) {
+                                    'High'   => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+                                    'Medium' => 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+                                    default  => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+                                };
+
+                                $priorityLabel = match ($priority) {
+                                    'High'   => __('messages.prescriptive_priority_high'),
+                                    'Medium' => __('messages.prescriptive_priority_medium'),
+                                    default  => __('messages.prescriptive_priority_low'),
+                                };
+
+                                $titleKey  = $rec['title_key']  ?? null;
+                                $reasonKey = $rec['reason_key'] ?? null;
+                                $actionKey = $rec['action_key'] ?? null;
+
+                                $recTitle  = $titleKey  ? __($titleKey, $rec['params'] ?? [])  : ($rec['title'] === 'Platform Operations Healthy' ? __('messages.prescriptive_healthy_title') : $rec['title']);
+                                $recReason = $reasonKey ? __($reasonKey, $rec['params'] ?? []) : ($rec['title'] === 'Platform Operations Healthy' ? __('messages.prescriptive_healthy_reason') : $rec['reason']);
+                                $recAction = $actionKey ? __($actionKey, $rec['params'] ?? []) : ($rec['title'] === 'Platform Operations Healthy' ? __('messages.prescriptive_healthy_action') : $rec['action']);
+                            @endphp
+                            <div class="rounded-xl border border-gray-100 dark:border-neutral-800 p-3.5 bg-neutral-50/70 dark:bg-neutral-800/40">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-bold text-xs sm:text-sm text-[#1B3B36] dark:text-white">{{ $recTitle }}</span>
+                                    <span class="px-2.5 py-0.5 text-[10px] sm:text-xs font-bold rounded-full shrink-0 {{ $badgeStyle }}">
+                                        {{ $priorityLabel }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-neutral-600 dark:text-neutral-300 mt-1">{{ $recReason }}</p>
+                                <p class="text-xs font-semibold text-primary mt-1">
+                                    {{ __('messages.prescriptive_recommended_action') }}: {{ $recAction }}
+                                </p>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Top Sitter Risk Ranking --}}
+                    @if (!empty($prescriptive['sitter_risk_list']))
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30">
+                                        <th class="text-left py-2.5 px-2 sm:px-4 text-[10px] sm:text-xs font-bold uppercase text-neutral-400">
+                                            {{ __('messages.prescriptive_col_sitter') }}
+                                        </th>
+                                        <th class="text-left py-2.5 px-2 sm:px-4 text-[10px] sm:text-xs font-bold uppercase text-neutral-400">
+                                            {{ __('messages.prescriptive_col_completed') }}
+                                        </th>
+                                        <th class="text-left py-2.5 px-2 sm:px-4 text-[10px] sm:text-xs font-bold uppercase text-neutral-400">
+                                            {{ __('messages.prescriptive_col_cancelled') }}
+                                        </th>
+                                        <th class="text-left py-2.5 px-2 sm:px-4 text-[10px] sm:text-xs font-bold uppercase text-neutral-400">
+                                            {{ __('messages.prescriptive_col_complaints') }}
+                                        </th>
+                                        <th class="text-right py-2.5 px-2 sm:px-4 text-[10px] sm:text-xs font-bold uppercase text-neutral-400">
+                                            {{ __('messages.prescriptive_col_risk_score') }}
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 dark:divide-neutral-800">
+                                    @foreach ($prescriptive['sitter_risk_list'] as $sitter)
+                                        <tr class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition">
+                                            <td class="py-2.5 px-2 sm:px-4 font-bold text-[#1B3B36] dark:text-white">{{ $sitter['name'] }}</td>
+                                            <td class="py-2.5 px-2 sm:px-4">{{ $sitter['completed'] }}</td>
+                                            <td class="py-2.5 px-2 sm:px-4 text-red-600 dark:text-red-400 font-semibold">{{ $sitter['cancelled'] }}</td>
+                                            <td class="py-2.5 px-2 sm:px-4 text-amber-600 dark:text-amber-400 font-semibold">{{ $sitter['complaints'] }}</td>
+                                            <td class="py-2.5 px-2 sm:px-4 text-right font-black text-[#1B3B36] dark:text-white">{{ $sitter['risk_score'] }} / 100</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </div>
+            @endisset
 
             <!-- QUICK ACTIONS -->
             <div class="bg-white dark:bg-neutral-900 rounded-2xl shadow-sm border border-gray-200/60 dark:border-neutral-800 p-4 sm:p-6">

@@ -187,6 +187,30 @@ class DashboardController extends Controller
             ->values();
 
         // ==========================================
+        // 10. PRESCRIPTIVE ANALYTICS
+        // ==========================================
+        $prescriptiveKpis = [
+            'cancellation_rate' => $totalBookings > 0
+                ? round(($cancelledBookings / $totalBookings) * 100, 1)
+                : 0,
+        ];
+
+        $prescriptiveVerification = [
+            'pending' => $pendingVerification,
+        ];
+
+        $prescriptiveComplaints = [
+            'pending' => $pendingComplaints,
+        ];
+
+        $prescriptive = (new \App\Services\AdminPrescriptiveService())
+            ->generateRecommendations(
+                $prescriptiveKpis,
+                $prescriptiveVerification,
+                $prescriptiveComplaints
+            );
+
+        // ==========================================
         // RETURN VIEW
         // ==========================================
         return view('dashboard.admin_dashboard', compact(
@@ -209,7 +233,8 @@ class DashboardController extends Controller
             'recentBookings',
             'pendingVerifications',
             'recentComplaints',
-            'recentActivities'
+            'recentActivities',
+            'prescriptive'
         ));
     }
 
