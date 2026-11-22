@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# Install system dependencies, build tools for dlib/OpenCV/grpc, PHP extensions, and Python 3
+# Inalis ang linux-headers-generic, inalis ang pecl grpc
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -15,14 +15,14 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zlib1g-dev \
     libssl-dev \
-    linux-headers-generic \
     python3 \
     python3-pip \
     python3-venv \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && pecl install grpc \
-    && docker-php-ext-enable grpc \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Direktang kopyahin ang pre-compiled na gRPC (walang compilation)
+COPY --from=ghcr.io/extphprs/grpc-php-rs:latest-php8.3 /usr/local/ /usr/local/
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -44,4 +44,5 @@ RUN php artisan storage:link || true \
 
 EXPOSE 8080
 
-CMD php artisan config:clear && php artisan migrate --force && (php artisan queue:work --sleep=3 --tries=3 &) && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
+# Simplified CMD (migration ilagay sa Pre-Deploy Command)
+CMD php artisan config:clear && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}
