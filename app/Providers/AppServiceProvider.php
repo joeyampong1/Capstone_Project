@@ -8,6 +8,7 @@ use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Pugsa ang HTTPS kung naa sa production
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https'); // <--- GIDUGANG
+        }
+
         // ==========================================
         // Share badge counts across specific layouts only
         // ==========================================
@@ -27,8 +33,6 @@ class AppServiceProvider extends ServiceProvider
             'layouts.admin',
             'layouts.owner',
             'layouts.sitter'
-            // Update this array with your actual layout file names
-            // (e.g., 'layouts.main', 'layouts.master', 'partials.navbar').
         ], function ($view) {
             if (!Auth::check()) {
                 return;
@@ -37,7 +41,6 @@ class AppServiceProvider extends ServiceProvider
             $userId = Auth::id();
             $user = Auth::user();
 
-            // Cache the badge counts for 1 minute (60 seconds) to reduce database queries.
             $counts = Cache::remember("user_badge_counts_{$userId}", 60, function () use ($userId, $user) {
                 $unreadMessagesCount = ChatMessage::where('receiver_id', $userId)
                     ->where('is_read', false)
