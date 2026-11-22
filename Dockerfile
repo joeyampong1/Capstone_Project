@@ -1,6 +1,6 @@
 FROM php:8.3-cli
 
-# Install system dependencies, build tools for dlib/OpenCV, PHP extensions, and Python 3
+# Install system dependencies, build tools for dlib/OpenCV/grpc, PHP extensions, and Python 3
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -13,10 +13,15 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
+    zlib1g-dev \
+    libssl-dev \
+    linux-headers-generic \
     python3 \
     python3-pip \
     python3-venv \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && pecl install grpc \
+    && docker-php-ext-enable grpc \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
