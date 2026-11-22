@@ -1,24 +1,3 @@
-@php
-    // 1. Happy Pets (Total Pets on database)
-    $happyPetsCount = \App\Models\Pet::count();
-
-    // 2. Satisfaction Rate (those with 4 and 5 stars)
-    $totalReviews = \App\Models\Review::count();
-    if ($totalReviews > 0) {
-        $positiveReviews = \App\Models\Review::where('rating', '>=', 4)->count();
-        $satisfactionRate = round(($positiveReviews / $totalReviews) * 100);
-    } else {
-        $satisfactionRate = 100; // Default if no reviews exist
-    }
-
-    // 3. Verified Sitters (Approved and Verified)
-    $verifiedSittersCount = \App\Models\User::where('is_sitter', true)
-        ->where('sitter_status', 'approved')
-        ->where('id_validation_status', 'verified')
-        ->count();
-@endphp
-
-
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -30,7 +9,7 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?font-family=figtree:400,500,600,700,900&display=swap" rel="stylesheet" />
 
-        {{-- ✅ FIX ISSUE #48: Direct Vite Build (No more CDN fallback) --}}
+        {{-- FIX ISSUE #48: Direct Vite Build (No more CDN fallback) --}}
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
 
@@ -139,7 +118,7 @@
                             <div class="flex justify-between items-center border-b border-gray-100 dark:border-neutral-700 pb-3">
                                 <h3 class="font-extrabold text-xs sm:text-sm text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                                     <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                    Active Local Sitters
+                                    Top Sitters
                                 </h3>
                                 <a href="{{ route('find.sitter') }}" class="text-xs text-primary font-bold hover:underline">Filter →</a>
                             </div>
@@ -197,9 +176,8 @@
                                     </div>
                                 </div>
                             @empty
-                                <!-- Empty if no active sitter -->
                                 <div class="text-center py-6">
-                                    <p class="text-sm text-gray-500">No active sitters at the moment.</p>
+                                    <p class="text-sm text-gray-500">No featured sitters available yet.</p>
                                 </div>
                             @endforelse
 

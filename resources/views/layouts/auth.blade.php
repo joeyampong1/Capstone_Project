@@ -1,13 +1,15 @@
 @php
     $totalPetsCount = \App\Models\Pet::count();
 
-    // Calculate satisfaction rate (4 and 5 stars)
+    // Calculate satisfaction rate (4 and 5 stars) & average rating
     $totalReviews = \App\Models\Review::count();
     if ($totalReviews > 0) {
         $positiveReviews = \App\Models\Review::where('rating', '>=', 4)->count();
         $satisfactionRate = round(($positiveReviews / $totalReviews) * 100);
+        $averageRating = number_format(\App\Models\Review::avg('rating'), 1);
     } else {
-        $satisfactionRate = 100; // Default if no reviews exist
+        $satisfactionRate = 0;
+        $averageRating = '0.0';
     }
 @endphp
 
@@ -80,8 +82,8 @@
                     <div class="absolute -bottom-3 -right-3 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-xl border border-white/50">
                         <div class="flex items-center gap-2">
                             <span class="text-yellow-400 text-sm">★★★★★</span>
-                            <span class="text-xs font-bold text-gray-800">5.0</span>
-                            <span class="text-xs text-gray-500">(1.2k)</span>
+                            <span class="text-xs font-bold text-gray-800">{{ $averageRating }}</span>
+                            <span class="text-xs text-gray-500">({{ number_format($totalReviews) }})</span>
                         </div>
                     </div>
                 </div>
@@ -106,7 +108,7 @@
                         <span class="text-yellow-300 dark:text-yellow-200 text-lg" style="text-shadow: 0 0 10px rgba(255, 255, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1), 0 0 2px rgba(255,255,255,0.5);">★★★★★</span>
                         <span class="font-black text-neutral-900 dark:text-white text-lg">5.0</span>
                     </div>
-                    <div class="text-neutral-700 dark:text-white/60 text-xs font-bold uppercase tracking-wider mt-1">Max Rate</div>
+                    <div class="text-neutral-700 dark:text-white/60 text-xs font-bold uppercase tracking-wider mt-1">Max Rating</div>
                 </div>
                 <div class="w-px h-8 bg-neutral-900/20 dark:bg-white/20"></div>
                 <div class="text-center">

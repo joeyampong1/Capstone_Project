@@ -53,7 +53,31 @@ Route::get('/', function () {
         ->limit(2)
         ->get();
 
-    return view('welcome', compact('topSitters'));
+    // 1. Happy Pets (Total pets in database)
+    $happyPetsCount = \App\Models\Pet::count();
+
+    // 2. Satisfaction Rate (% of reviews with 4 or 5 stars; 0 if no reviews yet)
+    $totalReviews = \App\Models\Review::count();
+    $satisfactionRate = 0;
+
+    if ($totalReviews > 0) {
+        $positiveReviews = \App\Models\Review::where('rating', '>=', 4)->count();
+        $satisfactionRate = (int) round(($positiveReviews / $totalReviews) * 100);
+    }
+
+    // 3. Verified Sitters (Approved and ID-verified sitters)
+    $verifiedSittersCount = \App\Models\User::query()
+        ->where('is_sitter', true)
+        ->where('sitter_status', 'approved')
+        ->where('id_validation_status', 'verified')
+        ->count();
+
+    return view('welcome', compact(
+        'topSitters',
+        'happyPetsCount',
+        'satisfactionRate',
+        'verifiedSittersCount'
+    ));
 });
 
 Route::get('/search', [App\Http\Controllers\Owner\PublicProfileController::class, 'search'])->name('search');
