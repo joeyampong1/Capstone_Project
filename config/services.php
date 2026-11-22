@@ -52,4 +52,9 @@ return [
         'path' => env('PYTHON_PATH', 'python'),
     ],
 
+    // Brevo Transactional Email API
+    'brevo' => [
+        'key' => env('BREVO_API_KEY'),
+    ],
+
 ];

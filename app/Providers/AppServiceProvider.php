@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Mail\BrevoTransport;
 use App\Models\ChatMessage;
 use App\Models\Notification;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\URL;
@@ -20,10 +22,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Pugsa ang HTTPS kung naa sa production
+        // Force HTTPS if there is a production environment
         if (config('app.env') === 'production') {
             URL::forceScheme('https'); // <--- GIDUGANG
         }
+
+        // Register Brevo HTTP API Mail Transport
+        Mail::extend('brevo', function (array $config) {
+            return new BrevoTransport((string) config('services.brevo.key'));
+        });
 
         // ==========================================
         // Share badge counts across specific layouts only
