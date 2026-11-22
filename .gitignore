@@ -13,8 +13,8 @@
 /.zed
 /auth.json
 /node_modules
-/public/build
-/public/hot
+# /public/build
+# /public/hot
 /public/storage
 /storage/*.key
 /storage/pail
@@ -32,11 +32,11 @@ send_result.json
 login.html
 login_response.html
 messages_page.html
-test_ocr.php 
+test_ocr.php
 # Firebase / sensitive
 /storage/app/firebase_credentials.json
- 
- 
+
+
 # Temporary Dev & Debug Files
 fix-*.php
 cookies.txt
