@@ -215,7 +215,7 @@
                                             x-transition:enter-start="opacity-0 scale-90"
                                             x-transition:enter-end="opacity-100 scale-100"
                                             :class="msg.is_mine ? 'sm:right-0' : 'sm:left-0'"
-                                            class="fixed bottom-20 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:absolute sm:bottom-9 z-50 sm:z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92vw]">
+                                            class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:top-auto sm:left-auto sm:translate-x-0 sm:translate-y-0 sm:absolute sm:bottom-9 z-50 sm:z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92vw]">
                                             <template x-for="emoji in ['👍','❤️','😂','😮','😢','🙏']" :key="emoji">
                                                 <button type="button"
                                                         @click="toggleReaction(msg.id, emoji); emojiPickerOpen = false"
