@@ -127,8 +127,11 @@
 
                         <!-- CONVERSATION ITEM -->
                         <div class="relative group/conv"
+                             data-name="{{ $otherFullName }}"
+                             data-preview="{{ $preview }}"
+                             data-archived="{{ $isArchived ? '1' : '0' }}"
                              x-data="{ menuOpen: false }"
-                             x-show="((tab === 'active' && {{ $isArchived ? 'false' : 'true' }}) || (tab === 'archived' && {{ $isArchived ? 'true' : 'false' }})) && matches(@js($otherFullName), @js($preview))">
+                             x-show="((tab === 'active' && $el.dataset.archived === '0') || (tab === 'archived' && $el.dataset.archived === '1')) && matches($el.dataset.name, $el.dataset.preview)">
 
                             <a href="{{ route('owner.messages', ['id' => $otherUser->id]) }}"
                                class="flex items-center gap-4 p-4 sm:p-5 pr-14 sm:pr-16 hover:bg-primary/5 dark:hover:bg-neutral-800/50 transition">
@@ -158,8 +161,9 @@
                                 <!-- DETAILS -->
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-baseline justify-between gap-2">
-                                        <h3 class="text-sm font-black text-[#1B3B36] dark:text-white truncate"
-                                            x-html="highlight(@js($otherFullName))">
+                                        <h3 data-name="{{ $otherFullName }}"
+                                            x-html="highlight($el.dataset.name)"
+                                            class="text-sm font-black text-[#1B3B36] dark:text-white truncate">
                                         </h3>
                                         <span class="text-[10px] text-neutral-400 whitespace-nowrap">
                                             {{ $timeAgo }}
