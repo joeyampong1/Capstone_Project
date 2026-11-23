@@ -157,9 +157,9 @@ class NotificationService
     // ==========================================
     private static function sendPush(User $user, string $title, string $message, ?string $actionUrl): void
     {
-        // Check if Firebase credentials exist before attempting to connect
         if (!config('firebase.projects.app.credentials')) {
-            return; // Skip silently if Firebase is not configured
+            \Log::warning("FCM Push skipped for user {$user->id}: FIREBASE_CREDENTIALS is missing or invalid.");
+            return;
         }
 
         try {
@@ -173,7 +173,6 @@ class NotificationService
 
             $messaging->send($cloudMessage);
         } catch (\Throwable $e) {
-            // Log a warning instead of an error so it doesn't clutter the main logs
             \Log::warning("FCM Push failed for user {$user->id}: " . $e->getMessage());
         }
     }

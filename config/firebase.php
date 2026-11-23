@@ -51,24 +51,31 @@ return [
              */
 
             'credentials' => (function () {
-                $path = env('FIREBASE_CREDENTIALS');
+                $raw = env('FIREBASE_CREDENTIALS');
 
-                // If no path is provided in .env, return null
-                if (!$path) return null;
+                if (!$raw) {
+                    return null;
+                }
 
-                // Resolve relative path to absolute if needed
+                // If is set as JSON string directly in the env variable
+                if (is_string($raw) && str_starts_with(trim($raw), '{')) {
+                    $decoded = json_decode($raw, true);
+                    return is_array($decoded) ? $decoded : null;
+                }
+
+                // If file path isset
+                $path = $raw;
                 if (!file_exists($path)) {
                     $path = base_path($path);
                 }
 
-                // Check if the file actually exists before reading
                 if (file_exists($path)) {
-                    return json_decode(file_get_contents($path), true);
+                    $decoded = json_decode(file_get_contents($path), true);
+                    return is_array($decoded) ? $decoded : null;
                 }
 
-                // Return null if file is missing (prevents config:cache from crashing)
                 return null;
-           })(),
+            })(),
 
             /*
              * ------------------------------------------------------------------------
