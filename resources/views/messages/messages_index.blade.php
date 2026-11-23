@@ -1,3 +1,25 @@
+@php
+    // Optional translation keys: fall back to English text if the key is not in the lang files yet
+    $tr = fn (string $key, string $fallback) => \Illuminate\Support\Facades\Lang::has($key) ? __($key) : $fallback;
+
+    $noResultsTitle = $tr('messages.mi_no_results_title', 'No conversations found');
+    $noResultsDesc  = $tr('messages.mi_no_results_desc', 'No conversation matches');
+    $clearSearchLbl = $tr('messages.mi_clear_search', 'Clear search');
+
+    // Lightweight list used by the client-side search (name + archived flag only)
+    $searchItems = collect($conversations)->map(function ($c) {
+        $u = $c['other_user'];
+        return [
+            'id'       => $u->id,
+            'name'     => trim($u->f_name . ' ' . $u->l_name) ?: 'User',
+            'archived' => (bool) ($c['is_archived'] ?? false),
+        ];
+    })->values();
+
+    $activeTotal   = collect($conversations)->where('is_archived', false)->count();
+    $archivedTotal = collect($conversations)->where('is_archived', true)->count();
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
         <div class="sticky top-0 z-10 bg-white dark:bg-neutral-900 flex items-center gap-3">
@@ -19,66 +41,49 @@
     </x-slot>
 
     <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100vh-140px)] sm:h-[calc(100vh-170px)] lg:h-[calc(100vh-180px)] flex flex-col"
-         x-data="{
-             tab: 'active',
-             search: '',
-             activeCount: {{ collect($conversations)->where('is_archived', false)->count() }},
-             archivedCount: {{ collect($conversations)->where('is_archived', true)->count() }},
-             escapeHtml(str) {
-                 return String(str ?? '')
-                     .replace(/&/g, '&amp;')
-                     .replace(/</g, '&lt;')
-                     .replace(/>/g, '&gt;')
-                     .replace(/\&quot;/g, '&quot;')
-                     .replace(/'/g, '&#039;');
-             },
-             escapeRegex(str) {
-                 return String(str ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-             },
-             matches(name, preview = '') {
-                 const q = this.search.trim().toLowerCase();
-                 if (!q) return true;
-                 return String(name ?? '').toLowerCase().includes(q)
-                     || String(preview ?? '').toLowerCase().includes(q);
-             },
-             highlight(text) {
-                 const safeText = this.escapeHtml(text);
-                 const q = this.search.trim();
-                 if (!q) return safeText;
-                 const regex = new RegExp(`(${this.escapeRegex(q)})`, 'gi');
-                 return safeText.replace(
-                     regex,
-                     '<mark class=\'bg-amber-200 dark:bg-amber-500/30 text-[#1B3B36] dark:text-amber-200 font-extrabold rounded px-0.5\'>$1</mark>'
-                 );
-             }
-         }">
+         x-data="messageIndex({{ \Illuminate\Support\Js::from([
+             'activeCount'   => $activeTotal,
+             'archivedCount' => $archivedTotal,
+             'items'         => $searchItems,
+         ]) }})">
         <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-2 sm:py-6 flex flex-col">
 
             <!-- SEARCH BAR + TABS -->
             <div class="flex-shrink-0 pb-4 space-y-4">
 
-                <!-- Search Bar -->
+                <!-- Search bar (live filter by name) -->
                 <div class="relative">
-                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
+
                     <input type="text"
-                           x-model.trim="search"
+                           x-model="search"
+                           @keydown.escape="search = ''"
+                           @keydown.enter.prevent
+                           autocomplete="off"
+                           autocapitalize="off"
+                           spellcheck="false"
                            placeholder="{{ __('messages.mi_search_ph') }}"
-                           class="w-full pl-9 pr-9 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                           class="w-full pl-9 pr-10 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 text-base sm:text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+
+                    <!-- Clear button -->
                     <button type="button"
                             x-show="search.length > 0"
                             x-cloak
-                            @click="search = ''"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 text-xs font-bold px-1.5 py-0.5 rounded">
-                        ✕
+                            @click="search = ''; $nextTick(() => $el.parentElement.querySelector('input').focus())"
+                            aria-label="{{ $clearSearchLbl }}"
+                            class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-neutral-400 hover:text-primary hover:bg-primary/10 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
                     </button>
                 </div>
 
-                <!-- Active / Archived Icons (Top Right) -->
+                <!-- Active / Archived icons (top right) -->
                 <div class="flex items-center justify-end gap-4">
 
-                    <!-- Active Tab Icon -->
+                    <!-- Active tab icon -->
                     <button type="button"
                             @click="tab = 'active'"
                             :class="tab === 'active' ? 'text-primary' : 'text-neutral-400 dark:text-neutral-500 hover:text-primary'"
@@ -91,7 +96,7 @@
                               class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-primary border border-white dark:border-neutral-900"></span>
                     </button>
 
-                    <!-- Archived Tab Icon -->
+                    <!-- Archived tab icon -->
                     <button type="button"
                             @click="tab = 'archived'"
                             :class="tab === 'archived' ? 'text-primary' : 'text-neutral-400 dark:text-neutral-500 hover:text-primary'"
@@ -108,7 +113,10 @@
 
             <!-- CONVERSATION LIST -->
             <div class="flex-1 overflow-y-auto">
-                <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 divide-y divide-gray-100 dark:divide-neutral-800">
+
+                <!-- Card is hidden when nothing is visible, so no empty white box is left behind -->
+                <div x-show="visibleCount > 0"
+                     class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800">
 
                     @foreach($conversations as $conv)
                         @php
@@ -127,11 +135,9 @@
 
                         <!-- CONVERSATION ITEM -->
                         <div class="relative group/conv"
-                             data-name="{{ $otherFullName }}"
-                             data-preview="{{ $preview }}"
-                             data-archived="{{ $isArchived ? '1' : '0' }}"
                              x-data="{ menuOpen: false }"
-                             x-show="((tab === 'active' && $el.dataset.archived === '0') || (tab === 'archived' && $el.dataset.archived === '1')) && matches($el.dataset.name, $el.dataset.preview)">
+                             x-show="isVisible(@js($otherFullName), {{ $isArchived ? 'true' : 'false' }})"
+                             :class="isFirstVisible({{ $otherUser->id }}) ? '' : 'border-t border-gray-100 dark:border-neutral-800'">
 
                             <a href="{{ route('owner.messages', ['id' => $otherUser->id]) }}"
                                class="flex items-center gap-4 p-4 sm:p-5 pr-14 sm:pr-16 hover:bg-primary/5 dark:hover:bg-neutral-800/50 transition">
@@ -161,10 +167,9 @@
                                 <!-- DETAILS -->
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-baseline justify-between gap-2">
-                                        <h3 data-name="{{ $otherFullName }}"
-                                            x-html="highlight($el.dataset.name)"
-                                            class="text-sm font-black text-[#1B3B36] dark:text-white truncate">
-                                        </h3>
+                                        <!-- Name: the server-rendered text is replaced by the highlighted version -->
+                                        <h3 class="text-sm font-black text-[#1B3B36] dark:text-white truncate"
+                                            x-html="highlight(@js($otherFullName))">{{ $otherFullName }}</h3>
                                         <span class="text-[10px] text-neutral-400 whitespace-nowrap">
                                             {{ $timeAgo }}
                                         </span>
@@ -286,8 +291,8 @@
 
                 </div>
 
-                <!-- EMPTY STATE -->
-                <div x-show="(tab === 'active' && activeCount === 0) || (tab === 'archived' && archivedCount === 0)"
+                <!-- EMPTY STATE (no conversations in this tab, no search active) -->
+                <div x-show="!searching && ((tab === 'active' && activeCount === 0) || (tab === 'archived' && archivedCount === 0))"
                      x-cloak
                      class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-12 text-center">
                     <svg class="w-16 h-16 mx-auto text-neutral-300 dark:text-neutral-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -303,13 +308,112 @@
                         {{ __('messages.mi_find_sitter') }}
                     </a>
                 </div>
+
+                <!-- NO SEARCH RESULTS -->
+                <div x-show="searching && visibleCount === 0"
+                     x-cloak
+                     class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 p-12 text-center">
+                    <svg class="w-16 h-16 mx-auto text-neutral-300 dark:text-neutral-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <h3 class="text-xl font-black text-[#1B3B36] dark:text-white">{{ $noResultsTitle }}</h3>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400 mt-1 break-words">
+                        {{ $noResultsDesc }} "<span class="font-bold" x-text="search.trim()"></span>"
+                    </p>
+                </div>
             </div>
 
         </div>
     </div>
+
     @push('scripts')
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+    <!-- Search / filter logic (kept in its own block so it works even if Firebase fails to load) -->
+    <script>
+    window.messageIndex = function (config) {
+        return {
+            tab: 'active',
+            search: '',
+            activeCount: config.activeCount || 0,
+            archivedCount: config.archivedCount || 0,
+            items: config.items || [],
+
+            // Search words, lowercased. "sandra mae" -> ['sandra', 'mae']
+            get tokens() {
+                return this.search.trim().toLowerCase().split(/\s+/).filter(Boolean);
+            },
+
+            get searching() {
+                return this.tokens.length > 0;
+            },
+
+            // Every typed word must appear somewhere in the name (any order)
+            matches(name) {
+                if (!this.searching) return true;
+                const haystack = String(name).toLowerCase();
+                return this.tokens.every(function (t) { return haystack.indexOf(t) !== -1; });
+            },
+
+            // Visible = belongs to the current tab AND matches the search
+            isVisible(name, archived) {
+                const inTab = this.tab === 'active' ? !archived : !!archived;
+                return inTab && this.matches(name);
+            },
+
+            get visibleCount() {
+                const self = this;
+                return this.items.filter(function (i) { return self.isVisible(i.name, i.archived); }).length;
+            },
+
+            // Used to draw the divider line only between visible rows
+            isFirstVisible(id) {
+                const self = this;
+                const first = this.items.find(function (i) { return self.isVisible(i.name, i.archived); });
+                return !!first && first.id === id;
+            },
+
+            escapeHtml(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            },
+
+            // Returns the name as safe HTML with the matched parts wrapped in <mark>
+            highlight(name) {
+                const text = String(name);
+                if (!this.searching) return this.escapeHtml(text);
+
+                const pattern = this.tokens
+                    .slice()
+                    .sort(function (a, b) { return b.length - a.length; })
+                    .map(function (t) { return t.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&'); })
+                    .join('|');
+
+                const re = new RegExp(pattern, 'gi');
+                let out = '';
+                let last = 0;
+                let m;
+
+                while ((m = re.exec(text)) !== null) {
+                    if (m[0] === '') { re.lastIndex++; continue; }
+                    out += this.escapeHtml(text.slice(last, m.index));
+                    out += '<mark class="bg-primary/20 dark:bg-primary/30 text-primary rounded-sm px-0.5">'
+                        + this.escapeHtml(m[0]) + '</mark>';
+                    last = m.index + m[0].length;
+                }
+
+                return out + this.escapeHtml(text.slice(last));
+            },
+        };
+    };
+    </script>
+
+    <!-- Presence (online dots) -->
     <script>
     const firebaseConfig = {
         apiKey:            "{{ config('firebase.web.api_key') }}",
