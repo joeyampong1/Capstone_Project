@@ -359,6 +359,7 @@
                             console.log('Notification permission granted.');
 
                             const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                            await navigator.serviceWorker.ready;
 
                             const currentToken = await messaging.getToken({
                                 vapidKey: "{{ config('firebase.web.vapid_key') }}",
@@ -368,14 +369,18 @@
                             if (currentToken) {
                                 console.log('FCM Token:', currentToken);
 
-                                fetch('{{ route("fcm.token") }}', {
+                                const res = await fetch('{{ route("fcm.token") }}', {
                                     method: 'POST',
                                     headers: {
                                         'Content-Type': 'application/json',
+                                        'Accept': 'application/json',
                                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                     },
                                     body: JSON.stringify({ token: currentToken })
                                 });
+
+                                const data = await res.json();
+                                console.log('Save FCM Token response:', data);
                             } else {
                                 console.log('No registration token available.');
                             }
