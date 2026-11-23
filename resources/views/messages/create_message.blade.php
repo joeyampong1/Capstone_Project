@@ -1,19 +1,4 @@
 <x-app-layout>
-<x-slot name="header">
-    <div class="flex items-center gap-3">
-        <a href="{{ url()->previous() }}"
-           class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-            </svg>
-        </a>
-        <div>
-            <h1 class="font-extrabold text-2xl text-[#1B3B36] dark:text-white tracking-tight leading-none">{{ __('messages.msg_index_title') }}</h1>
-            <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">{{ __('messages.msg_chat_with', ['name' => trim($otherUser->f_name . ' ' . $otherUser->l_name) ?: 'User']) }}</p>
-        </div>
-    </div>
-</x-slot>
-
     @php
         $otherFullName = trim($otherUser->f_name . ' ' . $otherUser->l_name) ?: 'User';
         $otherInitial = strtoupper(substr($otherUser->f_name ?? 'U', 0, 1));
@@ -21,38 +6,46 @@
         $lastMessageId = $messages->last()->id ?? 0;
     @endphp
 
-        <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100dvh-150px)] sm:h-[calc(100vh-170px)] lg:h-[calc(100vh-180px)] overflow-hidden">
-            <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-1.5 sm:py-6">
+    <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100dvh-110px)] sm:h-[calc(100vh-140px)] lg:h-[calc(100vh-150px)] overflow-hidden"
+         x-data='chatApp({
+             otherId: {{ $otherUser->id }},
+             lastId: {{ $lastMessageId }},
+             myId: {{ auth()->id() }},
+             roomId: "{{ $roomId }}",
+             csrfToken: "{{ csrf_token() }}",
+             initialMessages: @json($messagesJson ?? [])
+         })'
+         x-init='init()'>
 
-            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden flex flex-col h-full"
-                x-data='chatApp({
-                    otherId: {{ $otherUser->id }},
-                    lastId: {{ $lastMessageId }},
-                    myId: {{ auth()->id() }},
-                    roomId: "{{ $roomId }}",
-                    csrfToken: "{{ csrf_token() }}",
-                    initialMessages: @json($messagesJson ?? [])
-                })'
-                x-init='init()'>
+        <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-1.5 sm:py-6">
+            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden flex flex-col h-full">
 
-                <!-- CHAT HEADER -->
-                <div class="flex items-center gap-4 p-3 sm:p-5 border-b border-gray-100 dark:border-neutral-800 flex-shrink-0">
-                    <div class="relative">
+                <!-- COMBINED FIXED CHAT HEADER (<- + User Icon + Name + Status) -->
+                <div class="flex items-center gap-3 p-3 sm:p-5 border-b border-gray-100 dark:border-neutral-800 flex-shrink-0 select-none">
+                    <a href="{{ url()->previous() }}"
+                       class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                    </a>
+
+                    <div class="relative shrink-0">
                         @if($otherUser->profile_photo)
                             <img src="{{ $otherUser->profile_photo_url }}"
-                                alt="{{ $otherFullName }}"
-                                class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20">
+                                 alt="{{ $otherFullName }}"
+                                 class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-primary/20">
                         @else
                             <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary flex items-center justify-center text-white font-black">
                                 {{ $otherInitial }}
                             </div>
                         @endif
                         <span :class="otherOnline ? 'bg-green-500' : 'bg-neutral-400'"
-                            class="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-neutral-900 transition-colors"></span>
+                              class="absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full border-2 border-white dark:border-neutral-900 transition-colors"></span>
                     </div>
-                    <div>
-                        <h2 class="font-black text-[#1B3B36] dark:text-white text-sm sm:text-base">{{ $otherFullName }}</h2>
-                        <p class="text-[10px] sm:text-xs">
+
+                    <div class="min-w-0 flex-1">
+                        <h2 class="font-black text-[#1B3B36] dark:text-white text-sm sm:text-base truncate leading-tight">{{ $otherFullName }}</h2>
+                        <p class="text-[10px] sm:text-xs mt-0.5 truncate">
                             <span x-show="otherTyping" x-cloak class="text-primary font-semibold italic">
                                 {{ __('messages.msg_typing') }}...
                             </span>
@@ -66,9 +59,10 @@
                     </div>
                 </div>
 
-                <!-- MESSAGES THREAD -->
+                <!-- MESSAGES THREAD (Locked scroll when emoji picker is open) -->
                 <div x-ref="thread"
-                    class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0">
+                     :class="anyEmojiPickerOpen ? 'overflow-hidden touch-none' : 'overflow-y-auto overflow-x-hidden'"
+                     class="flex-1 p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0">
 
                     <!-- No messages yet -->
                     <template x-if="messages.length === 0">
@@ -87,8 +81,8 @@
                     <!-- Message loop -->
                     <template x-for="(msg, index) in messages" :key="msg.id">
                         <div class="group/message relative"
-                            @mouseenter="hoveredId = msg.id"
-                            @mouseleave="hoveredId = null">
+                             @mouseenter="hoveredId = msg.id"
+                             @mouseleave="hoveredId = null">
 
                             <!-- Reply Preview -->
                             <template x-if="msg.reply_to">
@@ -117,10 +111,9 @@
 
                                 <!-- Bubble + Timestamp + Reactions -->
                                 <div class="min-w-0">
-                                    <!-- ✅ Wrapper: -->
                                     <div class="relative inline-block max-w-full">
 
-                                        <!-- Bubble  -->
+                                        <!-- Bubble -->
                                         <div :class="msg.is_mine
                                             ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm'
                                             : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm border border-gray-100 dark:border-neutral-700'">
@@ -128,17 +121,17 @@
                                             <!-- Image Attachment -->
                                             <template x-if="msg.attachment_url && msg.message_type === 'image'">
                                                 <img :src="msg.attachment_url"
-                                                    :alt="'Attachment'"
-                                                    class="max-w-full rounded-lg mb-1.5 cursor-pointer hover:opacity-90 transition"
-                                                    style="max-height: 240px;"
-                                                    @click="window.open(msg.attachment_url, '_blank')">
+                                                     :alt="'Attachment'"
+                                                     class="max-w-full rounded-lg mb-1.5 cursor-pointer hover:opacity-90 transition"
+                                                     style="max-height: 240px;"
+                                                     @click="window.open(msg.attachment_url, '_blank')">
                                             </template>
 
                                             <!-- Document Attachment -->
                                             <template x-if="msg.attachment_url && msg.message_type !== 'image'">
                                                 <a :href="msg.attachment_url"
-                                                target="_blank"
-                                                class="flex items-center gap-2 px-3 py-2 rounded-lg mb-1.5 text-xs font-bold hover:underline">
+                                                   target="_blank"
+                                                   class="flex items-center gap-2 px-3 py-2 rounded-lg mb-1.5 text-xs font-bold hover:underline">
                                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                     </svg>
@@ -148,11 +141,11 @@
 
                                             <!-- Text -->
                                             <p x-show="msg.message"
-                                            :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'"
-                                            x-text="msg.message"></p>
+                                               :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'"
+                                               x-text="msg.message"></p>
                                         </div>
 
-                                        <!-- ✅ Reactions: overlap bottom edge  -->
+                                        <!-- Reactions: overlap bottom edge -->
                                         <template x-if="msg.reactions && msg.reactions.length > 0">
                                             <div :class="msg.is_mine
                                                 ? 'absolute bottom-0 right-2 translate-y-1/2 flex flex-wrap gap-1 z-20'
@@ -161,7 +154,7 @@
                                                     <div :class="reaction.user_reacted
                                                             ? 'bg-white dark:bg-neutral-700 border-primary text-primary'
                                                             : 'bg-white dark:bg-neutral-700 border-neutral-200 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400'"
-                                                        class="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-full border shadow-md text-xs cursor-default">
+                                                         class="inline-flex items-center gap-0.5 px-1.5 py-[2px] rounded-full border shadow-md text-xs cursor-default">
                                                         <span x-text="reaction.emoji" class="text-[13px] leading-none"></span>
                                                         <span class="font-bold text-[10px] leading-none" x-text="reaction.count"></span>
                                                     </div>
@@ -169,22 +162,21 @@
                                             </div>
                                         </template>
                                     </div>
-                                    <!-- ✅ Closing wrapper -->
 
-                                    <!-- ✅ Timestamp:  -->
-                                <span :class="msg.is_mine
-                                    ? 'text-[9px] sm:text-[10px] text-neutral-400 mt-4 block text-right pr-1'
-                                    : 'text-[9px] sm:text-[10px] text-neutral-400 mt-4 block pl-1'"
-                                    x-text="msg.created_at"></span>
+                                    <!-- Timestamp -->
+                                    <span :class="msg.is_mine
+                                        ? 'text-[9px] sm:text-[10px] text-neutral-400 mt-4 block text-right pr-1'
+                                        : 'text-[9px] sm:text-[10px] text-neutral-400 mt-4 block pl-1'"
+                                          x-text="msg.created_at"></span>
                                 </div>
 
                                 <!-- Hover Actions -->
-                                <div x-show="hoveredId === msg.id"
-                                    x-cloak
-                                    x-transition:enter="transition ease-out duration-150"
-                                    x-transition:enter-start="opacity-0 scale-90"
-                                    x-transition:enter-end="opacity-100 scale-100"
-                                    class="flex items-center gap-1 shrink-0 mb-5">
+                                <div x-show="hoveredId === msg.id || activeReactionMsgId === msg.id"
+                                     x-cloak
+                                     x-transition:enter="transition ease-out duration-150"
+                                     x-transition:enter-start="opacity-0 scale-90"
+                                     x-transition:enter-end="opacity-100 scale-100"
+                                     class="flex items-center gap-1 shrink-0 mb-5">
 
                                     <!-- Reply button -->
                                     <button type="button"
@@ -196,10 +188,10 @@
                                         </svg>
                                     </button>
 
-                                    <!-- React button -->
-                                    <div class="relative" x-data="{ emojiPickerOpen: false }">
+                                    <!-- React button + Emoji Picker -->
+                                    <div class="relative" @click.away="if (activeReactionMsgId === msg.id) activeReactionMsgId = null">
                                         <button type="button"
-                                                @click="emojiPickerOpen = !emojiPickerOpen"
+                                                @click="activeReactionMsgId = (activeReactionMsgId === msg.id ? null : msg.id)"
                                                 class="w-7 h-7 rounded-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 text-neutral-500 hover:text-primary hover:border-primary shadow-md flex items-center justify-center transition"
                                                 title="{{ __('messages.msg_react') }}">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,18 +199,17 @@
                                             </svg>
                                         </button>
 
-                                        <!-- Emoji Picker -->
-                                        <div x-show="emojiPickerOpen"
-                                            @click.away="emojiPickerOpen = false"
-                                            x-cloak
-                                            x-transition:enter="transition ease-out duration-150"
-                                            x-transition:enter-start="opacity-0 scale-90"
-                                            x-transition:enter-end="opacity-100 scale-100"
-                                            :class="msg.is_mine ? 'sm:right-0' : 'sm:left-0'"
-                                            class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:top-auto sm:left-auto sm:translate-x-0 sm:translate-y-0 sm:absolute sm:bottom-9 z-50 sm:z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92vw]">
+                                        <!-- Emoji Picker (Centered on mobile, locks convo scroll) -->
+                                        <div x-show="activeReactionMsgId === msg.id"
+                                             x-cloak
+                                             x-transition:enter="transition ease-out duration-150"
+                                             x-transition:enter-start="opacity-0 scale-90"
+                                             x-transition:enter-end="opacity-100 scale-100"
+                                             :class="msg.is_mine ? 'sm:right-0' : 'sm:left-0'"
+                                             class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:top-auto sm:left-auto sm:translate-x-0 sm:translate-y-0 sm:absolute sm:bottom-9 z-50 sm:z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92vw]">
                                             <template x-for="emoji in ['👍','❤️','😂','😮','😢','🙏']" :key="emoji">
                                                 <button type="button"
-                                                        @click="toggleReaction(msg.id, emoji); emojiPickerOpen = false"
+                                                        @click="toggleReaction(msg.id, emoji); activeReactionMsgId = null"
                                                         class="w-8 h-8 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-lg flex items-center justify-center transition hover:scale-125 shrink-0"
                                                         x-text="emoji"></button>
                                             </template>
@@ -257,14 +248,12 @@
                     <!-- Attachment Preview -->
                     <template x-if="pendingAttachment">
                         <div class="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-primary/5 border border-primary/20">
-                            <!-- Image thumbnail -->
                             <template x-if="pendingAttachment.isImage">
                                 <img :src="pendingAttachment.preview"
                                      alt="Preview"
                                      class="w-14 h-14 rounded-lg object-cover border border-primary/20 shrink-0">
                             </template>
 
-                            <!-- Document icon -->
                             <template x-if="!pendingAttachment.isImage">
                                 <div class="w-14 h-14 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 shrink-0">
                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -273,13 +262,11 @@
                                 </div>
                             </template>
 
-                            <!-- File info -->
                             <div class="flex-1 min-w-0">
                                 <p class="text-xs font-bold text-neutral-800 dark:text-white truncate" x-text="pendingAttachment.name"></p>
                                 <p class="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5" x-text="pendingAttachment.size"></p>
                             </div>
 
-                            <!-- Remove button -->
                             <button type="button"
                                     @click="clearAttachment()"
                                     class="w-8 h-8 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 flex items-center justify-center text-neutral-400 hover:text-red-500 transition shrink-0"
@@ -349,6 +336,7 @@
                         <textarea x-model="newMessage"
                                   x-ref="input"
                                   @input="onInput"
+                                  @focus="onInputFocus"
                                   @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); sendMessage(); }"
                                   placeholder="{{ __('messages.msg_type_message') }}"
                                   rows="1"
@@ -365,6 +353,7 @@
                             <span class="hidden sm:inline" x-text="sending ? '{{ __('messages.msg_sending') }}' : '{{ __('messages.msg_send') }}'">{{ __('messages.msg_send') }}</span>
                         </button>
                     </form>
+
                     <p class="hidden sm:block text-[9px] sm:text-[10px] text-neutral-400 dark:text-neutral-500 text-center mt-1.5">
                         {{ __('messages.msg_press') }} <kbd class="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[8px]">Enter</kbd> {{ __('messages.msg_to_send') }} <kbd class="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[8px]">Shift+Enter</kbd> {{ __('messages.msg_for_newline') }}
                     </p>
@@ -373,7 +362,7 @@
         </div>
     </div>
 
-   @push('scripts')
+    @push('scripts')
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -404,6 +393,7 @@
             otherOnline: false,
             otherLastSeen: null,
             hoveredId: null,
+            activeReactionMsgId: null,
             replyTo: null,
             pendingAttachment: null,
             lastId: config.lastId || 0,
@@ -417,6 +407,10 @@
             otherTypingRef: null,
             firestoreUnsubscribe: null,
 
+            get anyEmojiPickerOpen() {
+                return this.activeReactionMsgId !== null;
+            },
+
             init() {
                 console.log('[chatApp] init', { roomId: this.roomId });
                 this.messages = config.initialMessages || [];
@@ -427,8 +421,12 @@
                 this.setupTypingListener();
                 this.markAsRead();
 
-                // Polling fallback every 3s
                 this.pollInterval = setInterval(() => this.pollNewMessages(), 3000);
+            },
+
+            onInputFocus() {
+                this.activeReactionMsgId = null;
+                this.$nextTick(() => this.scrollToBottom());
             },
 
             // ===== PRESENCE (Realtime DB) =====
@@ -520,7 +518,9 @@
                                 if (data.is_mine === undefined) data.is_mine = data.sender_id === this.myId;
                                 this.messages.push(data);
                                 this.lastId = Math.max(this.lastId, data.id);
-                                this.$nextTick(() => this.scrollToBottom());
+                                if (!this.anyEmojiPickerOpen) {
+                                    this.$nextTick(() => this.scrollToBottom());
+                                }
                             }
                         } else if (change.type === 'modified') {
                             const data = change.doc.data();
@@ -542,6 +542,7 @@
 
                 if ((!text && !file) || this.sending) return;
                 this.sending = true;
+                this.activeReactionMsgId = null;
                 this.setMyTyping(false);
 
                 try {
@@ -561,7 +562,6 @@
 
                     const data = await res.json();
                     if (data.success) {
-                        // ✅ Optimistic UI:
                         if (data.message && !this.messages.find(m => m.id === data.message.id)) {
                             data.message.is_mine = true;
                             this.messages.push(data.message);
@@ -604,34 +604,30 @@
                                 this.lastId = Math.max(this.lastId, m.id);
                             }
                         });
-                        this.$nextTick(() => this.scrollToBottom());
+                        if (!this.anyEmojiPickerOpen) {
+                            this.$nextTick(() => this.scrollToBottom());
+                        }
                     }
                 } catch (e) { /* silent */ }
             },
 
             async toggleReaction(messageId, emoji) {
                 try {
-                    // 1. Optimistic update (mirror sa backend logic)
                     const idx = this.messages.findIndex(m => m.id === messageId);
                     if (idx !== -1) {
                         const msg = this.messages[idx];
                         if (!msg.reactions) msg.reactions = [];
 
-                        // Find if user already reacted with this SAME emoji
                         const sameEmoji = msg.reactions.find(r => r.emoji === emoji && r.user_reacted);
-
-                        // Find if user reacted with ANY emoji
                         const myPreviousReaction = msg.reactions.find(r => r.user_reacted);
 
                         if (sameEmoji) {
-                            // ✅ User clicked SAME emoji → REMOVE reaction
                             sameEmoji.count -= 1;
                             sameEmoji.user_reacted = false;
                             if (sameEmoji.count <= 0) {
                                 msg.reactions = msg.reactions.filter(r => r.emoji !== emoji);
                             }
                         } else {
-                            // ✅ User clicked DIFFERENT emoji → REMOVE previous, ADD new
                             if (myPreviousReaction) {
                                 myPreviousReaction.count -= 1;
                                 myPreviousReaction.user_reacted = false;
@@ -640,7 +636,6 @@
                                 }
                             }
 
-                            // Add the new emoji
                             const existing = msg.reactions.find(r => r.emoji === emoji);
                             if (existing) {
                                 existing.count += 1;
@@ -654,11 +649,9 @@
                             }
                         }
 
-                        // Force Alpine re-render
                         this.messages = [...this.messages];
                     }
 
-                    // 2. Send to backend
                     const res = await fetch(`/messages/${this.otherId}/react`, {
                         method: 'POST',
                         headers: {
@@ -669,7 +662,6 @@
                         body: JSON.stringify({ message_id: messageId, emoji: emoji }),
                     });
 
-                    // 3. If backend fails, reload from server
                     if (!res.ok) {
                         await this.reloadAllMessages();
                     }
@@ -687,12 +679,15 @@
                     if (data.messages && data.messages.length > 0) {
                         this.messages = data.messages;
                         this.lastId = Math.max(...data.messages.map(m => m.id));
-                        this.$nextTick(() => this.scrollToBottom());
+                        if (!this.anyEmojiPickerOpen) {
+                            this.$nextTick(() => this.scrollToBottom());
+                        }
                     }
                 } catch (e) { /* silent */ }
             },
 
             startReply(msg) {
+                this.activeReactionMsgId = null;
                 this.replyTo = {
                     id: msg.id,
                     message: msg.message,
@@ -762,5 +757,5 @@
         };
     };
     </script>
-  @endpush
+    @endpush
 </x-app-layout>
