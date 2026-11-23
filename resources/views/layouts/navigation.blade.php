@@ -431,6 +431,92 @@
                             </div>
                         </div>
 
+                        <!--
+                            Notification bell (mobile only).
+                            - Badge = My Bookings + Messages + Notifications combined.
+                            - Hidden while the search field is expanded so the header never overflows.
+                            - The dropdown is fixed and full width on mobile, so it can never be cut off
+                              by the screen edge regardless of where the bell sits in the header.
+                        -->
+                        <div x-data="{
+                                notifOpen: false,
+                                notifList: [],
+                                notifLoading: false,
+                                get totalUnread() {
+                                    return (Number($store.booking.count) || 0)
+                                         + (Number($store.msg.unread) || 0)
+                                         + (Number($store.notif.unread) || 0);
+                                },
+                                async toggleNotifs() {
+                                    this.notifOpen = !this.notifOpen;
+                                    if (!this.notifOpen) return;
+                                    this.notifLoading = true;
+                                    try {
+                                        const res = await fetch('{{ route('notifications.poll') }}?last_id=0', {
+                                            headers: { 'Accept': 'application/json' }
+                                        });
+                                        const data = await res.json();
+                                        this.notifList = (data.notifications || []).slice(0, 5);
+                                    } catch (e) {
+                                        console.error(e);
+                                    } finally {
+                                        this.notifLoading = false;
+                                    }
+                                }
+                            }"
+                            x-show="!searchOpen"
+                            class="relative sm:hidden">
+
+                            <button type="button" @click="toggleNotifs()"
+                                    class="relative p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-600 dark:text-neutral-300">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                <span x-show="totalUnread > 0" x-cloak
+                                      x-text="totalUnread > 99 ? '99+' : totalUnread"
+                                      class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold bg-red-500 text-white rounded-full shadow-sm border-2 border-white dark:border-neutral-900">
+                                </span>
+                            </button>
+
+                            <!-- Notifications dropdown (fixed, full width on mobile) -->
+                            <div x-show="notifOpen" @click.away="notifOpen = false" x-cloak
+                                 class="fixed inset-x-2 top-[4.5rem] bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50">
+                                <div class="px-4 py-2 border-b border-gray-100 dark:border-neutral-800 flex justify-between items-center">
+                                    <p class="font-bold text-[#1B3B36] dark:text-white">{{ __('messages.nav_notifications') }}</p>
+                                    <span class="text-xs text-neutral-500" x-text="notifList.length + ' {{ __('messages.nav_recent') }}'"></span>
+                                </div>
+
+                                <div class="max-h-64 overflow-y-auto">
+                                    <!-- Loading state -->
+                                    <div x-show="notifLoading && notifList.length === 0" class="px-4 py-6 text-center text-sm text-neutral-500">
+                                        {{ __('messages.nav_searching') }}
+                                    </div>
+
+                                    <!-- Empty state -->
+                                    <template x-if="!notifLoading && notifList.length === 0">
+                                        <div class="px-4 py-6 text-center text-sm text-neutral-500">
+                                            {{ __('messages.nav_no_notifications') }}
+                                        </div>
+                                    </template>
+
+                                    <template x-for="notif in notifList" :key="notif.id">
+                                        <a :href="notif.action_url || '#'" class="flex items-start gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                                            <div class="w-2 h-2 rounded-full bg-primary mt-2 shrink-0"></div>
+                                            <div class="min-w-0">
+                                                <p class="text-sm text-[#1B3B36] dark:text-white font-medium" x-text="notif.title"></p>
+                                                <p class="text-xs text-neutral-500 line-clamp-1" x-text="notif.message"></p>
+                                                <p class="text-xs text-neutral-400 mt-1" x-text="notif.created_at"></p>
+                                            </div>
+                                        </a>
+                                    </template>
+                                </div>
+
+                                <div class="px-4 py-2 border-t border-gray-100 dark:border-neutral-800 text-center">
+                                    <a href="{{ route('notifications.index') }}" class="text-xs text-primary font-semibold hover:underline">{{ __('messages.nav_view_all_notifications') }}</a>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- User profile dropdown -->
                         <div x-data="{ profileOpen: false }" class="relative flex items-center">
                             <button @click="profileOpen = !profileOpen"
