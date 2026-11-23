@@ -292,68 +292,13 @@
                     <div x-data="{
                             enabled: {{ auth()->user()->push_notifications_enabled ? 'true' : 'false' }},
                             saving: false,
-                            init() {
-                                if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
-                                    this.enabled = false;
-                                }
-                            },
                             async onToggle(event) {
                                 if (this.saving) return;
                                 const wantEnabled = event.target.checked;
                                 this.saving = true;
 
                                 try {
-                                    if (wantEnabled) {
-                                        if (typeof Notification === 'undefined' || typeof firebase === 'undefined') {
-                                            this.enabled = false;
-                                            event.target.checked = false;
-                                            return;
-                                        }
-
-                                        const permission = await Notification.requestPermission();
-                                        if (permission !== 'granted') {
-                                            this.enabled = false;
-                                            event.target.checked = false;
-                                            return;
-                                        }
-
-                                        const app = firebase.apps.length ? firebase.app() : firebase.initializeApp({
-                                            apiKey: 'AIzaSyD_k_OfmwBLaQBLQEKhDKbNSiirFizKb4',
-                                            authDomain: 'petnanny-51b57.firebaseapp.com',
-                                            projectId: 'petnanny-51b57',
-                                            storageBucket: 'petnanny-51b57.firebasestorage.app',
-                                            messagingSenderId: '864638678858',
-                                            appId: '1:864638678858:web:16b61f47459aa2db4b73b3'
-                                        });
-
-                                        const messaging = firebase.messaging();
-                                        const currentToken = await messaging.getToken({
-                                            vapidKey: 'BPO0ySzFpof1CThButW2kyaPc19y9iV5eA6YCzEQyZLFo_itZM_H390VF4hnU1OuFIJ01uSWK32TKbW4UnpX2P0'
-                                        });
-
-                                        if (!currentToken) {
-                                            this.enabled = false;
-                                            event.target.checked = false;
-                                            return;
-                                        }
-
-                                        const tokenRes = await fetch('{{ route('settings.save-token') }}', {
-                                            method: 'POST',
-                                            headers: {
-                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                'Content-Type': 'application/json',
-                                                'Accept': 'application/json',
-                                            },
-                                            body: JSON.stringify({ fcm_token: currentToken }),
-                                        });
-
-                                        if (!tokenRes.ok) {
-                                            this.enabled = false;
-                                            event.target.checked = false;
-                                            return;
-                                        }
-                                    }
-
+                                    // 1. Save boolean preference to database first
                                     const prefRes = await fetch('{{ route('settings.ui-preferences') }}', {
                                         method: 'PATCH',
                                         headers: {
@@ -364,16 +309,49 @@
                                         body: JSON.stringify({ push_notifications_enabled: wantEnabled }),
                                     });
 
-                                    if (prefRes.ok) {
-                                        this.enabled = wantEnabled;
-                                    } else {
+                                    if (!prefRes.ok) {
                                         this.enabled = !wantEnabled;
                                         event.target.checked = this.enabled;
+                                        return;
+                                    }
+
+                                    this.enabled = wantEnabled;
+
+                                    // 2. If turned ON, request browser permission & register FCM token
+                                    if (wantEnabled && typeof Notification !== 'undefined') {
+                                        const permission = await Notification.requestPermission();
+                                        if (permission === 'granted' && typeof firebase !== 'undefined' && firebase.messaging) {
+                                            const app = firebase.apps.length ? firebase.app() : firebase.initializeApp({
+                                                apiKey: 'AIzaSyD_k_OfmwBLaQBLQEKhDKbNSiirFizKb4',
+                                                authDomain: 'petnanny-51b57.firebaseapp.com',
+                                                projectId: 'petnanny-51b57',
+                                                storageBucket: 'petnanny-51b57.firebasestorage.app',
+                                                messagingSenderId: '864638678858',
+                                                appId: '1:864638678858:web:16b61f47459aa2db4b73b3'
+                                            });
+
+                                            const messaging = firebase.messaging();
+                                            const currentToken = await messaging.getToken({
+                                                vapidKey: 'BPO0ySzFpof1CThButW2kyaPc19y9iV5eA6YCzEQyZLFo_itZM_H390VF4hnU1OuFIJ01uSWK32TKbW4UnpX2P0'
+                                            });
+
+                                            if (currentToken) {
+                                                await fetch('{{ route('settings.save-token') }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Content-Type': 'application/json',
+                                                        'Accept': 'application/json',
+                                                    },
+                                                    body: JSON.stringify({ fcm_token: currentToken }),
+                                                });
+                                            }
+                                        } else if (permission === 'denied') {
+                                            alert('Notifications are blocked in your browser settings. Please allow notifications for this site.');
+                                        }
                                     }
                                 } catch (error) {
                                     console.error('Push notification toggle error:', error);
-                                    this.enabled = !wantEnabled;
-                                    event.target.checked = this.enabled;
                                 } finally {
                                     this.saving = false;
                                 }
@@ -725,4 +703,9 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+    @endpush
 </x-app-layout>
