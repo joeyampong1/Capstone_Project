@@ -291,62 +291,91 @@
                     <!-- Push Notifications -->
                     <div x-data="{
                             enabled: {{ auth()->user()->push_notifications_enabled ? 'true' : 'false' }},
-                            async toggle() {
-                                this.enabled = !this.enabled;
+                            saving: false,
+                            init() {
+                                if (typeof Notification !== 'undefined' && Notification.permission === 'denied') {
+                                    this.enabled = false;
+                                }
+                            },
+                            async onToggle(event) {
+                                if (this.saving) return;
+                                const wantEnabled = event.target.checked;
+                                this.saving = true;
 
-                                // 1. Save boolean state to Laravel database
-                                fetch('{{ route('settings.ui-preferences') }}', {
-                                    method: 'PATCH',
-                                    headers: {
-                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                        'Content-Type': 'application/json',
-                                        'Accept': 'application/json',
-                                    },
-                                    body: JSON.stringify({ push_notifications_enabled: this.enabled }),
-                                });
-
-                                // 2. If turned ON, request browser permission and get FCM Token
-                                if (this.enabled) {
-                                    try {
-                                        const permission = await Notification.requestPermission();
-                                        if (permission === 'granted') {
-
-                                            // Initialize Firebase
-                                            const app = firebase.apps.length ? firebase.app() : firebase.initializeApp({
-                                                apiKey: "AIzaSyD_k_OfmwBLaQBLQEKhDKbNSiirFizKb4",
-                                                authDomain: "petnanny-51b57.firebaseapp.com",
-                                                projectId: "petnanny-51b57",
-                                                storageBucket: "petnanny-51b57.firebasestorage.app",
-                                                messagingSenderId: "864638678858",
-                                                appId: "1:864638678858:web:16b61f47459aa2db4b73b3"
-                                            });
-
-                                            const messaging = firebase.messaging();
-
-                                            // GET TOKEN using the VAPID Key
-                                            const currentToken = await messaging.getToken({
-                                                vapidKey: 'BPO0ySzFpof1CThButW2kyaPc19y9iV5eA6YCzEQyZLFo_itZM_H390VF4hnU1OuFIJ01uSWK32TKbW4UnpX2P0'
-                                            });
-
-                                            if (currentToken) {
-                                                console.log('FCM Token:', currentToken);
-
-                                                // Send token to backend to save in DB
-                                                fetch('{{ route('settings.save-token') }}', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                                        'Content-Type': 'application/json',
-                                                    },
-                                                    body: JSON.stringify({ fcm_token: currentToken }),
-                                                });
-                                            } else {
-                                                console.log('No registration token available.');
-                                            }
+                                try {
+                                    if (wantEnabled) {
+                                        if (typeof Notification === 'undefined' || typeof firebase === 'undefined') {
+                                            this.enabled = false;
+                                            event.target.checked = false;
+                                            return;
                                         }
-                                    } catch (error) {
-                                        console.error('Error getting FCM token:', error);
+
+                                        const permission = await Notification.requestPermission();
+                                        if (permission !== 'granted') {
+                                            this.enabled = false;
+                                            event.target.checked = false;
+                                            return;
+                                        }
+
+                                        const app = firebase.apps.length ? firebase.app() : firebase.initializeApp({
+                                            apiKey: 'AIzaSyD_k_OfmwBLaQBLQEKhDKbNSiirFizKb4',
+                                            authDomain: 'petnanny-51b57.firebaseapp.com',
+                                            projectId: 'petnanny-51b57',
+                                            storageBucket: 'petnanny-51b57.firebasestorage.app',
+                                            messagingSenderId: '864638678858',
+                                            appId: '1:864638678858:web:16b61f47459aa2db4b73b3'
+                                        });
+
+                                        const messaging = firebase.messaging();
+                                        const currentToken = await messaging.getToken({
+                                            vapidKey: 'BPO0ySzFpof1CThButW2kyaPc19y9iV5eA6YCzEQyZLFo_itZM_H390VF4hnU1OuFIJ01uSWK32TKbW4UnpX2P0'
+                                        });
+
+                                        if (!currentToken) {
+                                            this.enabled = false;
+                                            event.target.checked = false;
+                                            return;
+                                        }
+
+                                        const tokenRes = await fetch('{{ route('settings.save-token') }}', {
+                                            method: 'POST',
+                                            headers: {
+                                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                'Content-Type': 'application/json',
+                                                'Accept': 'application/json',
+                                            },
+                                            body: JSON.stringify({ fcm_token: currentToken }),
+                                        });
+
+                                        if (!tokenRes.ok) {
+                                            this.enabled = false;
+                                            event.target.checked = false;
+                                            return;
+                                        }
                                     }
+
+                                    const prefRes = await fetch('{{ route('settings.ui-preferences') }}', {
+                                        method: 'PATCH',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'Content-Type': 'application/json',
+                                            'Accept': 'application/json',
+                                        },
+                                        body: JSON.stringify({ push_notifications_enabled: wantEnabled }),
+                                    });
+
+                                    if (prefRes.ok) {
+                                        this.enabled = wantEnabled;
+                                    } else {
+                                        this.enabled = !wantEnabled;
+                                        event.target.checked = this.enabled;
+                                    }
+                                } catch (error) {
+                                    console.error('Push notification toggle error:', error);
+                                    this.enabled = !wantEnabled;
+                                    event.target.checked = this.enabled;
+                                } finally {
+                                    this.saving = false;
                                 }
                             }
                         }"
@@ -357,10 +386,9 @@
                             <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ __('messages.ss_push_desc') }}</p>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                            <input type="checkbox" class="sr-only peer" :checked="enabled" @change="toggle()">
+                            <input type="checkbox" class="sr-only peer" :checked="enabled" :disabled="saving" @change="onToggle($event)">
                             <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         </label>
-
                     </div>
 
                     <!-- Email Notifications -->
