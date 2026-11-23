@@ -4,23 +4,45 @@
         $otherInitial = strtoupper(substr($otherUser->f_name ?? 'U', 0, 1));
         $myInitial = strtoupper(substr(auth()->user()->f_name ?? 'U', 0, 1));
         $lastMessageId = $messages->last()->id ?? 0;
+
+        // Passed all via Js::from -> safe against apostrophes / quotes (won't break x-data)
+        $chatConfig = [
+            'otherId'         => $otherUser->id,
+            'otherName'       => $otherFullName,
+            'otherInitial'    => $otherInitial,
+            'myInitial'       => $myInitial,
+            'lastId'          => $lastMessageId,
+            'myId'            => auth()->id(),
+            'roomId'          => (string) $roomId,
+            'csrfToken'       => csrf_token(),
+            'initialMessages' => $messagesJson ?? [],
+            'labels'          => [
+                'you'         => __('messages.msg_you'),
+                'replyingTo'  => __('messages.msg_replying_to'),
+                'fileTooBig'  => __('messages.msg_file_too_large'),
+                'sending'     => __('messages.msg_sending'),
+                'send'        => __('messages.msg_send'),
+            ],
+        ];
     @endphp
 
-    <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100dvh-110px)] sm:h-[calc(100vh-140px)] lg:h-[calc(100vh-150px)] overflow-hidden"
-         x-data='chatApp({
-             otherId: {{ $otherUser->id }},
-             lastId: {{ $lastMessageId }},
-             myId: {{ auth()->id() }},
-             roomId: "{{ $roomId }}",
-             csrfToken: "{{ csrf_token() }}",
-             initialMessages: @json($messagesJson ?? [])
-         })'
-         x-init='init()'>
+    {{--
+        ROOT: height is set via JS (fitViewport) = visible screen (including keyboard) - top of root.
+        The height class below is just a fallback before JS loads.
+    --}}
+    <div x-ref="root"
+         class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100dvh-110px)] sm:h-[calc(100vh-140px)] lg:h-[calc(100vh-150px)] overflow-hidden"
+         x-data="chatApp({{ \Illuminate\Support\Js::from($chatConfig) }})"
+         x-init="init()">
 
-        <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-1.5 sm:py-6">
-            <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden flex flex-col h-full">
+        {{-- Mobile: walay padding sa ubos para flush sa phone navigation. Desktop: same ra sa una. --}}
+        <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full pt-1.5 pb-0 sm:py-6">
 
-                <!-- COMBINED FIXED CHAT HEADER (<- + User Icon + Name + Status) -->
+            {{-- CARD (relative = where the emoji picker anchors) --}}
+            <div x-ref="card"
+                 class="relative bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-b-0 sm:border-b border-gray-200/60 dark:border-neutral-800 overflow-hidden flex flex-col h-full">
+
+                <!-- FIXED CHAT HEADER (<- + User Icon + Name + Status) -->
                 <div class="flex items-center gap-3 p-3 sm:p-5 border-b border-gray-100 dark:border-neutral-800 flex-shrink-0 select-none">
                     <a href="{{ url()->previous() }}"
                        class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition shrink-0">
@@ -59,10 +81,10 @@
                     </div>
                 </div>
 
-                <!-- MESSAGES THREAD (Locked scroll when emoji picker is open) -->
+                <!-- MESSAGES THREAD (only this scrolls; locked when emoji picker is open) -->
                 <div x-ref="thread"
                      :class="anyEmojiPickerOpen ? 'overflow-hidden touch-none' : 'overflow-y-auto overflow-x-hidden'"
-                     class="flex-1 p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0">
+                     class="flex-1 p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0 overscroll-contain">
 
                     <!-- No messages yet -->
                     <template x-if="messages.length === 0">
@@ -81,6 +103,7 @@
                     <!-- Message loop -->
                     <template x-for="(msg, index) in messages" :key="msg.id">
                         <div class="group/message relative"
+                             data-msg-row
                              @mouseenter="hoveredId = msg.id"
                              @mouseleave="hoveredId = null">
 
@@ -106,7 +129,7 @@
                                 <div :class="msg.is_mine
                                         ? 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-[10px] sm:text-xs font-bold text-white shrink-0 mb-5'
                                         : 'w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] sm:text-xs font-bold text-primary shrink-0 mb-5'">
-                                    <span x-text="msg.is_mine ? '{{ $myInitial }}' : '{{ $otherInitial }}'"></span>
+                                    <span x-text="msg.is_mine ? myInitial : otherInitial"></span>
                                 </div>
 
                                 <!-- Bubble + Timestamp + Reactions -->
@@ -114,7 +137,8 @@
                                     <div class="relative inline-block max-w-full">
 
                                         <!-- Bubble -->
-                                        <div :class="msg.is_mine
+                                        <div data-bubble
+                                             :class="msg.is_mine
                                             ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm'
                                             : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm border border-gray-100 dark:border-neutral-700'">
 
@@ -171,7 +195,7 @@
                                 </div>
 
                                 <!-- Hover Actions -->
-                                <div x-show="hoveredId === msg.id || activeReactionMsgId === msg.id"
+                                <div x-show="hoveredId === msg.id || (picker && picker.msgId === msg.id)"
                                      x-cloak
                                      x-transition:enter="transition ease-out duration-150"
                                      x-transition:enter-start="opacity-0 scale-90"
@@ -188,33 +212,15 @@
                                         </svg>
                                     </button>
 
-                                    <!-- React button + Emoji Picker -->
-                                    <div class="relative" @click.away="if (activeReactionMsgId === msg.id) activeReactionMsgId = null">
-                                        <button type="button"
-                                                @click="activeReactionMsgId = (activeReactionMsgId === msg.id ? null : msg.id)"
-                                                class="w-7 h-7 rounded-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 text-neutral-500 hover:text-primary hover:border-primary shadow-md flex items-center justify-center transition"
-                                                title="{{ __('messages.msg_react') }}">
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                            </svg>
-                                        </button>
-
-                                        <!-- Emoji Picker (Centered on mobile, locks convo scroll) -->
-                                        <div x-show="activeReactionMsgId === msg.id"
-                                             x-cloak
-                                             x-transition:enter="transition ease-out duration-150"
-                                             x-transition:enter-start="opacity-0 scale-90"
-                                             x-transition:enter-end="opacity-100 scale-100"
-                                             :class="msg.is_mine ? 'sm:right-0' : 'sm:left-0'"
-                                             class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 sm:top-auto sm:left-auto sm:translate-x-0 sm:translate-y-0 sm:absolute sm:bottom-9 z-50 sm:z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92vw]">
-                                            <template x-for="emoji in ['👍','❤️','😂','😮','😢','🙏']" :key="emoji">
-                                                <button type="button"
-                                                        @click="toggleReaction(msg.id, emoji); activeReactionMsgId = null"
-                                                        class="w-8 h-8 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-lg flex items-center justify-center transition hover:scale-125 shrink-0"
-                                                        x-text="emoji"></button>
-                                            </template>
-                                        </div>
-                                    </div>
+                                    <!-- React button (the picker is now outside the loop) -->
+                                    <button type="button"
+                                            @click="openPicker(msg, $event)"
+                                            class="w-7 h-7 rounded-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 text-neutral-500 hover:text-primary hover:border-primary shadow-md flex items-center justify-center transition"
+                                            title="{{ __('messages.msg_react') }}">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -223,8 +229,9 @@
                     <div class="h-2"></div>
                 </div>
 
-                <!-- MESSAGE INPUT -->
-                <div class="p-2 sm:p-4 border-t border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex-shrink-0">
+                <!-- MESSAGE INPUT (flush at the bottom; safe-area for phones with a gesture bar) -->
+                <div class="p-2 sm:p-4 border-t border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex-shrink-0"
+                     style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
 
                     <!-- Reply Preview -->
                     <template x-if="replyTo">
@@ -233,7 +240,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
                             </svg>
                             <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-primary" x-text="'{{ __('messages.msg_replying_to') }} ' + replyTo.sender_name"></p>
+                                <p class="text-xs font-bold text-primary" x-text="labels.replyingTo + ' ' + replyTo.sender_name"></p>
                                 <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate" x-text="replyTo.message"></p>
                             </div>
                             <button type="button" @click="cancelReply()"
@@ -298,7 +305,7 @@
                                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                                  class="absolute bottom-12 left-0 z-30 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-700 py-2 w-48">
                                 <button type="button"
-                                        onclick="document.getElementById('fileInput').click(); attachOpen = false"
+                                        @click="document.getElementById('fileInput').click(); attachOpen = false"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition text-left">
                                     <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +318,7 @@
                                     </div>
                                 </button>
                                 <button type="button"
-                                        onclick="document.getElementById('fileInput').click(); attachOpen = false"
+                                        @click="document.getElementById('fileInput').click(); attachOpen = false"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition text-left">
                                     <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,6 +340,7 @@
                                accept="image/*,.pdf,.doc,.docx"
                                @change="handleFileSelect($event)">
 
+                        {{-- text-base (16px) on mobile so iOS doesn't auto-zoom on focus --}}
                         <textarea x-model="newMessage"
                                   x-ref="input"
                                   @input="onInput"
@@ -340,7 +348,7 @@
                                   @keydown.enter="if (!$event.shiftKey) { $event.preventDefault(); sendMessage(); }"
                                   placeholder="{{ __('messages.msg_type_message') }}"
                                   rows="1"
-                                  class="flex-1 px-3 py-2 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-sm sm:text-base text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-h-[44px] max-h-32 resize-none overflow-y-auto"
+                                  class="flex-1 px-3 py-2 sm:px-4 sm:py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-950 text-base text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition min-h-[44px] max-h-32 resize-none overflow-y-auto"
                                   style="height: 44px;"
                         ></textarea>
 
@@ -350,13 +358,38 @@
                             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
-                            <span class="hidden sm:inline" x-text="sending ? '{{ __('messages.msg_sending') }}' : '{{ __('messages.msg_send') }}'">{{ __('messages.msg_send') }}</span>
+                            <span class="hidden sm:inline" x-text="sending ? labels.sending : labels.send">{{ __('messages.msg_send') }}</span>
                         </button>
                     </form>
 
                     <p class="hidden sm:block text-[9px] sm:text-[10px] text-neutral-400 dark:text-neutral-500 text-center mt-1.5">
                         {{ __('messages.msg_press') }} <kbd class="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[8px]">Enter</kbd> {{ __('messages.msg_to_send') }} <kbd class="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[8px]">Shift+Enter</kbd> {{ __('messages.msg_for_newline') }}
                     </p>
+                </div>
+
+                <!-- EMOJI PICKER BACKDROP (click out = close) -->
+                <div x-show="picker" x-cloak
+                     @click="closePicker()"
+                     class="absolute inset-0 z-40"></div>
+
+                <!--
+                    EMOJI PICKER:
+                -->
+                <div x-show="picker" x-cloak
+                     class="absolute inset-x-0 z-50 flex justify-center pointer-events-none"
+                     :style="picker ? ('top:' + picker.top + 'px') : ''">
+                    <div x-show="picker"
+                         x-transition:enter="transition ease-out duration-150"
+                         x-transition:enter-start="opacity-0 scale-90"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         class="pointer-events-auto bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92%]">
+                        <template x-for="emoji in emojis" :key="emoji">
+                            <button type="button"
+                                    @click="toggleReaction(picker.msgId, emoji)"
+                                    class="w-8 h-8 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-lg flex items-center justify-center transition hover:scale-125 shrink-0"
+                                    x-text="emoji"></button>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
@@ -393,27 +426,38 @@
             otherOnline: false,
             otherLastSeen: null,
             hoveredId: null,
-            activeReactionMsgId: null,
+            picker: null,               // { msgId, top } | null
+            emojis: ['👍', '❤️', '😂', '😮', '😢', '🙏'],
             replyTo: null,
             pendingAttachment: null,
             lastId: config.lastId || 0,
             otherId: config.otherId,
+            otherName: config.otherName,
+            otherInitial: config.otherInitial,
+            myInitial: config.myInitial,
             myId: config.myId,
             roomId: config.roomId,
+            labels: config.labels || {},
             csrfToken: config.csrfToken || '',
             typingTimeout: null,
             typingDebounce: null,
             typingRef: null,
             otherTypingRef: null,
             firestoreUnsubscribe: null,
+            pollInterval: null,
+            _fitRaf: null,
+            _fitHandler: null,
+            _origViewport: null,
 
             get anyEmojiPickerOpen() {
-                return this.activeReactionMsgId !== null;
+                return this.picker !== null;
             },
 
             init() {
-                console.log('[chatApp] init', { roomId: this.roomId });
                 this.messages = config.initialMessages || [];
+
+                this.lockPage();
+                this.fitViewport();
                 this.$nextTick(() => this.scrollToBottom());
 
                 this.setupPresence();
@@ -424,9 +468,121 @@
                 this.pollInterval = setInterval(() => this.pollNewMessages(), 3000);
             },
 
+            destroy() {
+                this.unlockPage();
+                clearInterval(this.pollInterval);
+                if (this.firestoreUnsubscribe) this.firestoreUnsubscribe();
+            },
+
+            // ===== PAGE LOCK + VIEWPORT FIT =====
+            // 1) Whole page won't scroll (only the thread scrolls)
+            // 2) Chat height matches the ACTUAL visible area (including when the keyboard is open),
+            //    so the chat header won't get pushed out and the input won't stay stuck/floating up.
+            lockPage() {
+                document.documentElement.style.overflow = 'hidden';
+                document.documentElement.style.overscrollBehavior = 'none';
+                document.body.style.overflow = 'hidden';
+                document.body.style.overscrollBehavior = 'none';
+
+                // Chrome Android: resizes the layout when the keyboard opens (not just the visual viewport)
+                const meta = document.querySelector('meta[name="viewport"]');
+                if (meta && !/interactive-widget/.test(meta.content)) {
+                    this._origViewport = meta.content;
+                    meta.content = meta.content + ', interactive-widget=resizes-content';
+                }
+
+                this._fitHandler = () => {
+                    cancelAnimationFrame(this._fitRaf);
+                    this._fitRaf = requestAnimationFrame(() => this.fitViewport());
+                };
+                window.addEventListener('resize', this._fitHandler);
+                window.addEventListener('orientationchange', this._fitHandler);
+                window.addEventListener('scroll', this._fitHandler, { passive: true });
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', this._fitHandler);
+                    window.visualViewport.addEventListener('scroll', this._fitHandler);
+                }
+            },
+
+            unlockPage() {
+                document.documentElement.style.overflow = '';
+                document.documentElement.style.overscrollBehavior = '';
+                document.body.style.overflow = '';
+                document.body.style.overscrollBehavior = '';
+
+                const meta = document.querySelector('meta[name="viewport"]');
+                if (meta && this._origViewport !== null) meta.content = this._origViewport;
+
+                window.removeEventListener('resize', this._fitHandler);
+                window.removeEventListener('orientationchange', this._fitHandler);
+                window.removeEventListener('scroll', this._fitHandler);
+                if (window.visualViewport) {
+                    window.visualViewport.removeEventListener('resize', this._fitHandler);
+                    window.visualViewport.removeEventListener('scroll', this._fitHandler);
+                }
+            },
+
+            fitViewport() {
+                const root = this.$refs.root;
+                if (!root) return;
+
+                // Prevent the page from scrolling (this is what hides the header when the keyboard opens)
+                if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
+
+                const vv = window.visualViewport;
+                const visibleBottom = vv ? (vv.offsetTop + vv.height) : window.innerHeight;
+                const top = root.getBoundingClientRect().top;
+
+                root.style.height = Math.max(visibleBottom - top, 200) + 'px';
+
+                // If the input is focused (keyboard open), keep the thread scrolled to the bottom
+                if (document.activeElement === this.$refs.input) {
+                    this.$nextTick(() => this.scrollToBottom());
+                }
+                // Kung mo-resize samtang naay picker, i-close para dili mo-mali ug posisyon
+                if (this.picker) this.picker = null;
+            },
+
             onInputFocus() {
-                this.activeReactionMsgId = null;
+                this.picker = null;
+                // Close the picker on resize so it doesn't end up in the wrong position
+                setTimeout(() => this.fitViewport(), 50);
+                setTimeout(() => this.fitViewport(), 300);
                 this.$nextTick(() => this.scrollToBottom());
+            },
+
+            // ===== EMOJI PICKER (anchored sa message, centered horizontally) =====
+            openPicker(msg, ev) {
+                if (this.picker && this.picker.msgId === msg.id) {
+                    this.picker = null;
+                    return;
+                }
+
+                const row = ev.currentTarget.closest('[data-msg-row]');
+                const bubble = (row && row.querySelector('[data-bubble]')) || row;
+                if (!bubble) return;
+
+                const card = this.$refs.card.getBoundingClientRect();
+                const thread = this.$refs.thread.getBoundingClientRect();
+                const b = bubble.getBoundingClientRect();
+
+                const H = 44;
+                const gap = 6;
+
+                const minTop = (thread.top - card.top) + 4;
+                const maxTop = (thread.bottom - card.top) - H - 4;
+
+                // Default: above the message. If there's no space, below it (past the reactions badge)
+                let top = (b.top - card.top) - H - gap;
+                if (top < minTop) top = (b.bottom - card.top) + gap + 14;
+
+                top = Math.min(Math.max(top, minTop), maxTop);
+
+                this.picker = { msgId: msg.id, top: Math.round(top) };
+            },
+
+            closePicker() {
+                this.picker = null;
             },
 
             // ===== PRESENCE (Realtime DB) =====
@@ -542,7 +698,7 @@
 
                 if ((!text && !file) || this.sending) return;
                 this.sending = true;
-                this.activeReactionMsgId = null;
+                this.picker = null;
                 this.setMyTyping(false);
 
                 try {
@@ -573,6 +729,10 @@
                         this.replyTo = null;
                         this.pendingAttachment = null;
                         if (fi) fi.value = '';
+
+                        // Reset textarea height after sending
+                        const el = this.$refs.input;
+                        if (el) el.style.height = '44px';
                     }
                 } catch (e) { /* silent */ }
                 finally { this.sending = false; }
@@ -612,6 +772,7 @@
             },
 
             async toggleReaction(messageId, emoji) {
+                this.picker = null;
                 try {
                     const idx = this.messages.findIndex(m => m.id === messageId);
                     if (idx !== -1) {
@@ -687,13 +848,13 @@
             },
 
             startReply(msg) {
-                this.activeReactionMsgId = null;
+                this.picker = null;
                 this.replyTo = {
                     id: msg.id,
                     message: msg.message,
-                    sender_name: msg.is_mine ? '{{ __('messages.msg_you') }}' : '{{ $otherFullName }}',
+                    sender_name: msg.is_mine ? this.labels.you : this.otherName,
                 };
-                this.$refs.input.focus();
+                this.$refs.input.focus({ preventScroll: true });
             },
 
             cancelReply() { this.replyTo = null; },
@@ -702,7 +863,7 @@
                 const file = event.target.files[0];
                 if (!file) { this.pendingAttachment = null; return; }
                 if (file.size > 20 * 1024 * 1024) {
-                    alert('{{ __('messages.msg_file_too_large') }}');
+                    alert(this.labels.fileTooBig);
                     event.target.value = '';
                     this.pendingAttachment = null;
                     return;
