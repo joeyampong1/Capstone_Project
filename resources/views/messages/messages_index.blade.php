@@ -21,8 +21,36 @@
     <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100vh-140px)] sm:h-[calc(100vh-170px)] lg:h-[calc(100vh-180px)] flex flex-col"
          x-data="{
              tab: 'active',
+             search: '',
              activeCount: {{ collect($conversations)->where('is_archived', false)->count() }},
-             archivedCount: {{ collect($conversations)->where('is_archived', true)->count() }}
+             archivedCount: {{ collect($conversations)->where('is_archived', true)->count() }},
+             escapeHtml(str) {
+                 return String(str ?? '')
+                     .replace(/&/g, '&amp;')
+                     .replace(/</g, '&lt;')
+                     .replace(/>/g, '&gt;')
+                     .replace(/\&quot;/g, '&quot;')
+                     .replace(/'/g, '&#039;');
+             },
+             escapeRegex(str) {
+                 return String(str ?? '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+             },
+             matches(name, preview = '') {
+                 const q = this.search.trim().toLowerCase();
+                 if (!q) return true;
+                 return String(name ?? '').toLowerCase().includes(q)
+                     || String(preview ?? '').toLowerCase().includes(q);
+             },
+             highlight(text) {
+                 const safeText = this.escapeHtml(text);
+                 const q = this.search.trim();
+                 if (!q) return safeText;
+                 const regex = new RegExp(`(${this.escapeRegex(q)})`, 'gi');
+                 return safeText.replace(
+                     regex,
+                     '<mark class=\'bg-amber-200 dark:bg-amber-500/30 text-[#1B3B36] dark:text-amber-200 font-extrabold rounded px-0.5\'>$1</mark>'
+                 );
+             }
          }">
         <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-2 sm:py-6 flex flex-col">
 
@@ -35,8 +63,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
                     <input type="text"
+                           x-model.trim="search"
                            placeholder="{{ __('messages.mi_search_ph') }}"
-                           class="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                           class="w-full pl-9 pr-9 py-3 rounded-xl border border-gray-200 dark:border-neutral-800 bg-gray-50 dark:bg-neutral-900 text-sm text-neutral-800 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition">
+                    <button type="button"
+                            x-show="search.length > 0"
+                            x-cloak
+                            @click="search = ''"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 text-xs font-bold px-1.5 py-0.5 rounded">
+                        ✕
+                    </button>
                 </div>
 
                 <!-- Active / Archived Icons (Top Right) -->
@@ -92,7 +128,7 @@
                         <!-- CONVERSATION ITEM -->
                         <div class="relative group/conv"
                              x-data="{ menuOpen: false }"
-                             x-show="(tab === 'active' && {{ $isArchived ? 'false' : 'true' }}) || (tab === 'archived' && {{ $isArchived ? 'true' : 'false' }})">
+                             x-show="((tab === 'active' && {{ $isArchived ? 'false' : 'true' }}) || (tab === 'archived' && {{ $isArchived ? 'true' : 'false' }})) && matches(@js($otherFullName), @js($preview))">
 
                             <a href="{{ route('owner.messages', ['id' => $otherUser->id]) }}"
                                class="flex items-center gap-4 p-4 sm:p-5 pr-14 sm:pr-16 hover:bg-primary/5 dark:hover:bg-neutral-800/50 transition">
@@ -122,8 +158,8 @@
                                 <!-- DETAILS -->
                                 <div class="flex-1 min-w-0">
                                     <div class="flex items-baseline justify-between gap-2">
-                                        <h3 class="text-sm font-black text-[#1B3B36] dark:text-white truncate">
-                                            {{ $otherFullName }}
+                                        <h3 class="text-sm font-black text-[#1B3B36] dark:text-white truncate"
+                                            x-html="highlight(@js($otherFullName))">
                                         </h3>
                                         <span class="text-[10px] text-neutral-400 whitespace-nowrap">
                                             {{ $timeAgo }}
