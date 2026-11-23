@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -49,6 +50,12 @@ class RegisteredUserController extends Controller
         $user->save();
 
         event(new Registered($user));
+
+        try {
+            NotificationService::newUserRegistered($user, 'Email');
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to notify admins on email registration: ' . $e->getMessage());
+        }
 
         return redirect()->route('login')
                         ->with('status', 'Your account has been created successfully! Please log in.');

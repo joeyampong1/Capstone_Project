@@ -221,6 +221,26 @@ class NotificationService
     }
 
     // ==========================================
+    // NEW USER REGISTRATION (Notify Admins)
+    // ==========================================
+
+    public static function newUserRegistered(User $newUser, string $provider = 'Email'): void
+    {
+        $fullName = trim(($newUser->f_name ?? '') . ' ' . ($newUser->l_name ?? '')) ?: $newUser->email;
+
+        self::notifyAdmins(
+            type:      'new_user_registered',
+            title:     'New user registered',
+            message:   "{$fullName} ({$newUser->email}) registered via {$provider}.",
+            actionUrl: route('admin.users.show', $newUser->id),
+            meta:      [
+                'new_user_id' => $newUser->id,
+                'provider'    => $provider,
+            ],
+        );
+    }
+
+    // ==========================================
     // DOMAIN EVENTS — Booking (Email + Push)
     // ==========================================
 

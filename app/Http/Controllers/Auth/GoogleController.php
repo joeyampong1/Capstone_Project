@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Hash;
@@ -78,6 +79,12 @@ class GoogleController extends Controller
                 $newUser->email_verified_at    = now();
 
                 $newUser->save();
+
+                try {
+                    NotificationService::newUserRegistered($newUser, 'Google');
+                } catch (\Throwable $e) {
+                    \Log::warning('Failed to notify admins on Google registration: ' . $e->getMessage());
+                }
 
                 Auth::login($newUser);
             }
