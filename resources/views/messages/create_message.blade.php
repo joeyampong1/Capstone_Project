@@ -21,8 +21,8 @@
         $lastMessageId = $messages->last()->id ?? 0;
     @endphp
 
-    <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100vh-140px)] sm:h-[calc(100vh-170px)] lg:h-[calc(100vh-180px)] overflow-hidden">
-    <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-2 sm:py-6">
+        <div class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100dvh-150px)] sm:h-[calc(100vh-170px)] lg:h-[calc(100vh-180px)] overflow-hidden">
+            <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full py-1.5 sm:py-6">
 
             <div class="bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden flex flex-col h-full"
                 x-data='chatApp({
@@ -68,7 +68,7 @@
 
                 <!-- MESSAGES THREAD -->
                 <div x-ref="thread"
-                     class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0">
+                    class="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0">
 
                     <!-- No messages yet -->
                     <template x-if="messages.length === 0">
@@ -214,12 +214,12 @@
                                             x-transition:enter="transition ease-out duration-150"
                                             x-transition:enter-start="opacity-0 scale-90"
                                             x-transition:enter-end="opacity-100 scale-100"
-                                            :class="msg.is_mine ? 'right-0' : 'left-0'"
-                                            class="absolute bottom-9 z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2 py-1.5 flex items-center gap-1">
+                                            :class="msg.is_mine ? 'sm:right-0' : 'sm:left-0'"
+                                            class="fixed bottom-20 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:absolute sm:bottom-9 z-50 sm:z-30 bg-white dark:bg-neutral-800 rounded-full shadow-xl border border-gray-200 dark:border-neutral-700 px-2.5 py-1.5 flex items-center gap-1 w-max max-w-[92vw]">
                                             <template x-for="emoji in ['👍','❤️','😂','😮','😢','🙏']" :key="emoji">
                                                 <button type="button"
                                                         @click="toggleReaction(msg.id, emoji); emojiPickerOpen = false"
-                                                        class="w-8 h-8 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-lg flex items-center justify-center transition hover:scale-125"
+                                                        class="w-8 h-8 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-700 text-lg flex items-center justify-center transition hover:scale-125 shrink-0"
                                                         x-text="emoji"></button>
                                             </template>
                                         </div>
@@ -365,7 +365,7 @@
                             <span class="hidden sm:inline" x-text="sending ? '{{ __('messages.msg_sending') }}' : '{{ __('messages.msg_send') }}'">{{ __('messages.msg_send') }}</span>
                         </button>
                     </form>
-                    <p class="text-[9px] sm:text-[10px] text-neutral-400 dark:text-neutral-500 text-center mt-1.5">
+                    <p class="hidden sm:block text-[9px] sm:text-[10px] text-neutral-400 dark:text-neutral-500 text-center mt-1.5">
                         {{ __('messages.msg_press') }} <kbd class="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[8px]">Enter</kbd> {{ __('messages.msg_to_send') }} <kbd class="px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-800 text-[8px]">Shift+Enter</kbd> {{ __('messages.msg_for_newline') }}
                     </p>
                 </div>
@@ -576,6 +576,18 @@
                     }
                 } catch (e) { /* silent */ }
                 finally { this.sending = false; }
+            },
+
+            async markAsRead() {
+                try {
+                    await fetch(`/messages/${this.otherId}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': this.csrfToken,
+                            'Accept': 'application/json',
+                        },
+                    });
+                } catch (e) { /* silent */ }
             },
 
             async pollNewMessages() {
