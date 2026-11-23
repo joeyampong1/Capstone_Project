@@ -1,15 +1,26 @@
+@php
+    // Shared user data used across the whole navigation
+    $authUser = auth()->user();
+    $fullName = $authUser
+        ? (trim(($authUser->f_name ?? '') . ' ' . ($authUser->l_name ?? '')) ?: 'User')
+        : '';
+    $firstName = $authUser
+        ? (trim((string) ($authUser->f_name ?? '')) ?: 'User')
+        : 'User';
+@endphp
+
 <nav x-data="{ open: false, searchOpen: false }" class="bg-white dark:bg-neutral-900 border-b border-neutral-100 dark:border-neutral-800 sticky top-0 z-50 shadow-sm">
     <div class="w-full mx-auto px-2 sm:px-16 lg:px-24">
         <div class="flex justify-between h-16 relative">
 
             <!-- ========================================== -->
-            <!-- LEFT SIDE: toggle + logo + page title      -->
+            <!-- LEFT SIDE: toggle + logo + nav links       -->
             <!-- ========================================== -->
             <div class="flex items-center gap-2 sm:gap-4">
 
                 @auth
-                    @if(auth()->user()->isAdmin())
-                        <!-- Admin: Sidebar Toggle (mobile only) -->
+                    @if($authUser->isAdmin())
+                        <!-- Admin: sidebar toggle (mobile only) -->
                         <button @click="sidebarOpen = !sidebarOpen"
                                 class="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl text-neutral-500 hover:text-primary hover:bg-primary/10 focus:outline-none transition duration-150 ease-in-out">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,7 +28,7 @@
                             </svg>
                         </button>
 
-                        <!-- Admin: Logo -->
+                        <!-- Admin: logo -->
                         <div class="shrink-0 flex items-center">
                             <a href="{{ route('admin.home') }}" class="flex items-center">
                                 <img src="{{ asset('assets/logo/PetNanny_Logo.png') }}" alt="PetNanny Logo" class="h-9 w-auto block dark:hidden">
@@ -30,11 +41,11 @@
 
                     @else
                         <!-- ========================================== -->
-                        <!-- OWNER/SITTER: Toggle + Logo + Nav Links    -->
+                        <!-- OWNER/SITTER: toggle + logo + nav links    -->
                         <!-- ========================================== -->
                         <div class="shrink-0 flex items-center gap-1">
 
-                            <!-- Toggle Button (mobile only) -->
+                            <!-- Sidebar toggle (mobile only) -->
                             <button @click="sidebarOpen = !sidebarOpen"
                                     class="lg:hidden inline-flex items-center justify-center w-8 h-8 rounded-lg text-neutral-500 hover:text-primary hover:bg-primary/10 transition duration-150">
                                 <svg x-show="!sidebarOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
@@ -55,7 +66,7 @@
                             </a>
                         </div>
 
-                        <!-- Desktop Nav Links (owner/sitter) -->
+                        <!-- Desktop nav links (owner/sitter) -->
                         <div class="hidden space-x-1 sm:-my-px sm:flex items-center">
                             <a href="{{ route('dashboard') }}"
                                class="inline-flex items-center gap-2 px-4 py-2 text-sm font-extrabold rounded-xl transition-all duration-150
@@ -75,7 +86,7 @@
                                 {{ __('messages.nav_find_sitters') }}
                             </a>
 
-                            <!-- My Bookings — with BADGE -->
+                            <!-- My Bookings with badge -->
                             <a href="{{ route('mybookings.index') }}"
                                class="inline-flex items-center gap-2.5 px-4 py-2 text-sm font-bold rounded-xl transition-all duration-150 relative
                                {{ request()->routeIs('mybookings.index') ? 'bg-primary text-white shadow-sm hover:bg-primary-600' : 'text-neutral-600 hover:text-primary hover:bg-primary-50 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800' }}">
@@ -83,7 +94,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
                                 {{ __('messages.nav_my_bookings') }}
-                                <!-- BOOKING BADGE -->
                                 <span x-data
                                       x-show="$store.booking.count > 0"
                                       x-text="$store.booking.count > 99 ? '99+' : $store.booking.count"
@@ -100,7 +110,7 @@
                                 {{ __('messages.nav_my_pets') }}
                             </a>
 
-                            <!-- ✅ Messages — with BADGE -->
+                            <!-- Messages with badge -->
                             <a href="{{ route('messages.index') }}"
                                class="inline-flex items-center gap-2.5 px-4 py-2 text-sm font-bold rounded-xl transition-all duration-150 relative
                                {{ request()->routeIs('messages.index') ? 'bg-primary text-white shadow-sm hover:bg-primary-600' : 'text-neutral-600 hover:text-primary hover:bg-primary-50 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800' }}">
@@ -108,7 +118,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                                 </svg>
                                 {{ __('messages.nav_messages') }}
-                                <!-- MESSAGES BADGE -->
                                 <span x-data
                                       x-show="$store.msg.unread > 0"
                                       x-text="$store.msg.unread > 99 ? '99+' : $store.msg.unread"
@@ -116,7 +125,7 @@
                                 </span>
                             </a>
 
-                            <!-- Notifications — with BADGE -->
+                            <!-- Notifications with badge -->
                             <a href="{{ route('notifications.index') }}"
                                class="inline-flex items-center gap-2.5 px-4 py-2 text-sm font-bold rounded-xl transition-all duration-150 relative
                                {{ request()->routeIs('notifications.index') ? 'bg-primary text-white shadow-sm hover:bg-primary-600' : 'text-neutral-600 hover:text-primary hover:bg-primary-50 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800' }}">
@@ -124,7 +133,6 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                                 </svg>
                                 {{ __('messages.nav_notifications') }}
-                                <!-- NOTIFICATIONS BADGE -->
                                 <span x-data
                                       x-show="$store.notif.unread > 0"
                                       x-text="$store.notif.unread > 99 ? '99+' : $store.notif.unread"
@@ -137,17 +145,17 @@
             </div>
 
             <!-- ========================================== -->
-            <!-- RIGHT SIDE: Admin / Owner-Sitter Controls  -->
+            <!-- RIGHT SIDE: admin / owner-sitter controls  -->
             <!-- ========================================== -->
 
             @auth
-                @if(auth()->user()->isAdmin())
+                @if($authUser->isAdmin())
                     <!-- ========================================== -->
-                    <!-- ADMIN RIGHT SIDE                         -->
+                    <!-- ADMIN RIGHT SIDE                           -->
                     <!-- ========================================== -->
                     <div class="flex items-center gap-3">
 
-                        <!-- Search Button (Mobile) -->
+                        <!-- Search button (mobile) -->
                         <button @click="searchOpen = !searchOpen"
                                 class="sm:hidden inline-flex items-center justify-center w-9 h-9 rounded-xl text-neutral-500 hover:text-primary hover:bg-primary/10 transition">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +163,7 @@
                             </svg>
                         </button>
 
-                        <!-- Search Bar (Desktop) -->
+                        <!-- Search bar (desktop) -->
                         <form action="{{ route('admin.users') }}" method="GET" class="hidden sm:flex items-center relative">
                             <div class="relative">
                                 <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,7 +177,7 @@
                             </div>
                         </form>
 
-                        <!-- Dark Mode Toggle -->
+                        <!-- Dark mode toggle -->
                         <div x-data="{
                                 dark: document.documentElement.classList.contains('dark'),
                                 toggle() {
@@ -190,13 +198,13 @@
                             <button @click="toggle()"
                                     class="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-600 dark:text-neutral-300"
                                     title="Toggle dark mode">
-                                <!-- Sun icon (shown when in dark mode) -->
+                                <!-- Sun icon (shown in dark mode) -->
                                 <svg x-show="dark" x-cloak
                                     class="w-5 h-5"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                                 </svg>
-                                <!-- Moon icon (shown when in light mode) -->
+                                <!-- Moon icon (shown in light mode) -->
                                 <svg x-show="!dark" x-cloak
                                     class="w-5 h-5"
                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,84 +213,81 @@
                             </button>
                         </div>
 
-                <!-- Notifications -->
-                <div x-data="{
-                        notifOpen: false,
-                        notifList: [],
-                        fetchNotifs() {
-                            this.notifOpen = !this.notifOpen;
-                            if (this.notifOpen && this.notifList.length === 0) {
-                                fetch('{{ route('notifications.poll') }}?last_id=0', {
-                                    headers: { 'Accept': 'application/json' }
-                                })
-                                .then(res => res.json())
-                                .then(data => {
-                                    this.notifList = data.notifications.slice(0, 5);
-                                });
-                            }
-                        }
-                    }"
-                    class="relative">
+                        <!-- Notifications -->
+                        <div x-data="{
+                                notifOpen: false,
+                                notifList: [],
+                                fetchNotifs() {
+                                    this.notifOpen = !this.notifOpen;
+                                    if (this.notifOpen && this.notifList.length === 0) {
+                                        fetch('{{ route('notifications.poll') }}?last_id=0', {
+                                            headers: { 'Accept': 'application/json' }
+                                        })
+                                        .then(res => res.json())
+                                        .then(data => {
+                                            this.notifList = data.notifications.slice(0, 5);
+                                        });
+                                    }
+                                }
+                            }"
+                            class="relative">
 
-                    <button @click="fetchNotifs()"
-                            class="relative p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-600 dark:text-neutral-300">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        <span x-data
-                            x-show="$store.notif.unread > 0"
-                            x-text="$store.notif.unread > 99 ? '99+' : $store.notif.unread"
-                            class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold bg-red-500 text-white rounded-full shadow-sm border-2 border-white dark:border-neutral-900">
-                        </span>
-                    </button>
+                            <button @click="fetchNotifs()"
+                                    class="relative p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition text-neutral-600 dark:text-neutral-300">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                <span x-data
+                                    x-show="$store.notif.unread > 0"
+                                    x-text="$store.notif.unread > 99 ? '99+' : $store.notif.unread"
+                                    class="absolute -top-1 -right-1 flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-extrabold bg-red-500 text-white rounded-full shadow-sm border-2 border-white dark:border-neutral-900">
+                                </span>
+                            </button>
 
-                    <!-- Notifications Dropdown -->
-                    <div x-show="notifOpen" @click.away="notifOpen = false" x-cloak
-                        class="absolute right-0 mt-2 w-80 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50">
-                        <div class="px-4 py-2 border-b border-gray-100 dark:border-neutral-800 flex justify-between items-center">
-                            <p class="font-bold text-[#1B3B36] dark:text-white">{{ __('messages.nav_notifications') }}</p>
-                            <!-- ✅ TRANSLATED 'recent' -->
-                            <span class="text-xs text-neutral-500" x-text="notifList.length + ' {{ __('messages.nav_recent') }}'"></span>
-                        </div>
-
-                        <div class="max-h-64 overflow-y-auto">
-                            <template x-if="notifList.length === 0">
-                                <!-- ✅ TRANSLATED 'No new notifications.' -->
-                                <div class="px-4 py-6 text-center text-sm text-neutral-500">
-                                    {{ __('messages.nav_no_notifications') }}
+                            <!-- Notifications dropdown -->
+                            <div x-show="notifOpen" @click.away="notifOpen = false" x-cloak
+                                class="absolute right-0 top-full mt-2 w-80 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50">
+                                <div class="px-4 py-2 border-b border-gray-100 dark:border-neutral-800 flex justify-between items-center">
+                                    <p class="font-bold text-[#1B3B36] dark:text-white">{{ __('messages.nav_notifications') }}</p>
+                                    <span class="text-xs text-neutral-500" x-text="notifList.length + ' {{ __('messages.nav_recent') }}'"></span>
                                 </div>
-                            </template>
 
-                            <template x-for="notif in notifList" :key="notif.id">
-                                <a :href="notif.action_url || '#'" class="flex items-start gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
-                                    <div class="w-2 h-2 rounded-full bg-primary mt-2 shrink-0"></div>
-                                    <div>
-                                        <p class="text-sm text-[#1B3B36] dark:text-white font-medium" x-text="notif.title"></p>
-                                        <p class="text-xs text-neutral-500 line-clamp-1" x-text="notif.message"></p>
-                                        <p class="text-xs text-neutral-400 mt-1" x-text="notif.created_at"></p>
-                                    </div>
-                                </a>
-                            </template>
+                                <div class="max-h-64 overflow-y-auto">
+                                    <template x-if="notifList.length === 0">
+                                        <div class="px-4 py-6 text-center text-sm text-neutral-500">
+                                            {{ __('messages.nav_no_notifications') }}
+                                        </div>
+                                    </template>
+
+                                    <template x-for="notif in notifList" :key="notif.id">
+                                        <a :href="notif.action_url || '#'" class="flex items-start gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition">
+                                            <div class="w-2 h-2 rounded-full bg-primary mt-2 shrink-0"></div>
+                                            <div>
+                                                <p class="text-sm text-[#1B3B36] dark:text-white font-medium" x-text="notif.title"></p>
+                                                <p class="text-xs text-neutral-500 line-clamp-1" x-text="notif.message"></p>
+                                                <p class="text-xs text-neutral-400 mt-1" x-text="notif.created_at"></p>
+                                            </div>
+                                        </a>
+                                    </template>
+                                </div>
+
+                                <div class="px-4 py-2 border-t border-gray-100 dark:border-neutral-800 text-center">
+                                    <a href="{{ route('notifications.index') }}" class="text-xs text-primary font-semibold hover:underline">{{ __('messages.nav_view_all_notifications') }}</a>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="px-4 py-2 border-t border-gray-100 dark:border-neutral-800 text-center">
-                            <!-- ✅ TRANSLATED 'View All Notifications' -->
-                            <a href="{{ route('notifications.index') }}" class="text-xs text-primary font-semibold hover:underline">{{ __('messages.nav_view_all_notifications') }}</a>
-                        </div>
-                    </div>
-                </div>
-
-                        <!-- Admin Profile Dropdown -->
+                        <!-- Admin profile dropdown -->
                         <div x-data="{ profileOpen: false }" class="relative">
                             <button @click="profileOpen = !profileOpen"
                                     class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
-                                @if(auth()->user()->profile_photo)
-                                    <img src="{{ auth()->user()->profile_photo_url }}"
-                                        alt="{{ auth()->user()->f_name }}"
+                                @if($authUser->profile_photo)
+                                    <img src="{{ $authUser->profile_photo_url }}"
+                                        alt="{{ $authUser->f_name }}"
                                         class="w-8 h-8 rounded-full object-cover border-2 border-primary/20">
                                 @else
                                     <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                                        {{ strtoupper(substr(auth()->user()->f_name ?? auth()->user()->email ?? 'U', 0, 1)) }}
+                                        {{ strtoupper(substr($authUser->f_name ?? $authUser->email ?? 'U', 0, 1)) }}
                                     </div>
                                 @endif
 
@@ -292,12 +297,12 @@
                                 </svg>
                             </button>
 
-                            <!-- Profile Dropdown -->
-                            <div x-show="profileOpen" @click.away="profileOpen = false"
-                                 class="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50">
+                            <!-- Dropdown panel -->
+                            <div x-show="profileOpen" @click.away="profileOpen = false" x-cloak
+                                 class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50">
                                 <div class="px-4 py-3 border-b border-gray-100 dark:border-neutral-800">
-                                    <p class="font-bold text-[#1B3B36] dark:text-white">{{ auth()->user()->name }}</p>
-                                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{{ auth()->user()->email }}</p>
+                                    <p class="font-bold text-[#1B3B36] dark:text-white truncate">{{ $fullName }}</p>
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ $authUser->email }}</p>
                                     <span class="inline-block mt-1 text-[10px] font-bold bg-primary/10 text-primary px-2 py-0.5 rounded-full">{{ __('messages.nav_admin_badge') }}</span>
                                 </div>
                                 <a href="{{ route('public.profile', ['id' => auth()->id()]) }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-[#1B3B36] dark:text-white">
@@ -328,195 +333,197 @@
 
                     </div>
 
-                    @else
-                        <!-- ========================================== -->
-                        <!-- OWNER/SITTER RIGHT SIDE (user + hamburger) -->
-                        <!-- ========================================== -->
-                        <div class="flex items-center gap-2 sm:gap-3">
+                @else
+                    <!-- ========================================== -->
+                    <!-- OWNER/SITTER RIGHT SIDE (user + hamburger) -->
+                    <!-- ========================================== -->
+                    <div class="flex items-center gap-2 sm:gap-3">
 
-                            <!-- ✅ SEARCH BAR (Expandable Icon with Live Search) -->
-                            <div class="relative flex items-center" x-data="{
-                                searchQuery: '',
-                                searchResults: [],
-                                isSearching: false,
-                                async fetchResults() {
-                                    if (this.searchQuery.length < 2) {
-                                        this.searchResults = [];
-                                        return;
-                                    }
-                                    this.isSearching = true;
-                                    try {
-                                        let response = await fetch(`{{ route('search') }}?q=${this.searchQuery}`, {
-                                            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-                                        });
-                                        let data = await response.json();
-                                        this.searchResults = data;
-                                    } catch (e) {
-                                        console.error(e);
-                                    } finally {
-                                        this.isSearching = false;
-                                    }
+                        <!-- Search bar (expandable icon with live search) -->
+                        <div class="relative flex items-center" x-data="{
+                            searchQuery: '',
+                            searchResults: [],
+                            isSearching: false,
+                            async fetchResults() {
+                                if (this.searchQuery.length < 2) {
+                                    this.searchResults = [];
+                                    return;
                                 }
-                            }" @click.away="searchOpen = false; searchResults = []; searchQuery = '';">
+                                this.isSearching = true;
+                                try {
+                                    let response = await fetch(`{{ route('search') }}?q=${encodeURIComponent(this.searchQuery)}`, {
+                                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                                    });
+                                    let data = await response.json();
+                                    this.searchResults = data;
+                                } catch (e) {
+                                    console.error(e);
+                                } finally {
+                                    this.isSearching = false;
+                                }
+                            }
+                        }" @click.away="searchOpen = false; searchResults = []; searchQuery = '';">
 
-                                <form action="{{ route('search') }}" method="GET"
-                                      class="flex items-center bg-neutral-50 dark:bg-neutral-800 border border-transparent focus-within:border-primary focus-within:bg-white dark:focus-within:bg-neutral-900 rounded-xl transition-all duration-300 overflow-hidden"
-                                      :class="searchOpen ? 'w-48 sm:w-64 px-2' : 'w-9 px-0 bg-transparent dark:bg-transparent border-transparent'">
+                            <form action="{{ route('search') }}" method="GET"
+                                  class="flex items-center bg-neutral-50 dark:bg-neutral-800 border border-transparent focus-within:border-primary focus-within:bg-white dark:focus-within:bg-neutral-900 rounded-xl transition-all duration-300 overflow-hidden"
+                                  :class="searchOpen ? 'w-48 sm:w-64 px-2' : 'w-9 px-0 bg-transparent dark:bg-transparent border-transparent'">
 
-                                    <!-- Search Icon Button -->
-                                    <button type="button" @click="searchOpen = !searchOpen; if(searchOpen) { $nextTick(() => $refs.searchInput.focus()) }"
-                                            class="p-1.5 text-neutral-500 hover:text-primary shrink-0 transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                                        </svg>
-                                    </button>
-
-                                    <!-- Input Field -->
-                                    <input type="text" name="q" x-show="searchOpen" x-cloak
-                                           x-ref="searchInput"
-                                           x-model="searchQuery"
-                                           @input.debounce.300ms="fetchResults()"
-                                           placeholder="{{ __('messages.nav_search_accounts') }}"
-                                           class="w-full min-w-0 bg-transparent border-none text-sm focus:ring-0 px-1 py-1.5 outline-none text-neutral-700 dark:text-neutral-200 placeholder-neutral-400">
-                                </form>
-
-                                <!-- ✅ DROPDOWN MODAL -->
-                                <div x-show="searchOpen && searchQuery.length >= 2" x-cloak
-                                     class="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-100 dark:border-neutral-800 z-50 overflow-hidden flex flex-col">
-
-                                    <div class="p-2 border-b border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
-                                        <span class="text-xs font-bold text-neutral-500 uppercase tracking-wider">{{ __('messages.nav_search_results') }}</span>
-                                    </div>
-
-                                    <!-- Scrollable list -->
-                                    <div class="max-h-80 overflow-y-auto">
-                                        <!-- Loading state -->
-                                        <div x-show="isSearching" class="p-4 text-center text-sm text-neutral-500">
-                                            {{ __('messages.nav_searching') }}
-                                        </div>
-
-                                        <!-- No results state -->
-                                        <div x-show="!isSearching && searchResults.length === 0" class="p-4 text-center text-sm text-neutral-500">
-                                            {{ __('messages.nav_no_accounts') }} "<span x-text="searchQuery"></span>"
-                                        </div>
-
-                                        <!-- Results -->
-                                        <template x-for="user in searchResults" :key="user.id">
-                                            <a :href="user.url" class="flex items-center gap-3 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition border-b border-gray-50 dark:border-neutral-800/50 last:border-0">
-                                                <img :src="user.photo" class="w-10 h-10 rounded-full object-cover shrink-0">
-                                                <div class="min-w-0">
-                                                    <p class="text-sm font-bold text-[#1B3B36] dark:text-white truncate" x-text="user.name"></p>
-                                                    <p class="text-xs text-neutral-500 flex items-center gap-1">
-                                                        <span x-text="user.is_sitter ? '{{ __('messages.role_sitter') }}' : '{{ __('messages.role_owner') }}'"></span>
-                                                        <template x-if="user.visibility === 'private'">
-                                                            <span class="inline-flex items-center text-amber-600 gap-1">
-                                                                • <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> {{ __('messages.vis_private') }}
-                                                            </span>
-                                                        </template>
-                                                    </p>
-                                                </div>
-                                            </a>
-                                        </template>
-                                    </div>
-
-                                    <!-- View all results footer -->
-                                    <div class="p-2 border-t border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50 text-center">
-                                        <a :href="'{{ route('search') }}?q=' + searchQuery" class="text-xs font-bold text-primary hover:underline">{{ __('messages.nav_view_all_results') }}</a>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- User Profile Dropdown -->
-                            <div x-data="{ profileOpen: false }" class="relative flex items-center">
-                                <button @click="profileOpen = !profileOpen"
-                                        class="inline-flex items-center gap-2 px-2 sm:px-3 py-1.5 border border-transparent text-sm font-extrabold rounded-xl text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800 hover:text-neutral-800 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none transition ease-in-out duration-150">
-                                    <div class="flex items-center gap-2">
-                                        @php
-                                            $user = auth()->user();
-                                            $firstName = trim((string) ($user->f_name ?? ''));
-                                            if ($firstName === '') {
-                                                $firstName = 'User';
-                                            }
-                                            $displayName = $firstName;
-                                        @endphp
-
-                                        @if($user && $user->profile_photo)
-                                            <img src="{{ $user->profile_photo_url }}"
-                                                alt="{{ $user->f_name ?? $displayName }}"
-                                                class="w-8 h-8 rounded-full object-cover border-2 border-primary/20 shrink-0">
-                                        @else
-                                            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white border-2 border-primary/20 shrink-0">
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        @endif
-
-                                        <!-- Name — hidden sa mobile -->
-                                        <span class="hidden sm:inline-block">
-                                            {{ $displayName }}
-                                        </span>
-                                    </div>
-
-                                    <!-- Chevron — hidden sa mobile -->
-                                    <div class="hidden sm:block ms-1">
-                                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                </button>
-
-                                <div x-show="profileOpen"
-                                    @click.away="profileOpen = false"
-                                    x-transition:enter="transition ease-out duration-200"
-                                    x-transition:enter-start="transform opacity-0 scale-95"
-                                    x-transition:enter-end="transform opacity-100 scale-100"
-                                    x-transition:leave="transition ease-in duration-150"
-                                    x-transition:leave-start="transform opacity-100 scale-100"
-                                    x-transition:leave-end="transform opacity-0 scale-95"
-                                    class="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50" style="display: none;">
-                                    <a href="{{ route('public.profile', ['id' => auth()->id()]) }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-[#1B3B36] dark:text-white font-bold">
-                                        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                                        </svg>
-                                        {{ __('messages.nav_my_profile') }}
-                                    </a>
-
-                                    <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event)">
-                                        @csrf
-                                        <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-red-500 font-bold">
-                                            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                                            </svg>
-                                            {{ __('messages.nav_log_out') }}
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <!-- Hamburger (mobile) — INSIDE sa same container -->
-                            <div class="flex items-center sm:hidden">
-                                <button @click="open = !open"
-                                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 focus:outline-none transition duration-150 ease-in-out">
-                                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                <!-- Search icon button -->
+                                <button type="button" @click="searchOpen = !searchOpen; if(searchOpen) { $nextTick(() => $refs.searchInput.focus()) }"
+                                        class="p-1.5 text-neutral-500 hover:text-primary shrink-0 transition">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                                     </svg>
                                 </button>
-                            </div>
 
+                                <!-- Input field -->
+                                <input type="text" name="q" x-show="searchOpen" x-cloak
+                                       x-ref="searchInput"
+                                       x-model="searchQuery"
+                                       @input.debounce.300ms="fetchResults()"
+                                       placeholder="{{ __('messages.nav_search_accounts') }}"
+                                       class="w-full min-w-0 bg-transparent border-none text-sm focus:ring-0 px-1 py-1.5 outline-none text-neutral-700 dark:text-neutral-200 placeholder-neutral-400">
+                            </form>
+
+                            <!-- Search results dropdown -->
+                            <div x-show="searchOpen && searchQuery.length >= 2" x-cloak
+                                 class="absolute top-full right-0 mt-2 w-72 sm:w-80 bg-white dark:bg-neutral-900 rounded-xl shadow-xl border border-gray-100 dark:border-neutral-800 z-50 overflow-hidden flex flex-col">
+
+                                <div class="p-2 border-b border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50">
+                                    <span class="text-xs font-bold text-neutral-500 uppercase tracking-wider">{{ __('messages.nav_search_results') }}</span>
+                                </div>
+
+                                <!-- Scrollable list -->
+                                <div class="max-h-80 overflow-y-auto">
+                                    <!-- Loading state -->
+                                    <div x-show="isSearching" class="p-4 text-center text-sm text-neutral-500">
+                                        {{ __('messages.nav_searching') }}
+                                    </div>
+
+                                    <!-- No results state -->
+                                    <div x-show="!isSearching && searchResults.length === 0" class="p-4 text-center text-sm text-neutral-500">
+                                        {{ __('messages.nav_no_accounts') }} "<span x-text="searchQuery"></span>"
+                                    </div>
+
+                                    <!-- Results -->
+                                    <template x-for="user in searchResults" :key="user.id">
+                                        <a :href="user.url" class="flex items-center gap-3 p-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition border-b border-gray-50 dark:border-neutral-800/50 last:border-0">
+                                            <img :src="user.photo" class="w-10 h-10 rounded-full object-cover shrink-0">
+                                            <div class="min-w-0">
+                                                <p class="text-sm font-bold text-[#1B3B36] dark:text-white truncate" x-text="user.name"></p>
+                                                <p class="text-xs text-neutral-500 flex items-center gap-1">
+                                                    <span x-text="user.is_sitter ? '{{ __('messages.role_sitter') }}' : '{{ __('messages.role_owner') }}'"></span>
+                                                    <template x-if="user.visibility === 'private'">
+                                                        <span class="inline-flex items-center text-amber-600 gap-1">
+                                                            • <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg> {{ __('messages.vis_private') }}
+                                                        </span>
+                                                    </template>
+                                                </p>
+                                            </div>
+                                        </a>
+                                    </template>
+                                </div>
+
+                                <!-- View all results footer -->
+                                <div class="p-2 border-t border-gray-100 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/50 text-center">
+                                    <a :href="'{{ route('search') }}?q=' + encodeURIComponent(searchQuery)" class="text-xs font-bold text-primary hover:underline">{{ __('messages.nav_view_all_results') }}</a>
+                                </div>
+                            </div>
                         </div>
-                    @endif
+
+                        <!-- User profile dropdown -->
+                        <div x-data="{ profileOpen: false }" class="relative flex items-center">
+                            <button @click="profileOpen = !profileOpen"
+                                    class="inline-flex items-center gap-2 px-2 sm:px-3 py-1.5 border border-transparent text-sm font-extrabold rounded-xl text-neutral-600 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800 hover:text-neutral-800 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none transition ease-in-out duration-150">
+                                <div class="flex items-center gap-2">
+                                    @if($authUser && $authUser->profile_photo)
+                                        <img src="{{ $authUser->profile_photo_url }}"
+                                            alt="{{ $authUser->f_name ?? $firstName }}"
+                                            class="w-8 h-8 rounded-full object-cover border-2 border-primary/20 shrink-0">
+                                    @else
+                                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white border-2 border-primary/20 shrink-0">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    @endif
+
+                                    <!-- First name (hidden on mobile) -->
+                                    <span class="hidden sm:inline-block">{{ $firstName }}</span>
+                                </div>
+
+                                <!-- Chevron (hidden on mobile) -->
+                                <div class="hidden sm:block ms-1">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </button>
+
+                            <!--
+                                Dropdown panel.
+                                "top-full" anchors it right below the button. Without it, the panel falls back to
+                                its static position inside the flex container and gets cut off by the top of the page.
+                            -->
+                            <div x-show="profileOpen"
+                                @click.away="profileOpen = false"
+                                x-cloak
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="transform opacity-0 scale-95"
+                                x-transition:enter-end="transform opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="transform opacity-100 scale-100"
+                                x-transition:leave-end="transform opacity-0 scale-95"
+                                class="absolute right-0 top-full mt-2 w-56 origin-top-right bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-800 py-2 z-50">
+
+                                <!-- Name and email -->
+                                <div class="px-4 py-3 border-b border-gray-100 dark:border-neutral-800">
+                                    <p class="font-bold text-[#1B3B36] dark:text-white truncate">{{ $fullName }}</p>
+                                    <p class="text-xs text-neutral-500 dark:text-neutral-400 truncate">{{ $authUser->email }}</p>
+                                </div>
+
+                                <a href="{{ route('public.profile', ['id' => auth()->id()]) }}" class="flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-[#1B3B36] dark:text-white font-bold">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                    </svg>
+                                    {{ __('messages.nav_my_profile') }}
+                                </a>
+
+                                <form method="POST" action="{{ route('logout') }}" onsubmit="return handleLogout(event)">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition text-sm text-red-500 font-bold">
+                                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        {{ __('messages.nav_log_out') }}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Hamburger (mobile) -->
+                        <div class="flex items-center sm:hidden">
+                            <button @click="open = !open"
+                                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-neutral-800 focus:outline-none transition duration-150 ease-in-out">
+                                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                                    <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                    </div>
+                @endif
             @endauth
 
         </div>
     </div>
 
     <!-- ========================================== -->
-    <!-- MOBILE SEARCH (Admin only)                 -->
+    <!-- MOBILE SEARCH (admin only)                 -->
     <!-- ========================================== -->
     @auth
-        @if(auth()->user()->isAdmin())
+        @if($authUser->isAdmin())
             <div x-show="searchOpen" x-cloak class="px-4 pb-3 sm:hidden">
                 <div class="relative">
                     <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -532,10 +539,10 @@
 
     <!-- ========================================== -->
     <!-- MOBILE RESPONSIVE NAVIGATION MENU          -->
-    <!-- (Owner/Sitter only)                       -->
+    <!-- (owner/sitter only)                        -->
     <!-- ========================================== -->
     @auth
-        @if(!auth()->user()->isAdmin())
+        @if(!$authUser->isAdmin())
             <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
                 <div class="pt-2 pb-3 space-y-1">
 
@@ -553,7 +560,7 @@
                         {{ __('messages.nav_find_sitters') }}
                     </a>
 
-                    <!-- My Bookings (mobile) — with BADGE -->
+                    <!-- My Bookings (mobile) with badge -->
                     <a href="{{ route('mybookings.index') }}"
                        class="flex items-center gap-3 w-full ps-4 pe-4 py-2.5 border-l-4 border-transparent text-start text-base font-medium transition duration-150 ease-in-out
                        {{ request()->routeIs('mybookings.index') ? 'bg-primary/10 text-primary border-primary font-bold' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800' }}">
@@ -573,7 +580,7 @@
                         {{ __('messages.nav_my_pets') }}
                     </a>
 
-                    <!-- Messages (mobile) — with BADGE -->
+                    <!-- Messages (mobile) with badge -->
                     <a href="{{ route('messages.index') }}"
                        class="flex items-center gap-3 w-full ps-4 pe-4 py-2.5 border-l-4 border-transparent text-start text-base font-medium transition duration-150 ease-in-out
                        {{ request()->routeIs('messages.index') ? 'bg-primary/10 text-primary border-primary font-bold' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800' }}">
@@ -586,7 +593,7 @@
                         </span>
                     </a>
 
-                    <!-- Notifications (mobile) — with BADGE -->
+                    <!-- Notifications (mobile) with badge -->
                     <a href="{{ route('notifications.index') }}"
                        class="flex items-center gap-3 w-full ps-4 pe-4 py-2.5 border-l-4 border-transparent text-start text-base font-medium transition duration-150 ease-in-out
                        {{ request()->routeIs('notifications.index') ? 'bg-primary/10 text-primary border-primary font-bold' : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 dark:text-neutral-300 dark:hover:text-white dark:hover:bg-neutral-800' }}">
@@ -600,20 +607,21 @@
                     </a>
                 </div>
 
+                <!-- User info + account actions -->
                 <div class="pt-4 pb-1 border-t border-gray-200 dark:border-neutral-800">
                     <div class="px-4 flex items-center gap-3">
-                        @if(Auth::user()->profile_photo)
-                            <img src="{{ Auth::user()->profile_photo_url }}"
-                                alt="{{ Auth::user()->f_name }}"
+                        @if($authUser->profile_photo)
+                            <img src="{{ $authUser->profile_photo_url }}"
+                                alt="{{ $authUser->f_name }}"
                                 class="w-10 h-10 rounded-full object-cover border-2 border-primary/20 shrink-0">
                         @else
                             <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
-                                {{ strtoupper(substr(Auth::user()->f_name ?? 'U', 0, 1)) }}
+                                {{ strtoupper(substr($authUser->f_name ?? 'U', 0, 1)) }}
                             </div>
                         @endif
                         <div class="min-w-0">
-                            <div class="font-medium text-base text-gray-800 dark:text-white truncate">{{ Auth::user()->name }}</div>
-                            <div class="font-medium text-sm text-gray-500 dark:text-neutral-400 truncate">{{ Auth::user()->email }}</div>
+                            <div class="font-medium text-base text-gray-800 dark:text-white truncate">{{ $fullName }}</div>
+                            <div class="font-medium text-sm text-gray-500 dark:text-neutral-400 truncate">{{ $authUser->email }}</div>
                         </div>
                     </div>
 
