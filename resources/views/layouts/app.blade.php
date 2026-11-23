@@ -388,7 +388,7 @@
                 }
 
                 // Run setup
-                // setupFCM(); // Commented out. Token generation is handled by the Settings toggle switch.
+               setupFCM();
 
                 // ✅ FIX ISSUE #40: Delete FCM token on logout
                 window.handleLogout = function(event) {
