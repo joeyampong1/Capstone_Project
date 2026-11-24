@@ -22,6 +22,8 @@
         $greetBody = $tr('messages.msg_greet_body', "Welcome to PetNanny! Chat here to talk about bookings, schedules and your pet's needs.");
         $waveLabel = $tr('messages.msg_wave', 'Wave to say hi');
         $waveHint  = $tr('messages.msg_wave_hint', 'Send a wave to start the conversation');
+        $cameraLabel = $tr('messages.msg_camera', 'Camera');
+        $cameraHint  = $tr('messages.msg_camera_hint', 'Take a photo');
 
         // Everything is passed through Js::from so apostrophes / quotes can never break x-data
         $chatConfig = [
@@ -414,6 +416,20 @@
                                     </div>
                                 </button>
                                 <button type="button"
+                                        @click="$refs.cameraInput.click(); attachOpen = false"
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition text-left">
+                                    <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-neutral-800 dark:text-white">{{ $cameraLabel }}</p>
+                                        <p class="text-[10px] text-neutral-400">{{ $cameraHint }}</p>
+                                    </div>
+                                </button>
+                                <button type="button"
                                         @click="$refs.docInput.click(); attachOpen = false"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition text-left">
                                     <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
@@ -432,6 +448,10 @@
                         <!-- Hidden file inputs: photos (multiple) and documents (multiple) -->
                         <input type="file" x-ref="photoInput" class="hidden"
                                accept="image/*" multiple
+                               @change="handleFiles($event)">
+                        <!-- Camera: opens the camera directly. Must NOT have "multiple", Android hides the camera when it is set. -->
+                        <input type="file" x-ref="cameraInput" class="hidden"
+                               accept="image/*" capture="environment"
                                @change="handleFiles($event)">
                         <input type="file" x-ref="docInput" class="hidden"
                                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple
