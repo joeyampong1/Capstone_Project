@@ -1240,17 +1240,17 @@ return [
     'hs_faq_q1'              => '¿Cómo reservo un cuidador de mascotas?',
     'hs_faq_a1'              => 'Para reservar un cuidador, ve a la página "Buscar Cuidador", explora los cuidadores disponibles, selecciona tu preferido y haz clic en "Reservar Ahora". Sigue las instrucciones para completar tu reserva.',
     'hs_faq_q2'              => '¿Cómo funcionan los pagos?',
-    'hs_faq_a2'              => 'Los pagos se procesan de forma segura a través de nuestra plataforma. Los dueños pagan por adelantado y los cuidadores reciben sus ganancias después de las visitas completadas, menos las tarifas de plataforma y protección.',
+    'hs_faq_a2'              => 'PetNanny no procesa pagos dentro de la aplicación. El pago se acuerda y se realiza directamente entre el dueño de la mascota y el cuidador después de completar el servicio, ya sea en efectivo, por GCash o como ambos convengan.',
     'hs_faq_q3'              => '¿Cuándo reciben los cuidadores sus pagos?',
     'hs_faq_a3'              => 'Los cuidadores reciben sus pagos dentro de 24-48 horas después de que la visita se completa y verifica. Los pagos se liberan a través del método de pago configurado en tu perfil.',
     'hs_faq_q4'              => '¿Cómo cancelo una reserva?',
     'hs_faq_a4'              => 'Para cancelar una reserva, ve a "Mis Reservas", selecciona la reserva que deseas cancelar y haz clic en "Cancelar Reserva". Pueden aplicarse políticas de cancelación según el momento.',
     'hs_faq_q5'              => '¿Cómo envío una queja?',
     'hs_faq_a5'              => 'Para enviar una queja, ve a la página "Quejas" y haz clic en "Presentar Queja". Proporciona los detalles de la reserva, el tipo de queja, la descripción y adjunta cualquier evidencia de apoyo.',
-    'hs_faq_q6'              => '¿Cómo envío una reclamación de protección?',
-    'hs_faq_a6'              => 'Para enviar una reclamación de protección, ve a la página "Reclamaciones" y haz clic en "Enviar Reclamación". Selecciona la reserva, proporciona detalles del incidente, sube evidencia y envía para revisión.',
-    'hs_faq_q7'              => '¿Cuánto tarda la investigación de una reclamación?',
-    'hs_faq_a7'              => 'Las investigaciones de reclamaciones suelen tomar 3-5 días hábiles. Nuestro equipo revisará la evidencia y comunicará la decisión a través de la plataforma. Se te notificará del resultado.',
+    'hs_faq_q6'              => '¿Cómo me registro en PetNanny?',
+    'hs_faq_a6'              => 'Haz clic en "Registrarse" en la página principal, completa tus datos personales y correo electrónico (o regístrate con tu cuenta de Google) y verifica tu correo para comenzar.',
+    'hs_faq_q7'              => '¿Cómo verifico mi cuenta?',
+    'hs_faq_a7'              => 'Ve a tu página de Perfil y sube una identificación oficial vigente junto con una selfie clara. Nuestro equipo de administración revisará tu solicitud y, una vez verificada, podrás postularte como cuidador de mascotas.',
     'hs_safety_header'       => 'Seguridad y Comunidad',
     'hs_safety_1'            => 'Reúnanse en un lugar seguro antes del primer servicio.',
     'hs_safety_2'            => 'Mantén la comunicación dentro de la plataforma.',
@@ -1794,7 +1794,7 @@ return [
     'mp_delete_warning'    => 'Esta acción no se puede deshacer.',
     'mp_delete'            => 'Eliminar',
 
-        // ==========================================
+    // ==========================================
     // 📬 OWNER / SITTER — MESSAGES (Chat View)
     // ==========================================
     'msg_index_title'        => 'Mensajes',
@@ -1822,6 +1822,24 @@ return [
     'msg_file_too_large'     => 'El archivo es demasiado grande. Tamaño máximo 20MB.',
     'msg_send_failed_status' => 'Falló (:status). Por favor intenta de nuevo.',
     'msg_send_failed_error'  => 'Falló: :error',
+    'msg_online'           => 'En línea',
+    'msg_last_seen'        => 'Última vez',
+    'msg_recently'         => 'recientemente',
+    'msg_just_now'         => 'justo ahora',
+    'msg_minutes_ago'      => 'hace :count min',
+    'msg_hours_ago'        => 'hace :count h',
+    'msg_days_ago'         => 'hace :count d',
+    'msg_greet_sub'        => 'Ya estás conectado en PetNanny',
+    'msg_greet_body'       => '¡Bienvenido a PetNanny! Chatea aquí para hablar sobre reservas, horarios y las necesidades de tu mascota.',
+    'msg_wave'             => 'Saluda con la mano',
+    'msg_wave_hint'        => 'Envía un saludo para iniciar la conversación',
+    'msg_camera'           => 'Cámara',
+    'msg_camera_hint'      => 'Tomar una foto',
+    'msg_too_many_files'   => 'Puedes adjuntar hasta :max archivos a la vez.',
+    'msg_network_error'    => 'Error de red. Revisa tu conexión e inténtalo de nuevo.',
+    'msg_send_failed'      => 'No se pudo enviar el mensaje.',
+    'msg_server_limit'     => 'El archivo es más grande de lo que permite el servidor. Prueba con una foto más pequeña.',
+    'msg_sending_progress' => 'Enviando :done de :total...',
 
     // ==========================================
     // 📥 OWNER / SITTER — MESSAGES INDEX (Inbox)

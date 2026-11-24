@@ -1240,17 +1240,17 @@ return [
     'hs_faq_q1'              => 'Paano ako mag-book ng pet sitter?',
     'hs_faq_a1'              => 'Upang mag-book ng pet sitter, pumunta sa "Maghanap ng Sitter" na pahina, mag-browse ng mga available na sitter, piliin ang iyong gustong sitter, at i-click ang "Mag-book Ngayon". Sundin ang mga prompt upang makumpleto ang iyong booking.',
     'hs_faq_q2'              => 'Paano gumagana ang mga bayad?',
-    'hs_faq_a2'              => 'Ang mga bayad ay pinoproseso nang secure sa pamamagitan ng aming platform. Ang mga owner ay nagbabayad nang maaga, at ang mga sitter ay tumatanggap ng kanilang kinita pagkatapos ng mga natapos na bisita, minus platform at protection fees.',
+    'hs_faq_a2'              => 'Walang in-app payment processing ang PetNanny. Direktang inaayos ang bayad sa pagitan ng pet owner at ng sitter pagkatapos ng serbisyo—puwedeng cash, GCash, o anumang kasunduan ninyong dalawa.',
     'hs_faq_q3'              => 'Kailan natatanggap ng mga sitter ang kanilang payouts?',
     'hs_faq_a3'              => 'Ang mga sitter ay tumatanggap ng kanilang payouts sa loob ng 24-48 oras pagkatapos makumpleto at ma-verify ang bisita. Ang payouts ay inilalabas sa pamamagitan ng payment method na naka-configure sa iyong profile.',
     'hs_faq_q4'              => 'Paano ako mag-kansela ng booking?',
     'hs_faq_a4'              => 'Upang kanselahin ang booking, pumunta sa "Aking mga Booking", piliin ang booking na nais mong kanselahin, at i-click ang "Kanselahin ang Booking". Maaaring may mga cancellation policy depende sa timing.',
     'hs_faq_q5'              => 'Paano ako magsumite ng reklamo?',
     'hs_faq_a5'              => 'Upang magsumite ng reklamo, pumunta sa "Mga Reklamo" na pahina at i-click ang "Mag-file ng Reklamo". Ilagay ang detalye ng booking, uri ng reklamo, paglalarawan, at mag-attach ng ebidensya.',
-    'hs_faq_q6'              => 'Paano ako magsumite ng protection claim?',
-    'hs_faq_a6'              => 'Upang magsumite ng protection claim, pumunta sa "Claims" na pahina at i-click ang "Isumite ang Claim". Piliin ang booking, ilagay ang detalye ng insidente, mag-upload ng ebidensya, at isumite para sa review.',
-    'hs_faq_q7'              => 'Gaano katagal ang imbestigasyon ng claim?',
-    'hs_faq_a7'              => 'Ang mga imbestigasyon ng claim ay karaniwang tumatagal ng 3-5 business days. Susuriin ng aming team ang ebidensya at ipapaalam ang desisyon sa pamamagitan ng platform. Aabisuhan ka sa resulta.',
+    'hs_faq_q6'              => 'Paano mag-register ng account sa PetNanny?',
+    'hs_faq_a6'              => 'I-click ang "Register" sa landing page, ilagay ang iyong personal na detalye at email address (o mag-sign up gamit ang Google account), at i-verify ang iyong email upang makapagsimula.',
+    'hs_faq_q7'              => 'Paano ma-verify ang aking account?',
+    'hs_faq_a7'              => 'Pumunta sa iyong Profile page at mag-upload ng valid government-issued ID kasama ang malinaw na selfie. Susuriin ito ng aming admin team, at kapag na-verify na, maaari ka nang mag-apply bilang pet sitter.',
     'hs_safety_header'       => 'Kaligtasan at Komunidad',
     'hs_safety_1'            => 'Magkita sa ligtas na lugar bago ang unang serbisyo.',
     'hs_safety_2'            => 'Panatilihin ang komunikasyon sa loob ng platform.',
@@ -1794,7 +1794,7 @@ return [
     'mp_delete_warning'    => 'Hindi na ito maibabalik.',
     'mp_delete'            => 'I-delete',
 
-        // ==========================================
+    // ==========================================
     // 📬 OWNER / SITTER — MESSAGES (Chat View)
     // ==========================================
     'msg_index_title'        => 'Mga Mensahe',
@@ -1810,6 +1810,8 @@ return [
     'msg_replying_to'        => 'Tumutugon kay',
     'msg_photo'              => 'Larawan',
     'msg_photo_hint'         => 'JPG, PNG, GIF',
+    'msg_camera'             => 'Camera',
+    'msg_camera_hint'        => 'Kumuha ng litrato',
     'msg_document'           => 'Dokumento',
     'msg_document_hint'      => 'PDF, DOC, DOCX',
     'msg_remove_attachment'  => 'Tanggalin ang attachment',
@@ -1822,6 +1824,15 @@ return [
     'msg_file_too_large'     => 'Masyadong malaki ang file. Maximum na laki ay 20MB.',
     'msg_send_failed_status' => 'Bigo (:status). Pakisubukan muli.',
     'msg_send_failed_error'  => 'Bigo: :error',
+    'msg_greet_sub'          => 'Konekta ka na sa PetNanny',
+    'msg_greet_body'         => 'Maligayang pagdating sa PetNanny! Mag-chat dito para pag-usapan ang mga booking, schedule, at pangangailangan ng iyong alaga.',
+    'msg_wave'               => 'Kumaway para bumati',
+    'msg_wave_hint'          => 'Magpadala ng kaway para simulan ang usapan',
+    'msg_too_many_files'     => 'Hanggang :max na file lang ang maaaring ilakip sa bawat pagpapadala.',
+    'msg_network_error'      => 'May problema sa koneksyon. Pakisuri ang iyong internet at subukang muli.',
+    'msg_send_failed'        => 'Hindi naipadala ang mensahe.',
+    'msg_server_limit'       => 'Mas malaki ang file kaysa sa pinapayagan ng server. Subukan ang mas maliit na litrato.',
+    'msg_sending_progress'   => 'Ipinapadala ang :done sa :total...',
 
     // ==========================================
     // 📥 OWNER / SITTER — MESSAGES INDEX (Inbox)

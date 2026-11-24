@@ -1240,17 +1240,17 @@ return [
     'hs_faq_q1'              => 'Comment réserver un pet-sitter ?',
     'hs_faq_a1'              => 'Pour réserver un pet-sitter, allez sur la page "Trouver un Pet-Sitter", parcourez les pet-sitters disponibles, sélectionnez celui qui vous préférez et cliquez sur "Réserver Maintenant". Suivez les instructions pour compléter votre réservation.',
     'hs_faq_q2'              => 'Comment fonctionnent les paiements ?',
-    'hs_faq_a2'              => 'Les paiements sont traités en toute sécurité via notre plateforme. Les propriétaires paient à l\'avance et les pet-sitters reçoivent leurs gains après les visites terminées, moins les frais de plateforme et de protection.',
+    'hs_faq_a2'              => 'PetNanny ne traite pas les paiements intégrés à l’application. Le paiement se règle directement entre le propriétaire de l’animal et le gardien une fois le service terminé, en espèces, via GCash ou selon l’accord convenu entre vous.',
     'hs_faq_q3'              => 'Quand les pet-sitters reçoivent-ils leurs paiements ?',
     'hs_faq_a3'              => 'Les pet-sitters reçoivent leurs paiements dans les 24 à 48 heures après la fin et la vérification de la visite. Les paiements sont libérés via le mode de paiement configuré dans votre profil.',
     'hs_faq_q4'              => 'Comment annuler une réservation ?',
     'hs_faq_a4'              => 'Pour annuler une réservation, allez dans "Mes Réservations", sélectionnez la réservation que vous souhaitez annuler et cliquez sur "Annuler la Réservation". Des politiques d\'annulation peuvent s\'appliquer en fonction du moment.',
     'hs_faq_q5'              => 'Comment soumettre une plainte ?',
     'hs_faq_a5'              => 'Pour soumettre une plainte, allez sur la page "Plaintes" et cliquez sur "Déposer une Plainte". Fournissez les détails de la réservation, le type de plainte, la description et joignez toute preuve justificative.',
-    'hs_faq_q6'              => 'Comment soumettre une réclamation de protection ?',
-    'hs_faq_a6'              => 'Pour soumettre une réclamation de protection, allez sur la page "Réclamations" et cliquez sur "Soumettre une Réclamation". Sélectionnez la réservation, fournissez les détails de l\'incident, téléversez des preuves et soumettez pour examen.',
-    'hs_faq_q7'              => 'Combien de temps prend l\'enquête sur une réclamation ?',
-    'hs_faq_a7'              => 'Les enquêtes sur les réclamations prennent généralement 3 à 5 jours ouvrables. Notre équipe examinera les preuves et communiquera la décision via la plateforme. Vous serez informé du résultat.',
+    'hs_faq_q6'              => 'Comment créer un compte sur PetNanny ?',
+    'hs_faq_a6'              => 'Cliquez sur « S’inscrire » sur la page d’accueil, renseignez vos informations personnelles et votre adresse e-mail (ou inscrivez-vous avec votre compte Google), puis vérifiez votre e-mail pour commencer.',
+    'hs_faq_q7'              => 'Comment faire vérifier mon compte ?',
+    'hs_faq_a7'              => 'Rendez-vous sur votre page Profil et téléversez une pièce d’identité officielle valide accompagnée d’un selfie clair. Notre équipe examinera votre demande et, une fois vérifiée, vous pourrez postuler en tant que pet sitter.',
     'hs_safety_header'       => 'Sécurité et Communauté',
     'hs_safety_1'            => 'Rencontrez-vous dans un lieu sûr avant le premier service.',
     'hs_safety_2'            => 'Gardez la communication à l\'intérieur de la plateforme.',
@@ -1794,7 +1794,7 @@ return [
     'mp_delete_warning'    => 'Cette action ne peut pas être annulée.',
     'mp_delete'            => 'Supprimer',
 
-        // ==========================================
+    // ==========================================
     // 📬 OWNER / SITTER — MESSAGES (Chat View)
     // ==========================================
     'msg_index_title'        => 'Messages',
@@ -1822,6 +1822,17 @@ return [
     'msg_file_too_large'     => 'Le fichier est trop volumineux. Taille maximale 20 Mo.',
     'msg_send_failed_status' => 'Échec (:status). Veuillez réessayer.',
     'msg_send_failed_error'  => 'Échec : :error',
+    'msg_greet_sub'        => 'Vous êtes maintenant connecté sur PetNanny',
+    'msg_greet_body'       => 'Bienvenue sur PetNanny ! Discutez ici des réservations, des horaires et des besoins de votre animal.',
+    'msg_wave'             => 'Faites un coucou',
+    'msg_wave_hint'        => 'Envoyez un coucou pour démarrer la conversation',
+    'msg_camera'           => 'Appareil photo',
+    'msg_camera_hint'      => 'Prendre une photo',
+    'msg_too_many_files'   => 'Vous pouvez joindre jusqu’à :max fichiers à la fois.',
+    'msg_network_error'    => 'Erreur réseau. Vérifiez votre connexion et réessayez.',
+    'msg_send_failed'      => 'Le message n’a pas pu être envoyé.',
+    'msg_server_limit'     => 'Le fichier est plus volumineux que ce que le serveur autorise. Essayez une photo plus légère.',
+    'msg_sending_progress' => 'Envoi de :done sur :total...',
 
     // ==========================================
     // 📥 OWNER / SITTER — MESSAGES INDEX (Inbox)

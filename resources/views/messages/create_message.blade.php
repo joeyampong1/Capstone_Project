@@ -49,6 +49,11 @@
                 'sendFailed'  => $tr('messages.msg_send_failed', 'The message could not be sent.'),
                 'serverLimit' => $tr('messages.msg_server_limit', 'The file is larger than the server allows. Try a smaller photo.'),
                 'progress'    => $tr('messages.msg_sending_progress', 'Sending :done of :total...'),
+                'recently'    => $tr('messages.msg_recently', 'recently'),
+                'justNow'     => $tr('messages.msg_just_now', 'just now'),
+                'minutesAgo'  => $tr('messages.msg_minutes_ago', ':countm ago'),
+                'hoursAgo'    => $tr('messages.msg_hours_ago', ':counth ago'),
+                'daysAgo'     => $tr('messages.msg_days_ago', ':countd ago'),
             ],
         ];
     @endphp
@@ -559,7 +564,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
     <script>
-    const firebaseConfig = {
+    const chatFirebaseConfig = {
         apiKey:            "{{ config('firebase.web.api_key') }}",
         authDomain:        "{{ config('firebase.web.auth_domain') }}",
         projectId:         "{{ config('firebase.web.project_id') }}",
@@ -1348,7 +1353,7 @@
             },
 
             formatLastSeen(ts) {
-                const t = window.chatTranslations || {};
+                const t = this.labels || {};
                 if (!ts) return t.recently || 'recently';
                 const sec = Math.floor((Date.now() - ts) / 1000);
                 if (sec < 60) return t.justNow || 'just now';

@@ -725,13 +725,6 @@ return [
     'msg_danger_desc'        => 'Deleting this message is permanent and cannot be undone.',
     'msg_delete'             => 'Delete Message',
     'msg_confirm_delete'     => 'Delete this message permanently? This action cannot be undone.',
-    'msg_online'             => 'Online',
-    'msg_last_seen'          => 'Last seen',
-    'msg_recently'           => 'recently',
-    'msg_just_now'           => 'just now',
-    'msg_minutes_ago'        => ':countm ago',
-    'msg_hours_ago'          => ':counth ago',
-    'msg_days_ago'           => ':countd ago',
 
     // ==========================================
     // 📊 ADMIN — REPORTS & PDF
@@ -1240,17 +1233,17 @@ return [
     'hs_faq_q1'              => 'How do I book a pet sitter?',
     'hs_faq_a1'              => 'To book a pet sitter, go to the "Find a Sitter" page, browse available sitters, select your preferred sitter, and click "Book Now". Follow the prompts to complete your booking.',
     'hs_faq_q2'              => 'How do payments work?',
-    'hs_faq_a2'              => 'Payments are processed securely through our platform. Owners pay for bookings upfront, and sitters receive their earnings after completed visits, minus platform and protection fees.',
-    'hs_faq_q3'              => 'When do sitters receive their payouts?',
-    'hs_faq_a3'              => 'Sitters receive their payouts within 24-48 hours after the visit is completed and verified. Payouts are released through the payment method configured in your profile.',
+    'hs_faq_a2'              => 'PetNanny does not process in-app payments. Payment is settled directly between the pet owner and the sitter after the service is completed—whether in cash, via GCash, or through whatever arrangement you both agree on.',
+    'hs_faq_q3'              => 'How do I apply to become a pet sitter?',
+    'hs_faq_a3'              => 'First, verify your account in your Profile by uploading a valid government ID and selfie. Once your ID is verified, go to System Settings, toggle Sitter Mode to submit your sitter application, and wait for admin approval.',
     'hs_faq_q4'              => 'How do I cancel a booking?',
     'hs_faq_a4'              => 'To cancel a booking, go to "My Bookings", select the booking you wish to cancel, and click "Cancel Booking". Cancellation policies may apply depending on the timing.',
     'hs_faq_q5'              => 'How do I submit a complaint?',
     'hs_faq_a5'              => 'To submit a complaint, go to the "Complaints" page and click "File Complaint". Provide the booking details, complaint type, description, and attach any supporting evidence.',
-    'hs_faq_q6'              => 'How do I submit a protection claim?',
-    'hs_faq_a6'              => 'To submit a protection claim, go to the "Claims" page and click "Submit Claim". Select the booking, provide incident details, upload evidence, and submit for review.',
-    'hs_faq_q7'              => 'How long does claim investigation take?',
-    'hs_faq_a7'              => 'Claim investigations typically take 3-5 business days. Our team will review the evidence and communicate the decision through the platform. You will be notified of the outcome.',
+    'hs_faq_q6'              => 'How do I register an account on PetNanny?',
+    'hs_faq_a6'              => 'Click "Register" on the landing page, fill in your personal details and email address (or sign up using your Google account), and verify your email to start booking sitters or managing your pets.',
+    'hs_faq_q7'              => 'How do I get my account verified?',
+    'hs_faq_a7'              => 'Go to your Profile page and upload a valid government-issued ID along with a clear selfie. Our admin team will review your submission, and once verified, you can book with higher trust or apply to become a pet sitter.',
     'hs_safety_header'       => 'Safety & Community',
     'hs_safety_1'            => 'Meet in a safe location before the first service.',
     'hs_safety_2'            => 'Keep communication inside the platform.',
@@ -1269,8 +1262,8 @@ return [
     'hs_resource_terms_desc'       => 'Platform rules and policies',
     'hs_resource_community_title'  => 'Community Guidelines',
     'hs_resource_community_desc'   => 'Safe and respectful interactions',
-    'hs_resource_protection_title' => 'Protection Policy',
-    'hs_resource_protection_desc'  => 'How claims are handled',
+    'hs_resource_protection_title' => 'Safety Guidelines',
+    'hs_resource_protection_desc'  => 'Tips for safe pet sitting',
     'hs_app_version'         => 'Version 1.0',
     'hs_app_description'     => 'Web-based Responsive System for On-Demand Pet Sitting with Matching Algorithm',
     'hs_app_copyright'       => '© 2026 PetNanny. All rights reserved.',
@@ -1794,7 +1787,7 @@ return [
     'mp_delete_warning'    => 'This action cannot be undone.',
     'mp_delete'            => 'Delete',
 
-        // ==========================================
+    // ==========================================
     // 📬 OWNER / SITTER — MESSAGES (Chat View)
     // ==========================================
     'msg_index_title'        => 'Messages',
@@ -1822,6 +1815,24 @@ return [
     'msg_file_too_large'     => 'File is too large. Maximum size is 20MB.',
     'msg_send_failed_status' => 'Failed (:status). Please try again.',
     'msg_send_failed_error'  => 'Failed: :error',
+    'msg_online'             => 'Online',
+    'msg_last_seen'          => 'Last seen',
+    'msg_recently'           => 'recently',
+    'msg_just_now'           => 'just now',
+    'msg_minutes_ago'        => ':countm ago',
+    'msg_hours_ago'          => ':counth ago',
+    'msg_days_ago'           => ':countd ago',
+    'msg_greet_sub'          => "You're now connected on PetNanny",
+    'msg_greet_body'         => "Welcome to PetNanny! Chat here to talk about bookings, schedules and your pet's needs.",
+    'msg_wave'               => 'Wave to say hi',
+    'msg_wave_hint'          => 'Send a wave to start the conversation',
+    'msg_camera'             => 'Camera',
+    'msg_camera_hint'        => 'Take a photo',
+    'msg_too_many_files'     => 'You can attach up to :max files at a time.',
+    'msg_network_error'      => 'Network error. Please check your connection and try again.',
+    'msg_send_failed'        => 'The message could not be sent.',
+    'msg_server_limit'       => 'The file is larger than the server allows. Try a smaller photo.',
+    'msg_sending_progress'   => 'Sending :done of :total...',
 
     // ==========================================
     // 📥 OWNER / SITTER — MESSAGES INDEX (Inbox)

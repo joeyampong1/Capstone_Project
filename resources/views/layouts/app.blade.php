@@ -321,7 +321,7 @@
             <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
             <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
             <script>
-                const firebaseConfig = {
+                const fcmFirebaseConfig = {
                     apiKey: "{{ config('firebase.web.api_key') }}",
                     authDomain: "{{ config('firebase.web.auth_domain') }}",
                     projectId: "{{ config('firebase.web.project_id') }}",
@@ -331,7 +331,7 @@
                 };
 
                 if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
+                    firebase.initializeApp(fcmFirebaseConfig);
                 }
 
                 const messaging = firebase.messaging();
