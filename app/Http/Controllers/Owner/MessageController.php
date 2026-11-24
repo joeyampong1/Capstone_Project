@@ -65,12 +65,18 @@ class MessageController extends Controller
         $request->validate([
             'message' => 'nullable|string|max:5000',
             'reply_to_id' => 'nullable|exists:chat_messages,id',
-            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf,doc,docx|max:20480',
+            'silent' => 'nullable|boolean',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,heic,heif,pdf,doc,docx|max:10240',
+        ], [
+            'attachment.max' => 'Each file must be 10 MB or smaller.',
+            'attachment.mimes' => 'Only photos (JPG, PNG, GIF, WEBP, HEIC), PDF and Word files are allowed.',
+            'attachment.uploaded' => 'The file could not be uploaded. It may be larger than the server upload limit.',
         ]);
 
         $currentUser = Auth::user();
         $otherUser = User::findOrFail($id);
         $roomId = ChatMessage::makeRoomId($currentUser->id, $otherUser->id);
+        $silent = $request->boolean('silent');
 
         if ($request->filled('reply_to_id')) {
             $replyMessage = ChatMessage::find($request->reply_to_id);
@@ -91,7 +97,9 @@ class MessageController extends Controller
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
             $extension = strtolower($file->getClientOriginalExtension());
-            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif'], true);
+            $mime = strtolower((string) $file->getMimeType());
+            $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'], true)
+                || str_starts_with($mime, 'image/');
 
             $upload = $this->cloudinary->upload(
                 $file,
@@ -130,7 +138,6 @@ class MessageController extends Controller
             ], 422);
         }
 
-        // ✅ FIX ISSUE #31: Try-Catch for sending message
         try {
             $msg = ChatMessage::create([
                 'room_id' => $roomId,
@@ -148,7 +155,7 @@ class MessageController extends Controller
 
             $formattedMessage = $this->formatSingleMessage($msg, $currentUser);
 
-            if ($otherUser->id !== $currentUser->id) {
+            if ($otherUser->id !== $currentUser->id && !$silent) {
                 $preview = $messageText !== ''
                     ? $messageText
                     : ($messageType === 'image' ? '📷 Sent a photo' : '📎 Sent an attachment');

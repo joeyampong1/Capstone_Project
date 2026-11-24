@@ -5,7 +5,25 @@
         $myInitial = strtoupper(substr(auth()->user()->f_name ?? 'U', 0, 1));
         $lastMessageId = $messages->last()->id ?? 0;
 
-        // Passed all via Js::from -> safe against apostrophes / quotes (won't break x-data)
+        // Translation helper: uses the lang key when it exists, otherwise falls back to the English text.
+        // Placeholders use the Laravel style (:name, :max, ...).
+        $tr = function (string $key, string $fallback, array $replace = []) {
+            if (\Illuminate\Support\Facades\Lang::has($key)) {
+                return __($key, $replace);
+            }
+            $pairs = [];
+            foreach ($replace as $k => $v) {
+                $pairs[':' . $k] = $v;
+            }
+            return strtr($fallback, $pairs);
+        };
+
+        $greetSub  = $tr('messages.msg_greet_sub', "You're now connected on PetNanny");
+        $greetBody = $tr('messages.msg_greet_body', "Welcome to PetNanny! Chat here to talk about bookings, schedules and your pet's needs.");
+        $waveLabel = $tr('messages.msg_wave', 'Wave to say hi');
+        $waveHint  = $tr('messages.msg_wave_hint', 'Send a wave to start the conversation');
+
+        // Everything is passed through Js::from so apostrophes / quotes can never break x-data
         $chatConfig = [
             'otherId'         => $otherUser->id,
             'otherName'       => $otherFullName,
@@ -16,33 +34,53 @@
             'roomId'          => (string) $roomId,
             'csrfToken'       => csrf_token(),
             'initialMessages' => $messagesJson ?? [],
+            'maxFiles'        => 10,   // max attachments per send
+            'maxFileMb'       => 10,   // Cloudinary free plan limit per file
             'labels'          => [
                 'you'         => __('messages.msg_you'),
                 'replyingTo'  => __('messages.msg_replying_to'),
                 'fileTooBig'  => __('messages.msg_file_too_large'),
                 'sending'     => __('messages.msg_sending'),
                 'send'        => __('messages.msg_send'),
+                'tooMany'     => $tr('messages.msg_too_many_files', 'You can attach up to :max files at a time.', ['max' => 10]),
+                'networkError'=> $tr('messages.msg_network_error', 'Network error. Please check your connection and try again.'),
+                'sendFailed'  => $tr('messages.msg_send_failed', 'The message could not be sent.'),
+                'serverLimit' => $tr('messages.msg_server_limit', 'The file is larger than the server allows. Try a smaller photo.'),
+                'progress'    => $tr('messages.msg_sending_progress', 'Sending :done of :total...'),
             ],
         ];
     @endphp
 
+    <style>
+        /* Waving hand animation for the greeting */
+        .pn-wave { display: inline-block; transform-origin: 70% 70%; animation: pn-wave 2.2s ease-in-out infinite; }
+        @@keyframes pn-wave {
+            0%, 60%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50% { transform: rotate(14deg); }
+            20%, 40%      { transform: rotate(-8deg); }
+        }
+        @@media (prefers-reduced-motion: reduce) {
+            .pn-wave { animation: none; }
+        }
+    </style>
+
     {{--
         ROOT: height is set via JS (fitViewport) = visible screen (including keyboard) - top of root.
-        The height class below is just a fallback before JS loads.
+        The height classes below are only a fallback before JS loads.
+        Note: no x-init here, Alpine calls init() automatically.
     --}}
     <div x-ref="root"
          class="bg-white dark:bg-neutral-950 antialiased text-neutral-800 dark:text-neutral-200 h-[calc(100dvh-110px)] sm:h-[calc(100vh-140px)] lg:h-[calc(100vh-150px)] overflow-hidden"
-         x-data="chatApp({{ \Illuminate\Support\Js::from($chatConfig) }})"
-         x-init="init()">
+         x-data="chatApp({{ \Illuminate\Support\Js::from($chatConfig) }})">
 
-        {{-- Mobile: walay padding sa ubos para flush sa phone navigation. Desktop: same ra sa una. --}}
+        {{-- Mobile: no bottom padding so the input sits flush above the phone navigation. Desktop keeps its padding. --}}
         <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 h-full pt-1.5 pb-0 sm:py-6">
 
             {{-- CARD (relative = where the emoji picker anchors) --}}
             <div x-ref="card"
                  class="relative bg-white dark:bg-neutral-900 rounded-t-2xl sm:rounded-3xl shadow-sm sm:shadow-xl border border-b-0 sm:border-b border-gray-200/60 dark:border-neutral-800 overflow-hidden flex flex-col h-full">
 
-                <!-- FIXED CHAT HEADER (<- + User Icon + Name + Status) -->
+                <!-- FIXED CHAT HEADER (<- + user icon + name + status) -->
                 <div class="flex items-center gap-3 p-3 sm:p-5 border-b border-gray-100 dark:border-neutral-800 flex-shrink-0 select-none">
                     <a href="{{ url()->previous() }}"
                        class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition shrink-0">
@@ -81,24 +119,54 @@
                     </div>
                 </div>
 
-                <!-- MESSAGES THREAD (only this scrolls; locked when emoji picker is open) -->
+                <!-- MESSAGES THREAD (only this scrolls; locked while the emoji picker is open) -->
                 <div x-ref="thread"
+                     @scroll.passive="onThreadScroll()"
                      :class="anyEmojiPickerOpen ? 'overflow-hidden touch-none' : 'overflow-y-auto overflow-x-hidden'"
                      class="flex-1 p-3 sm:p-6 space-y-3 sm:space-y-4 bg-neutral-50/50 dark:bg-neutral-950/30 min-h-0 overscroll-contain">
 
-                    <!-- No messages yet -->
-                    <template x-if="messages.length === 0">
-                        <div class="flex flex-col items-center justify-center py-16 text-center">
-                            <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                </svg>
-                            </div>
-                            <p class="text-sm font-bold text-neutral-600 dark:text-neutral-400">{{ __('messages.msg_no_messages') }}</p>
-                            <p class="text-xs text-neutral-400 mt-1">{{ __('messages.msg_say_hi') }}</p>
+                    <!-- GREETING HEADER: both profiles + welcome text. Always at the very top of the conversation. -->
+                    <div class="flex flex-col items-center text-center pt-4 pb-6 px-4 select-none">
+                        <div class="flex items-center -space-x-4 mb-3">
+                            <!-- Current user -->
+                            @if(auth()->user()->profile_photo)
+                                <img src="{{ auth()->user()->profile_photo_url }}"
+                                     alt="{{ auth()->user()->f_name }}"
+                                     class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-md">
+                            @else
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary flex items-center justify-center text-white text-xl sm:text-2xl font-black border-4 border-white dark:border-neutral-900 shadow-md">
+                                    {{ $myInitial }}
+                                </div>
+                            @endif
+
+                            <!-- Other user -->
+                            @if($otherUser->profile_photo)
+                                <img src="{{ $otherUser->profile_photo_url }}"
+                                     alt="{{ $otherFullName }}"
+                                     class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-md">
+                            @else
+                                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xl sm:text-2xl font-black border-4 border-white dark:border-neutral-900 shadow-md">
+                                    {{ $otherInitial }}
+                                </div>
+                            @endif
                         </div>
-                    </template>
+
+                        <p class="font-black text-[#1B3B36] dark:text-white text-base sm:text-lg leading-tight">{{ $otherFullName }}</p>
+                        <p class="text-[11px] text-primary font-semibold mt-0.5">{{ $greetSub }}</p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-3 max-w-xs leading-relaxed">{{ $greetBody }}</p>
+
+                        <!-- Wave: only available while the conversation has not started -->
+                        <div x-show="messages.length === 0" x-cloak class="mt-5 flex flex-col items-center">
+                            <button type="button"
+                                    @click="sendWave()"
+                                    :disabled="sending"
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary font-bold text-sm hover:bg-primary hover:text-white shadow-sm transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span class="pn-wave text-xl leading-none">👋</span>
+                                <span>{{ $waveLabel }}</span>
+                            </button>
+                            <p class="text-[10px] text-neutral-400 mt-2">{{ $waveHint }}</p>
+                        </div>
+                    </div>
 
                     <!-- Message loop -->
                     <template x-for="(msg, index) in messages" :key="msg.id">
@@ -107,7 +175,7 @@
                              @mouseenter="hoveredId = msg.id"
                              @mouseleave="hoveredId = null">
 
-                            <!-- Reply Preview -->
+                            <!-- Reply preview -->
                             <template x-if="msg.reply_to">
                                 <div :class="msg.is_mine ? 'ml-auto mr-12 max-w-[70%]' : 'ml-12 max-w-[70%]'">
                                     <div class="flex items-center gap-2 px-3 py-1.5 rounded-t-xl bg-neutral-100 dark:bg-neutral-800 border-l-2 border-primary text-xs">
@@ -120,7 +188,7 @@
                                 </div>
                             </template>
 
-                            <!-- Message Row -->
+                            <!-- Message row -->
                             <div :class="msg.is_mine
                                     ? 'flex items-end gap-2 ml-auto flex-row-reverse max-w-[90%] sm:max-w-[85%]'
                                     : 'flex items-end gap-2 max-w-[90%] sm:max-w-[85%]'">
@@ -132,30 +200,31 @@
                                     <span x-text="msg.is_mine ? myInitial : otherInitial"></span>
                                 </div>
 
-                                <!-- Bubble + Timestamp + Reactions -->
+                                <!-- Bubble + timestamp + reactions -->
                                 <div class="min-w-0">
                                     <div class="relative inline-block max-w-full">
 
                                         <!-- Bubble -->
-                                        <div data-bubble
-                                             :class="msg.is_mine
-                                            ? 'bg-primary text-white rounded-2xl rounded-tr-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm'
-                                            : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none px-3 py-2 sm:px-4 sm:py-3 shadow-sm border border-gray-100 dark:border-neutral-700'">
+                                        <div data-bubble :class="bubbleClass(msg)">
 
-                                            <!-- Image Attachment -->
+                                            <!-- Image attachment (click to view full size) -->
                                             <template x-if="msg.attachment_url && msg.message_type === 'image'">
                                                 <img :src="msg.attachment_url"
-                                                     :alt="'Attachment'"
-                                                     class="max-w-full rounded-lg mb-1.5 cursor-pointer hover:opacity-90 transition"
-                                                     style="max-height: 240px;"
-                                                     @click="window.open(msg.attachment_url, '_blank')">
+                                                     alt="Attachment"
+                                                     loading="lazy"
+                                                     @load="onImageLoad()"
+                                                     @click="openMessageViewer(msg)"
+                                                     :class="hasText(msg) ? 'mb-1.5' : ''"
+                                                     class="max-w-full rounded-lg cursor-pointer hover:opacity-90 transition"
+                                                     style="max-height: 240px;">
                                             </template>
 
-                                            <!-- Document Attachment -->
+                                            <!-- Document attachment -->
                                             <template x-if="msg.attachment_url && msg.message_type !== 'image'">
                                                 <a :href="msg.attachment_url"
                                                    target="_blank"
-                                                   class="flex items-center gap-2 px-3 py-2 rounded-lg mb-1.5 text-xs font-bold hover:underline">
+                                                   :class="hasText(msg) ? 'mb-1.5' : ''"
+                                                   class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-bold hover:underline">
                                                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                     </svg>
@@ -163,13 +232,13 @@
                                                 </a>
                                             </template>
 
-                                            <!-- Text -->
-                                            <p x-show="msg.message"
-                                               :class="msg.is_mine ? 'text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words' : 'text-xs sm:text-sm text-neutral-800 dark:text-white leading-relaxed whitespace-pre-wrap break-words'"
+                                            <!-- Text (the "Attachment" placeholder is hidden) -->
+                                            <p x-show="hasText(msg)"
+                                               :class="textClass(msg)"
                                                x-text="msg.message"></p>
                                         </div>
 
-                                        <!-- Reactions: overlap bottom edge -->
+                                        <!-- Reactions: overlap the bottom edge -->
                                         <template x-if="msg.reactions && msg.reactions.length > 0">
                                             <div :class="msg.is_mine
                                                 ? 'absolute bottom-0 right-2 translate-y-1/2 flex flex-wrap gap-1 z-20'
@@ -194,7 +263,7 @@
                                           x-text="msg.created_at"></span>
                                 </div>
 
-                                <!-- Hover Actions -->
+                                <!-- Hover actions -->
                                 <div x-show="hoveredId === msg.id || (picker && picker.msgId === msg.id)"
                                      x-cloak
                                      x-transition:enter="transition ease-out duration-150"
@@ -212,7 +281,7 @@
                                         </svg>
                                     </button>
 
-                                    <!-- React button (the picker is now outside the loop) -->
+                                    <!-- React button (the picker itself lives outside the loop) -->
                                     <button type="button"
                                             @click="openPicker(msg, $event)"
                                             class="w-7 h-7 rounded-full bg-white dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 text-neutral-500 hover:text-primary hover:border-primary shadow-md flex items-center justify-center transition"
@@ -229,11 +298,11 @@
                     <div class="h-2"></div>
                 </div>
 
-                <!-- MESSAGE INPUT (flush at the bottom; safe-area for phones with a gesture bar) -->
+                <!-- MESSAGE INPUT (flush at the bottom; safe-area padding for phones with a gesture bar) -->
                 <div class="p-2 sm:p-4 border-t border-gray-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex-shrink-0"
                      style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));">
 
-                    <!-- Reply Preview -->
+                    <!-- Reply preview -->
                     <template x-if="replyTo">
                         <div class="flex items-center gap-2 px-3 py-2 mb-2 rounded-xl bg-primary/5 border-l-4 border-primary">
                             <svg class="w-4 h-4 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,42 +321,69 @@
                         </div>
                     </template>
 
-                    <!-- Attachment Preview -->
-                    <template x-if="pendingAttachment">
-                        <div class="flex items-center gap-3 px-3 py-2 mb-2 rounded-xl bg-primary/5 border border-primary/20">
-                            <template x-if="pendingAttachment.isImage">
-                                <img :src="pendingAttachment.preview"
-                                     alt="Preview"
-                                     class="w-14 h-14 rounded-lg object-cover border border-primary/20 shrink-0">
-                            </template>
+                    <!-- ATTACHMENT STRIP: thumbnails above the input. Tap a photo to view it, tap the x to remove it. -->
+                    <div x-show="pending.length > 0" x-cloak class="mb-2">
+                        <div class="flex items-center gap-2.5 overflow-x-auto pt-2 pb-1.5 pr-2" style="scrollbar-width: none;">
+                            <template x-for="item in pending" :key="item.id">
+                                <div class="relative shrink-0">
 
-                            <template x-if="!pendingAttachment.isImage">
-                                <div class="w-14 h-14 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 shrink-0">
-                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
+                                    <!-- Photo thumbnail -->
+                                    <button type="button"
+                                            x-show="item.isImage"
+                                            @click="openPendingViewer(item)"
+                                            class="block w-14 h-14 rounded-xl overflow-hidden border border-primary/20 bg-neutral-100 dark:bg-neutral-800">
+                                        <img :src="item.preview" alt="" class="w-full h-full object-cover">
+                                    </button>
+
+                                    <!-- Document tile -->
+                                    <div x-show="!item.isImage"
+                                         class="w-14 h-14 rounded-xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 flex flex-col items-center justify-center px-1">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <span class="text-[8px] font-bold uppercase truncate w-full text-center" x-text="fileExt(item.name)"></span>
+                                    </div>
+
+                                    <!-- Busy overlay (compressing / uploading) -->
+                                    <div x-show="item.status === 'processing' || item.status === 'sending'"
+                                         class="absolute inset-0 rounded-xl bg-black/45 flex items-center justify-center pointer-events-none">
+                                        <span class="w-5 h-5 rounded-full border-2 border-white/40 border-t-white animate-spin"></span>
+                                    </div>
+
+                                    <!-- Error ring -->
+                                    <div x-show="item.status === 'error'"
+                                         class="absolute inset-0 rounded-xl ring-2 ring-red-500 pointer-events-none"></div>
+
+                                    <!-- Remove / change button -->
+                                    <button type="button"
+                                            @click.stop="removePending(item.id)"
+                                            :disabled="item.status === 'sending'"
+                                            class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-neutral-800 dark:bg-neutral-200 text-white dark:text-neutral-900 border-2 border-white dark:border-neutral-900 flex items-center justify-center shadow disabled:opacity-40">
+                                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
                                 </div>
                             </template>
-
-                            <div class="flex-1 min-w-0">
-                                <p class="text-xs font-bold text-neutral-800 dark:text-white truncate" x-text="pendingAttachment.name"></p>
-                                <p class="text-[10px] text-neutral-500 dark:text-neutral-400 mt-0.5" x-text="pendingAttachment.size"></p>
-                            </div>
-
-                            <button type="button"
-                                    @click="clearAttachment()"
-                                    class="w-8 h-8 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 flex items-center justify-center text-neutral-400 hover:text-red-500 transition shrink-0"
-                                    title="{{ __('messages.msg_remove_attachment') }}">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
                         </div>
-                    </template>
+
+                        <!-- Status line: progress or error -->
+                        <p x-show="sending && sendProgress.total > 1" x-cloak
+                           class="text-[11px] text-neutral-500 dark:text-neutral-400 mt-0.5"
+                           x-text="progressText()"></p>
+                        <p x-show="sendError" x-cloak
+                           class="text-[11px] text-red-500 font-semibold mt-0.5"
+                           x-text="sendError"></p>
+                    </div>
+
+                    <!-- Error line when there is no attachment strip (e.g. a text message failed) -->
+                    <p x-show="sendError && pending.length === 0" x-cloak
+                       class="text-[11px] text-red-500 font-semibold mb-1.5 px-1"
+                       x-text="sendError"></p>
 
                     <form @submit.prevent="sendMessage" class="flex gap-2 sm:gap-3 items-center">
-                        <!-- Plus Icon with Options -->
-                        <div class="relative" x-data="{ attachOpen: false }">
+                        <!-- Plus button with options -->
+                        <div class="relative">
                             <button type="button"
                                     @click="attachOpen = !attachOpen"
                                     class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-primary/10 hover:text-primary transition flex items-center justify-center flex-shrink-0 cursor-pointer">
@@ -305,7 +401,7 @@
                                  x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                                  class="absolute bottom-12 left-0 z-30 bg-white dark:bg-neutral-800 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-700 py-2 w-48">
                                 <button type="button"
-                                        @click="document.getElementById('fileInput').click(); attachOpen = false"
+                                        @click="$refs.photoInput.click(); attachOpen = false"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition text-left">
                                     <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +414,7 @@
                                     </div>
                                 </button>
                                 <button type="button"
-                                        @click="document.getElementById('fileInput').click(); attachOpen = false"
+                                        @click="$refs.docInput.click(); attachOpen = false"
                                         class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition text-left">
                                     <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -333,14 +429,15 @@
                             </div>
                         </div>
 
-                        <!-- File Input -->
-                        <input type="file"
-                               id="fileInput"
-                               class="hidden"
-                               accept="image/*,.pdf,.doc,.docx"
-                               @change="handleFileSelect($event)">
+                        <!-- Hidden file inputs: photos (multiple) and documents (multiple) -->
+                        <input type="file" x-ref="photoInput" class="hidden"
+                               accept="image/*" multiple
+                               @change="handleFiles($event)">
+                        <input type="file" x-ref="docInput" class="hidden"
+                               accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" multiple
+                               @change="handleFiles($event)">
 
-                        {{-- text-base (16px) on mobile so iOS doesn't auto-zoom on focus --}}
+                        {{-- text-base (16px) on mobile so iOS does not auto-zoom on focus --}}
                         <textarea x-model="newMessage"
                                   x-ref="input"
                                   @input="onInput"
@@ -353,7 +450,7 @@
                         ></textarea>
 
                         <button type="submit"
-                                :disabled="sending"
+                                :disabled="sending || processingCount > 0"
                                 class="bg-primary hover:bg-primary-600 text-white font-bold text-xs sm:text-sm px-4 py-2 sm:px-6 sm:py-3 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5 flex items-center gap-1.5 sm:gap-2 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
@@ -367,14 +464,12 @@
                     </p>
                 </div>
 
-                <!-- EMOJI PICKER BACKDROP (click out = close) -->
+                <!-- EMOJI PICKER BACKDROP (tap outside = close) -->
                 <div x-show="picker" x-cloak
                      @click="closePicker()"
                      class="absolute inset-0 z-40"></div>
 
-                <!--
-                    EMOJI PICKER:
-                -->
+                <!-- EMOJI PICKER: one instance, vertically anchored to the reacted message, centered horizontally -->
                 <div x-show="picker" x-cloak
                      class="absolute inset-x-0 z-50 flex justify-center pointer-events-none"
                      :style="picker ? ('top:' + picker.top + 'px') : ''">
@@ -393,6 +488,49 @@
                 </div>
             </div>
         </div>
+
+        <!-- IMAGE VIEWER (used for both chat photos and photos waiting to be sent) -->
+        <template x-if="lightbox">
+            <div class="fixed inset-0 flex items-center justify-center bg-black/90"
+                 style="z-index: 100;"
+                 @click.self="closeViewer()"
+                 @keydown.escape.window="closeViewer()"
+                 @keydown.arrow-left.window="stepViewer(-1)"
+                 @keydown.arrow-right.window="stepViewer(1)">
+
+                <!-- Top bar: counter + close -->
+                <div class="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-3 pointer-events-none"
+                     style="padding-top: max(0.75rem, env(safe-area-inset-top));">
+                    <span class="text-xs font-bold text-white/80" x-text="(lightbox.index + 1) + ' / ' + lightbox.items.length"></span>
+                    <button type="button" @click="closeViewer()"
+                            class="pointer-events-auto w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Previous -->
+                <button type="button" x-show="lightbox.items.length > 1" @click.stop="stepViewer(-1)"
+                        class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+
+                <img :src="lightbox.items[lightbox.index].url"
+                     alt=""
+                     class="max-w-[94vw] max-h-[82vh] object-contain rounded-lg select-none">
+
+                <!-- Next -->
+                <button type="button" x-show="lightbox.items.length > 1" @click.stop="stepViewer(1)"
+                        class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </template>
     </div>
 
     @push('scripts')
@@ -419,6 +557,7 @@
 
     window.chatApp = function(config) {
         return {
+            // ----- conversation state -----
             messages: [],
             newMessage: '',
             sending: false,
@@ -429,7 +568,18 @@
             picker: null,               // { msgId, top } | null
             emojis: ['👍', '❤️', '😂', '😮', '😢', '🙏'],
             replyTo: null,
-            pendingAttachment: null,
+            attachOpen: false,
+
+            // ----- attachments -----
+            pending: [],                // [{ id, file, name, size, isImage, preview, status, error }]
+            sendError: '',
+            sendProgress: { done: 0, total: 0 },
+            lightbox: null,             // { items: [{ url, name }], index }
+            maxFiles: config.maxFiles || 10,
+            maxFileBytes: (config.maxFileMb || 10) * 1024 * 1024,
+            _seq: 0,
+
+            // ----- misc -----
             lastId: config.lastId || 0,
             otherId: config.otherId,
             otherName: config.otherName,
@@ -439,12 +589,14 @@
             roomId: config.roomId,
             labels: config.labels || {},
             csrfToken: config.csrfToken || '',
+            stick: true,                // true while the thread is scrolled near the bottom
             typingTimeout: null,
             typingDebounce: null,
             typingRef: null,
             otherTypingRef: null,
             firestoreUnsubscribe: null,
             pollInterval: null,
+            presenceInterval: null,
             _fitRaf: null,
             _fitHandler: null,
             _origViewport: null,
@@ -453,6 +605,11 @@
                 return this.picker !== null;
             },
 
+            get processingCount() {
+                return this.pending.filter(function (p) { return p.status === 'processing'; }).length;
+            },
+
+            // Alpine calls init() automatically
             init() {
                 this.messages = config.initialMessages || [];
 
@@ -468,23 +625,26 @@
                 this.pollInterval = setInterval(() => this.pollNewMessages(), 3000);
             },
 
+            // Alpine calls destroy() automatically when the component is removed
             destroy() {
                 this.unlockPage();
                 clearInterval(this.pollInterval);
+                clearInterval(this.presenceInterval);
                 if (this.firestoreUnsubscribe) this.firestoreUnsubscribe();
+                this.pending.forEach((p) => { if (p.preview) URL.revokeObjectURL(p.preview); });
             },
 
             // ===== PAGE LOCK + VIEWPORT FIT =====
-            // 1) Whole page won't scroll (only the thread scrolls)
-            // 2) Chat height matches the ACTUAL visible area (including when the keyboard is open),
-            //    so the chat header won't get pushed out and the input won't stay stuck/floating up.
+            // 1) The whole page does not scroll (only the thread scrolls).
+            // 2) The chat height matches the ACTUAL visible area (including when the keyboard is open),
+            //    so the chat header is not pushed out and the input does not float.
             lockPage() {
                 document.documentElement.style.overflow = 'hidden';
                 document.documentElement.style.overscrollBehavior = 'none';
                 document.body.style.overflow = 'hidden';
                 document.body.style.overscrollBehavior = 'none';
 
-                // Chrome Android: resizes the layout when the keyboard opens (not just the visual viewport)
+                // Chrome Android: resize the layout when the keyboard opens (not just the visual viewport)
                 const meta = document.querySelector('meta[name="viewport"]');
                 if (meta && !/interactive-widget/.test(meta.content)) {
                     this._origViewport = meta.content;
@@ -526,7 +686,7 @@
                 const root = this.$refs.root;
                 if (!root) return;
 
-                // Prevent the page from scrolling (this is what hides the header when the keyboard opens)
+                // Keep the page from scrolling (this is what hides the header when the keyboard opens)
                 if (window.scrollY !== 0 || window.scrollX !== 0) window.scrollTo(0, 0);
 
                 const vv = window.visualViewport;
@@ -535,23 +695,75 @@
 
                 root.style.height = Math.max(visibleBottom - top, 200) + 'px';
 
-                // If the input is focused (keyboard open), keep the thread scrolled to the bottom
+                // While the input is focused (keyboard open), keep the thread at the bottom
                 if (document.activeElement === this.$refs.input) {
                     this.$nextTick(() => this.scrollToBottom());
                 }
-                // Kung mo-resize samtang naay picker, i-close para dili mo-mali ug posisyon
+                // Close the picker on resize so it never ends up in the wrong position
                 if (this.picker) this.picker = null;
             },
 
             onInputFocus() {
                 this.picker = null;
-                // Close the picker on resize so it doesn't end up in the wrong position
+                this.attachOpen = false;
+                // Give the keyboard a moment to open, then re-fit and scroll
                 setTimeout(() => this.fitViewport(), 50);
                 setTimeout(() => this.fitViewport(), 300);
                 this.$nextTick(() => this.scrollToBottom());
             },
 
-            // ===== EMOJI PICKER (anchored sa message, centered horizontally) =====
+            // ===== THREAD SCROLL HELPERS =====
+            onThreadScroll() {
+                const el = this.$refs.thread;
+                if (!el) return;
+                this.stick = (el.scrollHeight - el.scrollTop - el.clientHeight) < 140;
+            },
+
+            // Photos change the thread height after they load: keep the view at the bottom if we were there
+            onImageLoad() {
+                if (this.stick && !this.anyEmojiPickerOpen) this.scrollToBottom();
+            },
+
+            scrollToBottom() {
+                const el = this.$refs.thread;
+                if (el) el.scrollTop = el.scrollHeight;
+                this.stick = true;
+            },
+
+            // ===== MESSAGE DISPLAY HELPERS =====
+            // Attachments are stored with the placeholder text "Attachment": do not show it in the bubble
+            hasText(msg) {
+                if (!msg.message) return false;
+                if (msg.message_type && msg.message_type !== 'text' && msg.message === 'Attachment') return false;
+                return true;
+            },
+
+            // A message made only of 1-3 emoji (like the wave) is shown bigger
+            isBigEmoji(msg) {
+                if (!this.hasText(msg)) return false;
+                try {
+                    const t = String(msg.message).trim();
+                    return /^(?:\p{Extended_Pictographic}|\u200d|\ufe0f|\s)+$/u.test(t) && Array.from(t.replace(/\s/g, '')).length <= 6;
+                } catch (e) {
+                    return false;
+                }
+            },
+
+            bubbleClass(msg) {
+                const imageOnly = msg.message_type === 'image' && !this.hasText(msg);
+                const pad = imageOnly ? 'p-1.5' : 'px-3 py-2 sm:px-4 sm:py-3';
+                return msg.is_mine
+                    ? 'bg-primary text-white rounded-2xl rounded-tr-none shadow-sm ' + pad
+                    : 'bg-white dark:bg-neutral-800 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 dark:border-neutral-700 ' + pad;
+            },
+
+            textClass(msg) {
+                const size = this.isBigEmoji(msg) ? 'text-3xl leading-none' : 'text-xs sm:text-sm leading-relaxed';
+                const color = msg.is_mine ? '' : ' text-neutral-800 dark:text-white';
+                return size + color + ' whitespace-pre-wrap break-words';
+            },
+
+            // ===== EMOJI PICKER (anchored to the message, centered horizontally) =====
             openPicker(msg, ev) {
                 if (this.picker && this.picker.msgId === msg.id) {
                     this.picker = null;
@@ -572,7 +784,7 @@
                 const minTop = (thread.top - card.top) + 4;
                 const maxTop = (thread.bottom - card.top) - H - 4;
 
-                // Default: above the message. If there's no space, below it (past the reactions badge)
+                // Default: above the message. If there is no room, below it (past the reactions badge)
                 let top = (b.top - card.top) - H - gap;
                 if (top < minTop) top = (b.bottom - card.top) + gap + 14;
 
@@ -583,6 +795,174 @@
 
             closePicker() {
                 this.picker = null;
+            },
+
+            // ===== IMAGE VIEWER =====
+            openViewer(items, index) {
+                if (!items.length) return;
+                this.picker = null;
+                this.lightbox = { items: items, index: index };
+            },
+
+            closeViewer() {
+                this.lightbox = null;
+            },
+
+            stepViewer(dir) {
+                if (!this.lightbox) return;
+                const n = this.lightbox.items.length;
+                this.lightbox.index = (this.lightbox.index + dir + n) % n;
+            },
+
+            // Viewer for photos already in the conversation (all photos, starting at the tapped one)
+            openMessageViewer(msg) {
+                const imgs = this.messages.filter(function (m) { return m.message_type === 'image' && m.attachment_url; });
+                const idx = imgs.findIndex(function (m) { return m.id === msg.id; });
+                this.openViewer(imgs.map(function (m) { return { url: m.attachment_url, name: '' }; }), Math.max(idx, 0));
+            },
+
+            // Viewer for photos waiting in the attachment strip
+            openPendingViewer(item) {
+                const imgs = this.pending.filter(function (p) { return p.isImage && p.preview; });
+                const idx = imgs.findIndex(function (p) { return p.id === item.id; });
+                this.openViewer(imgs.map(function (p) { return { url: p.preview, name: p.name }; }), Math.max(idx, 0));
+            },
+
+            // ===== ATTACHMENTS =====
+            fileExt(name) {
+                const m = /\.([a-z0-9]+)$/i.exec(name || '');
+                return m ? m[1].slice(0, 4) : 'file';
+            },
+
+            formatSize(bytes) {
+                if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+                return (bytes / 1024).toFixed(0) + ' KB';
+            },
+
+            isImageFile(file) {
+                return (file.type || '').toLowerCase().startsWith('image/')
+                    || /\.(jpe?g|png|gif|webp|heic|heif)$/i.test(file.name || '');
+            },
+
+            // Shrinks big photos (camera photos are often 4-12 MB) to max 1600px JPEG before upload.
+            // This keeps each request small (PHP / server limits) and saves Cloudinary free-plan quota.
+            // If the browser cannot decode the file (e.g. HEIC), the original file is returned untouched.
+            async compressImage(file) {
+                const type = (file.type || '').toLowerCase();
+                if (!type.startsWith('image/') || type === 'image/gif' || type === 'image/svg+xml') return file;
+
+                const MAX_DIM = 1600;
+                try {
+                    let bitmap;
+                    if (window.createImageBitmap) {
+                        bitmap = await createImageBitmap(file);
+                    } else {
+                        bitmap = await new Promise(function (resolve, reject) {
+                            const img = new Image();
+                            const url = URL.createObjectURL(file);
+                            img.onload = function () { URL.revokeObjectURL(url); resolve(img); };
+                            img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('decode')); };
+                            img.src = url;
+                        });
+                    }
+
+                    const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+                    const w = Math.max(1, Math.round(bitmap.width * scale));
+                    const h = Math.max(1, Math.round(bitmap.height * scale));
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#ffffff';   // JPEG has no transparency
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.drawImage(bitmap, 0, 0, w, h);
+                    if (bitmap.close) bitmap.close();
+
+                    const blob = await new Promise(function (resolve) { canvas.toBlob(resolve, 'image/jpeg', 0.82); });
+                    if (!blob) return file;
+                    if (scale === 1 && blob.size >= file.size) return file;   // already small enough
+
+                    const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+                    return new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() });
+                } catch (e) {
+                    return file;
+                }
+            },
+
+            updatePending(id, patch) {
+                const item = this.pending.find(function (p) { return p.id === id; });
+                if (item) Object.assign(item, patch);
+            },
+
+            // Called by both file inputs (photos and documents)
+            async handleFiles(event) {
+                const input = event.target;
+                const files = Array.from(input.files || []);
+                input.value = '';   // allows picking the same file again later
+                if (!files.length) return;
+
+                this.sendError = '';
+
+                for (const file of files) {
+                    if (this.pending.length >= this.maxFiles) {
+                        this.sendError = (this.labels.tooMany || '').replace(':max', this.maxFiles);
+                        break;
+                    }
+
+                    const isImage = this.isImageFile(file);
+                    const id = ++this._seq;
+
+                    this.pending.push({
+                        id: id,
+                        file: file,
+                        name: file.name,
+                        size: this.formatSize(file.size),
+                        isImage: isImage,
+                        preview: isImage ? URL.createObjectURL(file) : null,
+                        status: isImage ? 'processing' : 'ready',
+                        error: null,
+                    });
+
+                    if (isImage) {
+                        // Compress in the background; the thumbnail shows a spinner meanwhile
+                        this.compressImage(file).then((out) => {
+                            const current = this.pending.find(function (p) { return p.id === id; });
+                            if (!current) return;   // removed while compressing
+
+                            if (out !== file) {
+                                if (current.preview) URL.revokeObjectURL(current.preview);
+                                current.preview = URL.createObjectURL(out);
+                            }
+                            current.file = out;
+                            current.size = this.formatSize(out.size);
+                            current.name = out.name;
+
+                            if (out.size > this.maxFileBytes) {
+                                current.status = 'error';
+                                this.sendError = (this.labels.fileTooBig || '') + ' (' + out.name + ')';
+                            } else {
+                                current.status = 'ready';
+                            }
+                        });
+                    } else if (file.size > this.maxFileBytes) {
+                        this.updatePending(id, { status: 'error' });
+                        this.sendError = (this.labels.fileTooBig || '') + ' (' + file.name + ')';
+                    }
+                }
+            },
+
+            removePending(id) {
+                const item = this.pending.find(function (p) { return p.id === id; });
+                if (item && item.preview) URL.revokeObjectURL(item.preview);
+                this.pending = this.pending.filter(function (p) { return p.id !== id; });
+                if (this.pending.every(function (p) { return p.status !== 'error'; })) this.sendError = '';
+            },
+
+            progressText() {
+                return (this.labels.progress || '')
+                    .replace(':done', Math.min(this.sendProgress.done + 1, this.sendProgress.total))
+                    .replace(':total', this.sendProgress.total);
             },
 
             // ===== PRESENCE (Realtime DB) =====
@@ -611,7 +991,7 @@
                     this.otherLastSeen = data.last_seen;
                 });
 
-                setInterval(() => {
+                this.presenceInterval = setInterval(() => {
                     myRef.update({
                         status: 'online',
                         last_seen: firebase.database.ServerValue.TIMESTAMP,
@@ -674,7 +1054,7 @@
                                 if (data.is_mine === undefined) data.is_mine = data.sender_id === this.myId;
                                 this.messages.push(data);
                                 this.lastId = Math.max(this.lastId, data.id);
-                                if (!this.anyEmojiPickerOpen) {
+                                if (!this.anyEmojiPickerOpen && this.stick) {
                                     this.$nextTick(() => this.scrollToBottom());
                                 }
                             }
@@ -690,52 +1070,129 @@
                 });
             },
 
-            // ===== SEND MESSAGE =====
-            async sendMessage() {
-                const text = this.newMessage.trim();
-                const fi = document.getElementById('fileInput');
-                const file = fi && fi.files && fi.files.length > 0 ? fi.files[0] : null;
+            // ===== SENDING =====
+            // One request = one message (text OR one attachment). Sending files one by one keeps every
+            // request small (works with low PHP/server upload limits) and lets the UI show progress.
+            // Resolves to { ok: true, message } or { ok: false, error }.
+            async postMessage(opts) {
+                const fd = new FormData();
+                fd.append('_token', this.csrfToken);
+                fd.append('message', opts.text || '');
+                if (opts.replyId) fd.append('reply_to_id', opts.replyId);
+                if (opts.file) fd.append('attachment', opts.file, opts.file.name);
+                if (opts.silent) fd.append('silent', '1');   // no notification for this one
 
-                if ((!text && !file) || this.sending) return;
-                this.sending = true;
-                this.picker = null;
-                this.setMyTyping(false);
-
+                let res;
                 try {
-                    const fd = new FormData();
-                    fd.append('_token', this.csrfToken);
-                    fd.append('message', text);
-                    if (this.replyTo) fd.append('reply_to_id', this.replyTo.id);
-                    if (file) fd.append('attachment', file);
-
-                    const res = await fetch(`/messages/${this.otherId}`, {
+                    res = await fetch(`/messages/${this.otherId}`, {
                         method: 'POST',
                         headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': this.csrfToken },
                         body: fd,
                     });
+                } catch (e) {
+                    console.error('Send message error:', e);
+                    return { ok: false, error: this.labels.networkError };
+                }
 
-                    if (!res.ok) return;
+                let data = null;
+                try { data = await res.json(); } catch (_) { data = null; }
 
-                    const data = await res.json();
-                    if (data.success) {
-                        if (data.message && !this.messages.find(m => m.id === data.message.id)) {
-                            data.message.is_mine = true;
-                            this.messages.push(data.message);
-                            this.lastId = Math.max(this.lastId, data.message.id);
-                            this.$nextTick(() => this.scrollToBottom());
-                        }
+                if (!res.ok) {
+                    const firstError = data && data.errors ? Object.values(data.errors).flat()[0] : null;
+                    let error = firstError || (data && data.message) || null;
+                    if (!error && res.status === 413) error = this.labels.serverLimit;
+                    if (!error) error = this.labels.sendFailed + ' (HTTP ' + res.status + ')';
+                    return { ok: false, error: error };
+                }
 
+                if (!data || !data.success) {
+                    return { ok: false, error: (data && data.message) || this.labels.sendFailed };
+                }
+
+                return { ok: true, message: data.message };
+            },
+
+            // Adds a sent message to the thread (the Firestore listener may already have added it)
+            appendSent(message) {
+                if (!message || this.messages.find(m => m.id === message.id)) return;
+                message.is_mine = true;
+                this.messages.push(message);
+                this.lastId = Math.max(this.lastId, message.id);
+                this.$nextTick(() => this.scrollToBottom());
+            },
+
+            async sendMessage() {
+                if (this.sending || this.processingCount > 0) return;
+
+                const text = this.newMessage.trim();
+                const items = this.pending.slice();
+
+                if (!text && items.length === 0) return;
+
+                this.sending = true;
+                this.sendError = '';
+                this.picker = null;
+                this.attachOpen = false;
+                this.setMyTyping(false);
+
+                // Photos / documents first, then the text as the last message
+                const jobs = items.map(function (it) { return { item: it }; });
+                if (text) jobs.push({ text: text });
+
+                this.sendProgress = { done: 0, total: jobs.length };
+                let replyId = this.replyTo ? this.replyTo.id : null;
+                let allSent = true;
+
+                for (let i = 0; i < jobs.length; i++) {
+                    const job = jobs[i];
+                    const isLast = i === jobs.length - 1;
+
+                    if (job.item) this.updatePending(job.item.id, { status: 'sending' });
+
+                    const result = await this.postMessage({
+                        text: job.text || '',
+                        file: job.item ? job.item.file : null,
+                        replyId: replyId,
+                        silent: !isLast,   // only the last message notifies the other user
+                    });
+
+                    if (!result.ok) {
+                        allSent = false;
+                        this.sendError = result.error;
+                        if (job.item) this.updatePending(job.item.id, { status: 'error' });
+                        break;
+                    }
+
+                    replyId = null;   // only the first message is a reply
+                    this.appendSent(result.message);
+                    this.sendProgress.done = i + 1;
+
+                    if (job.item) {
+                        this.removePending(job.item.id);
+                    } else {
                         this.newMessage = '';
-                        this.replyTo = null;
-                        this.pendingAttachment = null;
-                        if (fi) fi.value = '';
-
-                        // Reset textarea height after sending
                         const el = this.$refs.input;
                         if (el) el.style.height = '44px';
                     }
-                } catch (e) { /* silent */ }
-                finally { this.sending = false; }
+                }
+
+                if (allSent) this.replyTo = null;
+                this.sending = false;
+            },
+
+            // One-time wave: only offered while the conversation is empty
+            async sendWave() {
+                if (this.sending || this.messages.length > 0) return;
+                this.sending = true;
+                this.sendError = '';
+
+                const result = await this.postMessage({ text: '👋' });
+                if (result.ok) {
+                    this.appendSent(result.message);
+                } else {
+                    this.sendError = result.error;
+                }
+                this.sending = false;
             },
 
             async markAsRead() {
@@ -764,7 +1221,7 @@
                                 this.lastId = Math.max(this.lastId, m.id);
                             }
                         });
-                        if (!this.anyEmojiPickerOpen) {
+                        if (!this.anyEmojiPickerOpen && this.stick) {
                             this.$nextTick(() => this.scrollToBottom());
                         }
                     }
@@ -851,42 +1308,13 @@
                 this.picker = null;
                 this.replyTo = {
                     id: msg.id,
-                    message: msg.message,
+                    message: this.hasText(msg) ? msg.message : (msg.message_type === 'image' ? '📷' : '📎'),
                     sender_name: msg.is_mine ? this.labels.you : this.otherName,
                 };
                 this.$refs.input.focus({ preventScroll: true });
             },
 
             cancelReply() { this.replyTo = null; },
-
-            handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (!file) { this.pendingAttachment = null; return; }
-                if (file.size > 20 * 1024 * 1024) {
-                    alert(this.labels.fileTooBig);
-                    event.target.value = '';
-                    this.pendingAttachment = null;
-                    return;
-                }
-                const isImage = file.type.startsWith('image/');
-                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-                const sizeKB = (file.size / 1024).toFixed(2);
-                const displaySize = file.size > 1024 * 1024 ? sizeMB + ' MB' : sizeKB + ' KB';
-                const att = { name: file.name, size: displaySize, isImage, preview: null };
-                if (isImage) {
-                    const r = new FileReader();
-                    r.onload = (e) => { this.pendingAttachment = { ...att, preview: e.target.result }; };
-                    r.readAsDataURL(file);
-                } else {
-                    this.pendingAttachment = att;
-                }
-            },
-
-            clearAttachment() {
-                this.pendingAttachment = null;
-                const fi = document.getElementById('fileInput');
-                if (fi) fi.value = '';
-            },
 
             onInput() {
                 const el = this.$refs.input;
@@ -897,11 +1325,6 @@
                 this.setMyTyping(true);
                 clearTimeout(this.typingDebounce);
                 this.typingDebounce = setTimeout(() => this.setMyTyping(false), 2000);
-            },
-
-            scrollToBottom() {
-                const el = this.$refs.thread;
-                if (el) el.scrollTop = el.scrollHeight;
             },
 
             formatLastSeen(ts) {
