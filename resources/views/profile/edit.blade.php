@@ -19,6 +19,16 @@
         </div>
     </x-slot>
 
+    <!-- Cropper.js styles (photo adjust modal) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+    <style>
+        /* Round crop mask for the profile photo */
+        .crop-round .cropper-view-box,
+        .crop-round .cropper-face { border-radius: 50%; }
+        /* Keep the image from being dragged/selected by the browser on touch devices */
+        #cropImage { display: block; max-width: 100%; }
+    </style>
+
     <div class="py-6 sm:py-12 bg-secondary/30 dark:bg-neutral-950/30">
         <div class="w-full sm:max-w-4xl mx-auto px-2 sm:px-16 lg:px-24 space-y-4 sm:space-y-6">
 
@@ -152,89 +162,258 @@
         </div>
     </div>
 
-    <!-- Script for photo upload -->
+    <!-- ========================================== -->
+    <!-- PHOTO ADJUST MODAL (crop / zoom / move)    -->
+    <!-- ========================================== -->
+    <div id="cropModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-3 sm:p-6" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+        <div class="w-full max-w-2xl bg-white dark:bg-neutral-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden">
+
+            <!-- Modal header -->
+            <div class="px-4 sm:px-6 pt-4 sm:pt-5 pb-3">
+                <h3 id="cropTitle" class="text-lg font-black text-[#1B3B36] dark:text-white">Adjust photo</h3>
+                <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">Drag to move. Pinch, scroll or use the slider to zoom.</p>
+            </div>
+
+            <!-- Cropper area -->
+            <div id="cropStage" class="bg-neutral-900 w-full h-[50vh] sm:h-[420px] touch-none">
+                <img id="cropImage" alt="Photo to crop">
+            </div>
+
+            <!-- Zoom controls -->
+            <div class="px-4 sm:px-6 py-4 flex items-center gap-3">
+                <button type="button" id="cropZoomOut"
+                    class="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition"
+                    aria-label="Zoom out">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                </button>
+                <input type="range" id="cropZoomRange" min="1" max="4" step="0.01" value="1" class="w-full accent-[#1B3B36]">
+                <button type="button" id="cropZoomIn"
+                    class="w-9 h-9 shrink-0 inline-flex items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-primary/10 hover:text-primary transition"
+                    aria-label="Zoom in">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </button>
+            </div>
+
+            <!-- Actions -->
+            <div class="px-4 sm:px-6 pb-4 sm:pb-6 flex items-center justify-end gap-2">
+                <button type="button" id="cropCancel"
+                    class="px-4 py-2 rounded-xl text-sm font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition">
+                    Cancel
+                </button>
+                <button type="button" id="cropSave"
+                    class="px-5 py-2 rounded-xl text-sm font-bold bg-primary hover:bg-primary-600 text-white shadow-md transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    Save photo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for photo upload with crop/zoom -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
     <script>
-        // Convert/compress image to JPEG so iPhone HEIC/large photos always work
-        async function prepareImageForUpload(file) {
-            const type = (file.type || '').toLowerCase();
-            if (type === 'image/gif' || type === 'image/svg+xml') return file;
+        (function () {
+            const modal     = document.getElementById('cropModal');
+            const stage     = document.getElementById('cropStage');
+            const cropImg   = document.getElementById('cropImage');
+            const titleEl   = document.getElementById('cropTitle');
+            const zoomRange = document.getElementById('cropZoomRange');
+            const zoomInBtn = document.getElementById('cropZoomIn');
+            const zoomOutBtn= document.getElementById('cropZoomOut');
+            const cancelBtn = document.getElementById('cropCancel');
+            const saveBtn   = document.getElementById('cropSave');
 
-            const MAX_DIM = 1600;
-            try {
-                let bitmap;
-                if (window.createImageBitmap) {
-                    bitmap = await createImageBitmap(file);
-                } else {
-                    bitmap = await new Promise((resolve, reject) => {
-                        const img = new Image();
-                        const url = URL.createObjectURL(file);
-                        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-                        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
-                        img.src = url;
-                    });
-                }
+            const MAX_ZOOM = 4;       // slider max, relative to the "fit" size
+            let cropper    = null;
+            let objectUrl  = null;
+            let baseRatio  = 1;       // zoom ratio when the image first fits the crop area
+            let current    = null;    // { fieldName, url, originalName }
 
-                const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
-                const w = Math.max(1, Math.round(bitmap.width * scale));
-                const h = Math.max(1, Math.round(bitmap.height * scale));
+            // Crop settings per upload type
+            const CONFIG = {
+                profile_photo: { title: 'Adjust profile photo', aspect: 1,     round: true,  maxSize: 800  },
+                cover_photo:   { title: 'Adjust cover photo',   aspect: 3 / 1, round: false, maxSize: 1800 }
+            };
 
-                const canvas = document.createElement('canvas');
-                canvas.width = w;
-                canvas.height = h;
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, w, h);
-                ctx.drawImage(bitmap, 0, 0, w, h);
-                if (bitmap.close) bitmap.close();
-
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-                if (!blob) return file;
-
-                const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
-                return new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() });
-            } catch (e) {
-                return file;
+            function openModal()  { modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+                if (cropper) { cropper.destroy(); cropper = null; }
+                if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+                cropImg.removeAttribute('src');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save photo';
+                current = null;
             }
-        }
 
-        async function uploadProfileImage(file, fieldName, url) {
-            const processedFile = await prepareImageForUpload(file);
-            const formData = new FormData();
-            formData.append(fieldName, processedFile, processedFile.name);
+            function getFitRatio() {
+                if (!cropper) return 1;
+                const imgData = cropper.getImageData();
+                const boxData = cropper.getCropBoxData();
+                if (!imgData.naturalWidth || !imgData.naturalHeight || !boxData.width || !boxData.height) {
+                    return imgData.ratio || 1;
+                }
+                // Minimum ratio so the image covers the crop box with no gaps
+                return Math.max(boxData.width / imgData.naturalWidth, boxData.height / imgData.naturalHeight);
+            }
 
-            try {
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: formData
+            function startCropper(file, fieldName, url) {
+                const cfg = CONFIG[fieldName];
+                current = { fieldName, url, originalName: file.name || 'photo' };
+
+                titleEl.textContent = cfg.title;
+                stage.classList.toggle('crop-round', cfg.round);
+
+                objectUrl = URL.createObjectURL(file);
+                cropImg.onload = function () {
+                    openModal();
+                    cropper = new Cropper(cropImg, {
+                        aspectRatio: cfg.aspect,
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 1,
+                        cropBoxMovable: false,
+                        cropBoxResizable: false,
+                        toggleDragModeOnDblclick: false,
+                        guides: false,
+                        center: false,
+                        highlight: false,
+                        background: false,
+                        responsive: true,
+                        checkOrientation: true,
+                        ready() {
+                            baseRatio = getFitRatio();
+                            zoomRange.value = 1;
+                        },
+                        zoom(e) {
+                            const minRatio = getFitRatio();
+                            const maxRatio = minRatio * MAX_ZOOM;
+                            if (e.detail.ratio < minRatio || e.detail.ratio > maxRatio) {
+                                e.preventDefault();
+                                const clamped = Math.min(maxRatio, Math.max(minRatio, e.detail.ratio));
+                                cropper.zoomTo(clamped);
+                                zoomRange.value = (clamped / minRatio).toFixed(2);
+                                return;
+                            }
+                            const v = e.detail.ratio / minRatio;
+                            zoomRange.value = Math.min(MAX_ZOOM, Math.max(1, v)).toFixed(2);
+                        }
+                    });
+                };
+                cropImg.onerror = function () {
+                    closeModal();
+                    alert('This photo could not be opened. Please try a JPG or PNG image.');
+                };
+                cropImg.src = objectUrl;
+            }
+
+            // Slider + buttons
+            zoomRange.addEventListener('input', function () {
+                if (!cropper) return;
+                const minRatio = getFitRatio();
+                const sliderVal = Math.min(MAX_ZOOM, Math.max(1, parseFloat(this.value) || 1));
+                cropper.zoomTo(minRatio * sliderVal);
+            });
+            zoomInBtn.addEventListener('click', function () {
+                if (!cropper) return;
+                const minRatio = getFitRatio();
+                const nextVal = Math.min(MAX_ZOOM, (parseFloat(zoomRange.value) || 1) + 0.2);
+                zoomRange.value = nextVal.toFixed(2);
+                cropper.zoomTo(minRatio * nextVal);
+            });
+            zoomOutBtn.addEventListener('click', function () {
+                if (!cropper) return;
+                const minRatio = getFitRatio();
+                const nextVal = Math.max(1, (parseFloat(zoomRange.value) || 1) - 0.2);
+                zoomRange.value = nextVal.toFixed(2);
+                cropper.zoomTo(minRatio * nextVal);
+            });
+
+            cancelBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+            });
+
+            // Crop -> JPEG file -> upload
+            saveBtn.addEventListener('click', async function () {
+                if (!cropper || !current) return;
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Saving...';
+
+                const cfg = CONFIG[current.fieldName];
+                const canvas = cropper.getCroppedCanvas({
+                    maxWidth: cfg.maxSize,
+                    maxHeight: cfg.maxSize,
+                    fillColor: '#ffffff',
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high'
                 });
 
-                const data = await res.json();
+                if (!canvas) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save photo';
+                    alert(@js(__('messages.pe_upload_failed')));
+                    return;
+                }
 
-                if (res.ok && data.success) {
-                    location.reload();
-                } else {
+                canvas.toBlob(async function (blob) {
+                    if (!blob) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save photo';
+                        alert(@js(__('messages.pe_upload_failed')));
+                        return;
+                    }
+                    const baseName = current.originalName.replace(/\.[^.]+$/, '') || 'photo';
+                    const file = new File([blob], baseName + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                    const ok = await uploadProfileImage(file, current.fieldName, current.url);
+                    if (!ok) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = 'Save photo';
+                    }
+                }, 'image/jpeg', 0.88);
+            });
+
+            async function uploadProfileImage(file, fieldName, url) {
+                const formData = new FormData();
+                formData.append(fieldName, file, file.name);
+
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok && data.success) {
+                        location.reload();
+                        return true;
+                    }
                     const validationErr = data.errors ? Object.values(data.errors).flat()[0] : null;
                     alert('Upload failed: ' + (validationErr || data.error || data.message || 'Unknown error'));
+                    return false;
+                } catch (err) {
+                    alert(@js(__('messages.pe_upload_failed')));
+                    return false;
                 }
-            } catch (err) {
-                alert(@js(__('messages.pe_upload_failed')));
             }
-        }
 
-        // Profile photo upload
-        document.getElementById('profile_photo')?.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) uploadProfileImage(file, 'profile_photo', '{{ route('profile.photo') }}');
-        });
+            // Selecting a photo now opens the adjust modal instead of uploading right away
+            function bindInput(id, fieldName, url) {
+                document.getElementById(id)?.addEventListener('change', function () {
+                    const file = this.files[0];
+                    this.value = ''; // allow re-selecting the same photo later
+                    if (file) startCropper(file, fieldName, url);
+                });
+            }
 
-        // Cover photo upload
-        document.getElementById('cover_photo')?.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) uploadProfileImage(file, 'cover_photo', '{{ route('profile.cover') }}');
-        });
+            bindInput('profile_photo', 'profile_photo', '{{ route('profile.photo') }}');
+            bindInput('cover_photo',   'cover_photo',   '{{ route('profile.cover') }}');
+        })();
     </script>
 </x-app-layout>
