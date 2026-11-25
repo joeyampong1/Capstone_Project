@@ -109,7 +109,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.photo');
+    Route::delete('/profile/photo', [ProfileController::class, 'removePhoto'])->name('profile.photo.remove');
     Route::post('/profile/cover', [ProfileController::class, 'updateCover'])->name('profile.cover');
+    Route::delete('/profile/cover', [ProfileController::class, 'removeCover'])->name('profile.cover.remove');
     Route::patch('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location');
     Route::post('/profile/id', [ProfileController::class, 'updateId'])->name('profile.id');
 
