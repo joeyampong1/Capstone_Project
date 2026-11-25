@@ -40,8 +40,8 @@
                 <div class="relative h-40 sm:h-52 bg-gradient-to-r from-[#1B3B36] via-primary-700 to-accent-600 dark:from-neutral-800 dark:via-primary-950 dark:to-neutral-900 group">
 
                     @if(!auth()->user()->cover_photo)
-                        <div class="w-full h-full flex items-center justify-center opacity-20 pointer-events-none select-none">
-                            <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-15 pointer-events-none select-none">
+                            <svg class="w-28 h-28 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                     d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
@@ -55,12 +55,12 @@
                     @endif
 
                     <!-- Cover Camera Trigger & Menu -->
-                    <div class="relative w-full h-full">
+                    <div class="absolute inset-0 z-10">
                         <button type="button"
                             id="coverCameraBtn"
                             aria-haspopup="menu"
                             aria-expanded="false"
-                            class="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer
+                            class="w-full h-full flex flex-col items-center justify-center cursor-pointer
                                     bg-black/0 hover:bg-black/30 transition-all duration-300
                                     {{ auth()->user()->cover_photo ? 'opacity-0 hover:opacity-100 focus:opacity-100' : 'opacity-100' }}">
 
@@ -114,7 +114,7 @@
                                     alt="{{ auth()->user()->name }}"
                                     class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-100 dark:bg-neutral-800">
                             @else
-                                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-300">
+                                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 border-white dark:border-neutral-900 shadow-lg bg-primary text-white">
                                     <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 2.239-7 5v1a1 1 0 001 1h12a1 1 0 001-1v-1c0-2.761-3.134-5-7-5z"/>
                                     </svg>
@@ -125,7 +125,7 @@
                                 id="profileCameraBtn"
                                 aria-haspopup="menu"
                                 aria-expanded="false"
-                                class="absolute bottom-0 right-0 bg-primary hover:bg-primary-600 text-white rounded-full p-1.5 cursor-pointer shadow-md transition"
+                                class="absolute bottom-0 right-0 bg-primary hover:bg-primary-600 text-white rounded-full p-1.5 cursor-pointer shadow-md border-2 border-white dark:border-neutral-900 transition"
                                 title="Photo options">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
