@@ -37,11 +37,22 @@
             <!-- ========================================== -->
             <div class="bg-white dark:bg-neutral-900 rounded-3xl shadow-xl border border-gray-200/60 dark:border-neutral-800 overflow-hidden">
                 <!-- Cover Photo -->
-                <div class="relative h-40 sm:h-52 bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 group">
+                <div class="relative h-40 sm:h-52 bg-gradient-to-r from-[#1B3B36] via-primary-700 to-accent-600 dark:from-neutral-800 dark:via-primary-950 dark:to-neutral-900 group">
+
+                    <!-- Default cover pattern when no custom cover photo is set -->
+                    @if(!auth()->user()->cover_photo)
+                        <div class="w-full h-full flex items-center justify-center opacity-20 pointer-events-none select-none">
+                            <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    @endif
 
                     <!-- Cover Image (if uploaded) -->
-                    @if(auth()->user()->cover_photo_url)
-                        <img src="{{ auth()->user()->cover_photo_url }}"
+                    @if(auth()->user()->cover_photo_url && auth()->user()->cover_photo)
+                        <img id="coverPreviewImg"
+                            src="{{ auth()->user()->cover_photo_url }}"
                             alt="Cover Photo"
                             class="w-full h-full object-cover">
                     @endif
@@ -68,13 +79,38 @@
                         <input type="file" id="cover_photo" name="cover_photo" class="hidden" accept="image/*">
                     </label>
 
+                    <!-- Remove Cover Photo Button -->
+                    @if(auth()->user()->cover_photo)
+                        <button type="button"
+                            id="removeCoverBtn"
+                            class="absolute top-3 right-3 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-black/60 hover:bg-red-600 text-white backdrop-blur-sm transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                            Remove cover
+                        </button>
+                    @endif
+
                     <!-- Avatar -->
                     <div class="absolute -bottom-12 left-6 sm:left-8 z-10">
                         <div class="relative">
-                            <img src="{{ auth()->user()->profile_photo_url }}"
-                                alt="{{ auth()->user()->name }}"
-                                class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-lg">
-                            <label for="profile_photo" class="absolute bottom-0 right-0 bg-primary hover:bg-primary-600 text-white rounded-full p-1.5 cursor-pointer shadow-md transition">
+                            @if(auth()->user()->profile_photo)
+                                <img id="profilePreviewImg"
+                                    src="{{ auth()->user()->profile_photo_url }}"
+                                    alt="{{ auth()->user()->name }}"
+                                    class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-100 dark:bg-neutral-800">
+                            @else
+                                <div id="profileDefaultIcon"
+                                    class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-300">
+                                    <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 2.239-7 5v1a1 1 0 001 1h12a1 1 0 001-1v-1c0-2.761-3.134-5-7-5z"/>
+                                    </svg>
+                                </div>
+                            @endif
+
+                            <label for="profile_photo"
+                                class="absolute bottom-0 right-0 bg-primary hover:bg-primary-600 text-white rounded-full p-1.5 cursor-pointer shadow-md transition"
+                                title="Change profile photo">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -86,27 +122,42 @@
                 </div>
 
                 <!-- User info -->
-                <div class="pt-16 pb-6 px-6 sm:px-8">
-                    <h3 class="text-xl font-black text-[#1B3B36] dark:text-white">{{ auth()->user()->name }}</h3>
-                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ auth()->user()->email }}</p>
-                    <div class="mt-2 flex items-center gap-2 flex-wrap">
-                        <!-- Role Badge -->
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent dark:bg-accent/20">
-                            {{ auth()->user()->role === 'admin' ? __('messages.pe_badge_admin') : __('messages.pe_badge_user') }}
-                        </span>
-                        <!-- ID Validation Status -->
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            {{ auth()->user()->id_validation_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                               (auth()->user()->id_validation_status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                               'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400') }}">
-                            {{ __('messages.pe_badge_id', ['status' => ucfirst(auth()->user()->id_validation_status)]) }}
-                        </span>
-                        @if(auth()->user()->isSitter())
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                                {{ __('messages.pf_badge_level', ['level' => auth()->user()->sitter_level]) }}
+                <div class="pt-16 pb-6 px-6 sm:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div>
+                        <h3 class="text-xl font-black text-[#1B3B36] dark:text-white">{{ auth()->user()->name }}</h3>
+                        <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ auth()->user()->email }}</p>
+                        <div class="mt-2 flex items-center gap-2 flex-wrap">
+                            <!-- Role Badge -->
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent dark:bg-accent/20">
+                                {{ auth()->user()->role === 'admin' ? __('messages.pe_badge_admin') : __('messages.pe_badge_user') }}
                             </span>
-                        @endif
+                            <!-- ID Validation Status -->
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                {{ auth()->user()->id_validation_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                   (auth()->user()->id_validation_status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400') }}">
+                                {{ __('messages.pe_badge_id', ['status' => ucfirst(auth()->user()->id_validation_status)]) }}
+                            </span>
+                            @if(auth()->user()->isSitter())
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                                    {{ __('messages.pf_badge_level', ['level' => auth()->user()->sitter_level]) }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
+
+                    @if(auth()->user()->profile_photo)
+                        <div>
+                            <button type="button"
+                                id="removeProfilePhotoBtn"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                                Remove photo
+                            </button>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -222,13 +273,15 @@
             const cancelBtn = document.getElementById('cropCancel');
             const saveBtn   = document.getElementById('cropSave');
 
-            const MAX_ZOOM = 4;       // slider max, relative to the "fit" size
+            const removeProfileBtn = document.getElementById('removeProfilePhotoBtn');
+            const removeCoverBtn   = document.getElementById('removeCoverBtn');
+
+            const MAX_ZOOM = 4;
             let cropper    = null;
             let objectUrl  = null;
-            let baseRatio  = 1;       // zoom ratio when the image first fits the crop area
-            let current    = null;    // { fieldName, url, originalName }
+            let baseRatio  = 1;
+            let current    = null;
 
-            // Crop settings per upload type
             const CONFIG = {
                 profile_photo: { title: 'Adjust profile photo', aspect: 1,     round: true,  maxSize: 800  },
                 cover_photo:   { title: 'Adjust cover photo',   aspect: 3 / 1, round: false, maxSize: 1800 }
@@ -253,7 +306,6 @@
                 if (!imgData.naturalWidth || !imgData.naturalHeight || !boxData.width || !boxData.height) {
                     return imgData.ratio || 1;
                 }
-                // Minimum ratio so the image covers the crop box with no gaps
                 return Math.max(boxData.width / imgData.naturalWidth, boxData.height / imgData.naturalHeight);
             }
 
@@ -307,7 +359,6 @@
                 cropImg.src = objectUrl;
             }
 
-            // Slider + buttons
             zoomRange.addEventListener('input', function () {
                 if (!cropper) return;
                 const minRatio = getFitRatio();
@@ -335,7 +386,6 @@
                 if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
             });
 
-            // Crop -> JPEG file -> upload
             saveBtn.addEventListener('click', async function () {
                 if (!cropper || !current) return;
                 saveBtn.disabled = true;
@@ -403,11 +453,42 @@
                 }
             }
 
-            // Selecting a photo now opens the adjust modal instead of uploading right away
+            async function removePhoto(url, confirmMessage) {
+                if (!confirm(confirmMessage)) return;
+
+                try {
+                    const res = await fetch(url, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok && data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to remove photo: ' + (data.error || data.message || 'Unknown error'));
+                    }
+                } catch (err) {
+                    alert('Failed to remove photo.');
+                }
+            }
+
+            removeProfileBtn?.addEventListener('click', function () {
+                removePhoto('{{ route('profile.photo.remove') }}', 'Remove your profile photo and revert to the default icon?');
+            });
+
+            removeCoverBtn?.addEventListener('click', function () {
+                removePhoto('{{ route('profile.cover.remove') }}', 'Remove your cover photo and revert to the default cover?');
+            });
+
             function bindInput(id, fieldName, url) {
                 document.getElementById(id)?.addEventListener('change', function () {
                     const file = this.files[0];
-                    this.value = ''; // allow re-selecting the same photo later
+                    this.value = '';
                     if (file) startCropper(file, fieldName, url);
                 });
             }

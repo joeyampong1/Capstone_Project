@@ -575,7 +575,7 @@
     };
 
     if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(chatFirebaseConfig);
     }
     const db   = firebase.firestore();
     const rtdb = firebase.database();
