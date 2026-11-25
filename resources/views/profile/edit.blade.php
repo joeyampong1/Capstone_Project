@@ -154,42 +154,87 @@
 
     <!-- Script for photo upload -->
     <script>
-        // Profile photo upload
-        document.getElementById('profile_photo')?.addEventListener('change', function(e) {
-            const file = this.files[0];
-            if (!file) return;
+        // Convert/compress image to JPEG so iPhone HEIC/large photos always work
+        async function prepareImageForUpload(file) {
+            const type = (file.type || '').toLowerCase();
+            if (type === 'image/gif' || type === 'image/svg+xml') return file;
+
+            const MAX_DIM = 1600;
+            try {
+                let bitmap;
+                if (window.createImageBitmap) {
+                    bitmap = await createImageBitmap(file);
+                } else {
+                    bitmap = await new Promise((resolve, reject) => {
+                        const img = new Image();
+                        const url = URL.createObjectURL(file);
+                        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+                        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('decode')); };
+                        img.src = url;
+                    });
+                }
+
+                const scale = Math.min(1, MAX_DIM / Math.max(bitmap.width, bitmap.height));
+                const w = Math.max(1, Math.round(bitmap.width * scale));
+                const h = Math.max(1, Math.round(bitmap.height * scale));
+
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, w, h);
+                ctx.drawImage(bitmap, 0, 0, w, h);
+                if (bitmap.close) bitmap.close();
+
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+                if (!blob) return file;
+
+                const newName = (file.name || 'photo').replace(/\.[^.]+$/, '') + '.jpg';
+                return new File([blob], newName, { type: 'image/jpeg', lastModified: Date.now() });
+            } catch (e) {
+                return file;
+            }
+        }
+
+        async function uploadProfileImage(file, fieldName, url) {
+            const processedFile = await prepareImageForUpload(file);
             const formData = new FormData();
-            formData.append('profile_photo', file);
-            fetch('{{ route('profile.photo') }}', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) location.reload();
-                else alert('Upload failed: ' + (data.error || 'Unknown error'));
-            })
-            .catch(() => alert(@js(__('messages.pe_upload_failed'))));
+            formData.append(fieldName, processedFile, processedFile.name);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    location.reload();
+                } else {
+                    const validationErr = data.errors ? Object.values(data.errors).flat()[0] : null;
+                    alert('Upload failed: ' + (validationErr || data.error || data.message || 'Unknown error'));
+                }
+            } catch (err) {
+                alert(@js(__('messages.pe_upload_failed')));
+            }
+        }
+
+        // Profile photo upload
+        document.getElementById('profile_photo')?.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) uploadProfileImage(file, 'profile_photo', '{{ route('profile.photo') }}');
         });
 
         // Cover photo upload
-        document.getElementById('cover_photo')?.addEventListener('change', function(e) {
+        document.getElementById('cover_photo')?.addEventListener('change', function() {
             const file = this.files[0];
-            if (!file) return;
-            const formData = new FormData();
-            formData.append('cover_photo', file);
-            fetch('{{ route('profile.cover') }}', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) location.reload();
-                else alert('Upload failed: ' + (data.error || 'Unknown error'));
-            })
-            .catch(() => alert(@js(__('messages.pe_upload_failed'))));
+            if (file) uploadProfileImage(file, 'cover_photo', '{{ route('profile.cover') }}');
         });
     </script>
 </x-app-layout>
