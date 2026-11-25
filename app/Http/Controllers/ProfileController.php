@@ -102,7 +102,7 @@ class ProfileController extends Controller
         return Redirect::to('/')->with('status', 'Your account and personal data have been permanently removed.');
     }
 
-    // ========================================== //
+// ========================================== //
     // Update Profile Photo (Avatar) — Cloudinary //
     // ========================================== //
     public function updatePhoto(Request $request)
@@ -113,10 +113,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Delete old photo (Cloudinary or local)
-        $this->deleteOldImage($user->profile_photo, $user->profile_photo_public_id);
+        try {
+            $this->deleteOldImage($user->profile_photo, $user->profile_photo_public_id);
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to delete old profile photo before upload', ['error' => $e->getMessage()]);
+        }
 
-        // Upload to Cloudinary
         $upload = $this->cloudinary->upload(
             $request->file('profile_photo'),
             'avatars',
@@ -125,7 +127,7 @@ class ProfileController extends Controller
                     'width'   => 400,
                     'height'  => 400,
                     'crop'    => 'fill',
-                    'gravity' => 'face',
+                    'gravity' => 'auto',
                 ],
             ]
         );
@@ -144,7 +146,7 @@ class ProfileController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // ========================================== //
+// ========================================== //
     // Update Cover Photo — Cloudinary            //
     // ========================================== //
     public function updateCover(Request $request)
@@ -155,10 +157,12 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Delete old cover (Cloudinary or local)
-        $this->deleteOldImage($user->cover_photo, $user->cover_photo_public_id);
+        try {
+            $this->deleteOldImage($user->cover_photo, $user->cover_photo_public_id);
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to delete old cover photo before upload', ['error' => $e->getMessage()]);
+        }
 
-        // Upload to Cloudinary
         $upload = $this->cloudinary->upload(
             $request->file('cover_photo'),
             'covers',
@@ -185,22 +189,22 @@ class ProfileController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function removePhoto(Request $request)
-{
-    $user = $request->user();
+public function removePhoto(Request $request)
+    {
+        $user = $request->user();
 
-    try {
-        $this->deleteOldImage($user->profile_photo, $user->profile_photo_public_id);
-    } catch (\Throwable $e) {
-        \Log::warning('Failed to delete old profile photo on remove', ['error' => $e->getMessage()]);
+        try {
+            $this->deleteOldImage($user->profile_photo, $user->profile_photo_public_id);
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to delete old profile photo on remove', ['error' => $e->getMessage()]);
+        }
+
+        $user->profile_photo           = null;
+        $user->profile_photo_public_id = null;
+        $user->save();
+
+        return response()->json(['success' => true]);
     }
-
-    $user->profile_photo           = null;
-    $user->profile_photo_public_id = null;
-    $user->save();
-
-    return response()->json(['success' => true]);
-}
 
     public function removeCover(Request $request)
     {
@@ -218,6 +222,8 @@ class ProfileController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+
 
     public function updateLocation(Request $request)
     {

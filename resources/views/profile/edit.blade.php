@@ -301,14 +301,14 @@
             const cancelBtn = document.getElementById('cropCancel');
             const saveBtn   = document.getElementById('cropSave');
 
-            const profileCameraBtn = document.getElementById('profileCameraBtn');
-            const profilePhotoMenu = document.getElementById('profilePhotoMenu');
-            const profilePickOption = document.getElementById('profilePickOption');
+            const profileCameraBtn    = document.getElementById('profileCameraBtn');
+            const profilePhotoMenu    = document.getElementById('profilePhotoMenu');
+            const profilePickOption   = document.getElementById('profilePickOption');
             const removeProfileOption = document.getElementById('removeProfileOption');
 
-            const coverCameraBtn = document.getElementById('coverCameraBtn');
-            const coverPhotoMenu = document.getElementById('coverPhotoMenu');
-            const coverPickOption = document.getElementById('coverPickOption');
+            const coverCameraBtn    = document.getElementById('coverCameraBtn');
+            const coverPhotoMenu    = document.getElementById('coverPhotoMenu');
+            const coverPickOption   = document.getElementById('coverPickOption');
             const removeCoverOption = document.getElementById('removeCoverOption');
 
             const MAX_ZOOM = 4;
@@ -328,8 +328,12 @@
                         menu.classList.add('hidden');
                     }
                 });
-                if (profileCameraBtn) profileCameraBtn.setAttribute('aria-expanded', String(profilePhotoMenu && !profilePhotoMenu.classList.contains('hidden')));
-                if (coverCameraBtn) coverCameraBtn.setAttribute('aria-expanded', String(coverPhotoMenu && !coverPhotoMenu.classList.contains('hidden')));
+                if (profileCameraBtn) {
+                    profileCameraBtn.setAttribute('aria-expanded', String(Boolean(profilePhotoMenu && !profilePhotoMenu.classList.contains('hidden'))));
+                }
+                if (coverCameraBtn) {
+                    coverCameraBtn.setAttribute('aria-expanded', String(Boolean(coverPhotoMenu && !coverPhotoMenu.classList.contains('hidden'))));
+                }
             }
 
             function toggleMenu(btn, menu, inputId, hasPhoto) {
@@ -372,12 +376,18 @@
             });
 
             document.addEventListener('click', function (e) {
-                if (!profilePhotoMenu?.contains(e.target) && !coverPhotoMenu?.contains(e.target)) {
-                    closeMenus(null);
-                }
+                setTimeout(() => {
+                    if (!profilePhotoMenu?.contains(e.target) && !coverPhotoMenu?.contains(e.target)) {
+                        closeMenus(null);
+                    }
+                }, 0);
             });
 
-            function openModal()  { modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
+            function openModal() {
+                modal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
             function closeModal() {
                 modal.classList.add('hidden');
                 document.body.classList.remove('overflow-hidden');
@@ -455,6 +465,7 @@
                 const sliderVal = Math.min(MAX_ZOOM, Math.max(1, parseFloat(this.value) || 1));
                 cropper.zoomTo(minRatio * sliderVal);
             });
+
             zoomInBtn.addEventListener('click', function () {
                 if (!cropper) return;
                 const minRatio = getFitRatio();
@@ -462,6 +473,7 @@
                 zoomRange.value = nextVal.toFixed(2);
                 cropper.zoomTo(minRatio * nextVal);
             });
+
             zoomOutBtn.addEventListener('click', function () {
                 if (!cropper) return;
                 const minRatio = getFitRatio();
@@ -471,13 +483,29 @@
             });
 
             cancelBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal();
+            });
+
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape') {
                     closeMenus(null);
                     if (!modal.classList.contains('hidden')) closeModal();
                 }
             });
+
+            function dataUrlToBlob(dataUrl) {
+                const parts = dataUrl.split(',');
+                const mimeMatch = parts[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+                const byteString = atob(parts[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ab], { type: mime });
+            }
 
             saveBtn.addEventListener('click', async function () {
                 if (!cropper || !current) return;
@@ -500,7 +528,7 @@
                     return;
                 }
 
-                canvas.toBlob(async function (blob) {
+                const finalizeBlob = async function (blob) {
                     if (!blob) {
                         saveBtn.disabled = false;
                         saveBtn.textContent = 'Save photo';
@@ -514,7 +542,27 @@
                         saveBtn.disabled = false;
                         saveBtn.textContent = 'Save photo';
                     }
-                }, 'image/jpeg', 0.88);
+                };
+
+                if (canvas.toBlob) {
+                    canvas.toBlob(async function (blob) {
+                        if (blob) {
+                            await finalizeBlob(blob);
+                        } else {
+                            try {
+                                await finalizeBlob(dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.85)));
+                            } catch (e) {
+                                await finalizeBlob(null);
+                            }
+                        }
+                    }, 'image/jpeg', 0.88);
+                } else {
+                    try {
+                        await finalizeBlob(dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.85)));
+                    } catch (e) {
+                        await finalizeBlob(null);
+                    }
+                }
             });
 
             async function uploadProfileImage(file, fieldName, url) {
@@ -564,10 +612,10 @@
                     if (res.ok && data.success) {
                         location.reload();
                     } else {
-                        alert('Failed to remove photo: ' + (data.error || data.message || 'Server Error'));
+                        alert('Failed to remove photo: ' + (data.error || data.message || 'Unknown error'));
                     }
                 } catch (err) {
-                    alert('Failed to remove photo: Server Error');
+                    alert('Failed to remove photo: ' + (err?.message || 'Unknown error'));
                 }
             }
 
