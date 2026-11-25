@@ -372,9 +372,11 @@
             });
 
             document.addEventListener('click', function (e) {
-                if (!profilePhotoMenu?.contains(e.target) && !coverPhotoMenu?.contains(e.target)) {
-                    closeMenus(null);
-                }
+                setTimeout(() => {
+                    if (!profilePhotoMenu?.contains(e.target) && !coverPhotoMenu?.contains(e.target)) {
+                        closeMenus(null);
+                    }
+                }, 0);
             });
 
             function openModal()  { modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
@@ -479,6 +481,19 @@
                 }
             });
 
+            function dataUrlToBlob(dataUrl) {
+                const parts = dataUrl.split(',');
+                const mimeMatch = parts[0].match(/:(.*?);/);
+                const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+                const byteString = atob(parts[1]);
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ab], { type: mime });
+            }
+
             saveBtn.addEventListener('click', async function () {
                 if (!cropper || !current) return;
                 saveBtn.disabled = true;
@@ -500,7 +515,7 @@
                     return;
                 }
 
-                canvas.toBlob(async function (blob) {
+                const finalizeBlob = async function (blob) {
                     if (!blob) {
                         saveBtn.disabled = false;
                         saveBtn.textContent = 'Save photo';
@@ -514,7 +529,29 @@
                         saveBtn.disabled = false;
                         saveBtn.textContent = 'Save photo';
                     }
-                }, 'image/jpeg', 0.88);
+                };
+
+                if (canvas.toBlob) {
+                    canvas.toBlob(async function (blob) {
+                        if (blob) {
+                            await finalizeBlob(blob);
+                        } else {
+                            try {
+                                const fallbackBlob = dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.85));
+                                await finalizeBlob(fallbackBlob);
+                            } catch (e) {
+                                await finalizeBlob(null);
+                            }
+                        }
+                    }, 'image/jpeg', 0.88);
+                } else {
+                    try {
+                        const fallbackBlob = dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.85));
+                        await finalizeBlob(fallbackBlob);
+                    } catch (e) {
+                        await finalizeBlob(null);
+                    }
+                }
             });
 
             async function uploadProfileImage(file, fieldName, url) {
