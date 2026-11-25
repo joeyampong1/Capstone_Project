@@ -39,7 +39,6 @@
                 <!-- Cover Photo -->
                 <div class="relative h-40 sm:h-52 bg-gradient-to-r from-[#1B3B36] via-primary-700 to-accent-600 dark:from-neutral-800 dark:via-primary-950 dark:to-neutral-900 group">
 
-                    <!-- Default cover pattern when no custom cover photo is set -->
                     @if(!auth()->user()->cover_photo)
                         <div class="w-full h-full flex items-center justify-center opacity-20 pointer-events-none select-none">
                             <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -49,115 +48,144 @@
                         </div>
                     @endif
 
-                    <!-- Cover Image (if uploaded) -->
                     @if(auth()->user()->cover_photo_url && auth()->user()->cover_photo)
-                        <img id="coverPreviewImg"
-                            src="{{ auth()->user()->cover_photo_url }}"
+                        <img src="{{ auth()->user()->cover_photo_url }}"
                             alt="Cover Photo"
                             class="w-full h-full object-cover">
                     @endif
 
-                    <!-- Cover Upload Overlay / Icon -->
-                    <label for="cover_photo"
-                        class="absolute inset-0 flex flex-col items-center justify-center cursor-pointer
-                                bg-black/0 hover:bg-black/30 transition-all duration-300
-                                {{ auth()->user()->cover_photo ? 'opacity-0 hover:opacity-100' : 'opacity-100' }}">
+                    <!-- Cover Camera Trigger & Menu -->
+                    <div class="relative w-full h-full">
+                        <button type="button"
+                            id="coverCameraBtn"
+                            aria-haspopup="menu"
+                            aria-expanded="false"
+                            class="absolute inset-0 w-full h-full flex flex-col items-center justify-center cursor-pointer
+                                    bg-black/0 hover:bg-black/30 transition-all duration-300
+                                    {{ auth()->user()->cover_photo ? 'opacity-0 hover:opacity-100 focus:opacity-100' : 'opacity-100' }}">
 
-                        <!-- Camera Icon -->
-                        <svg class="w-12 h-12 text-white drop-shadow-lg {{ auth()->user()->cover_photo ? 'scale-75' : 'scale-100' }} transition-transform"
-                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
+                            <svg class="w-12 h-12 text-white drop-shadow-lg {{ auth()->user()->cover_photo ? 'scale-75' : 'scale-100' }} transition-transform"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
 
-                        <span class="text-white text-xs font-bold mt-2 drop-shadow-md {{ auth()->user()->cover_photo ? 'opacity-0 group-hover:opacity-100' : 'opacity-100' }} transition-opacity">
-                            {{ auth()->user()->cover_photo ? __('messages.pe_change_cover') : __('messages.pe_add_cover') }}
-                        </span>
+                            <span class="text-white text-xs font-bold mt-2 drop-shadow-md {{ auth()->user()->cover_photo ? 'opacity-0 group-hover:opacity-100' : 'opacity-100' }} transition-opacity">
+                                {{ auth()->user()->cover_photo ? __('messages.pe_change_cover') : __('messages.pe_add_cover') }}
+                            </span>
+                        </button>
+
+                        <div id="coverPhotoMenu"
+                            role="menu"
+                            class="hidden absolute top-3 right-3 z-30 w-44 rounded-2xl bg-white dark:bg-neutral-800 shadow-xl border border-gray-200/80 dark:border-neutral-700 py-1.5 text-left">
+                            <button type="button"
+                                id="coverPickOption"
+                                role="menuitem"
+                                class="w-full px-3.5 py-2 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center gap-2 transition">
+                                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                {{ auth()->user()->cover_photo ? __('messages.pe_change_cover') : __('messages.pe_add_cover') }}
+                            </button>
+                            @if(auth()->user()->cover_photo)
+                                <button type="button"
+                                    id="removeCoverOption"
+                                    role="menuitem"
+                                    class="w-full px-3.5 py-2 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center gap-2 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                    Remove cover
+                                </button>
+                            @endif
+                        </div>
 
                         <input type="file" id="cover_photo" name="cover_photo" class="hidden" accept="image/*">
-                    </label>
-
-                    <!-- Remove Cover Photo Button -->
-                    @if(auth()->user()->cover_photo)
-                        <button type="button"
-                            id="removeCoverBtn"
-                            class="absolute top-3 right-3 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-black/60 hover:bg-red-600 text-white backdrop-blur-sm transition">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                            </svg>
-                            Remove cover
-                        </button>
-                    @endif
+                    </div>
 
                     <!-- Avatar -->
-                    <div class="absolute -bottom-12 left-6 sm:left-8 z-10">
+                    <div class="absolute -bottom-12 left-6 sm:left-8 z-20">
                         <div class="relative">
                             @if(auth()->user()->profile_photo)
-                                <img id="profilePreviewImg"
-                                    src="{{ auth()->user()->profile_photo_url }}"
+                                <img src="{{ auth()->user()->profile_photo_url }}"
                                     alt="{{ auth()->user()->name }}"
                                     class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-100 dark:bg-neutral-800">
                             @else
-                                <div id="profileDefaultIcon"
-                                    class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-300">
+                                <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center border-4 border-white dark:border-neutral-900 shadow-lg bg-neutral-200 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-300">
                                     <svg class="w-12 h-12 sm:w-14 sm:h-14" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5zm0 2c-3.866 0-7 2.239-7 5v1a1 1 0 001 1h12a1 1 0 001-1v-1c0-2.761-3.134-5-7-5z"/>
                                     </svg>
                                 </div>
                             @endif
 
-                            <label for="profile_photo"
+                            <button type="button"
+                                id="profileCameraBtn"
+                                aria-haspopup="menu"
+                                aria-expanded="false"
                                 class="absolute bottom-0 right-0 bg-primary hover:bg-primary-600 text-white rounded-full p-1.5 cursor-pointer shadow-md transition"
-                                title="Change profile photo">
+                                title="Photo options">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                            </label>
+                            </button>
+
+                            <div id="profilePhotoMenu"
+                                role="menu"
+                                class="hidden absolute bottom-10 left-0 z-30 w-44 rounded-2xl bg-white dark:bg-neutral-800 shadow-xl border border-gray-200/80 dark:border-neutral-700 py-1.5 text-left">
+                                <button type="button"
+                                    id="profilePickOption"
+                                    role="menuitem"
+                                    class="w-full px-3.5 py-2 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center gap-2 transition">
+                                    <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    {{ auth()->user()->profile_photo ? 'Change photo' : 'Upload photo' }}
+                                </button>
+                                @if(auth()->user()->profile_photo)
+                                    <button type="button"
+                                        id="removeProfileOption"
+                                        role="menuitem"
+                                        class="w-full px-3.5 py-2 text-xs font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center gap-2 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                        </svg>
+                                        Remove photo
+                                    </button>
+                                @endif
+                            </div>
+
                             <input type="file" id="profile_photo" name="profile_photo" class="hidden" accept="image/*">
                         </div>
                     </div>
                 </div>
 
                 <!-- User info -->
-                <div class="pt-16 pb-6 px-6 sm:px-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <div>
-                        <h3 class="text-xl font-black text-[#1B3B36] dark:text-white">{{ auth()->user()->name }}</h3>
-                        <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ auth()->user()->email }}</p>
-                        <div class="mt-2 flex items-center gap-2 flex-wrap">
-                            <!-- Role Badge -->
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent dark:bg-accent/20">
-                                {{ auth()->user()->role === 'admin' ? __('messages.pe_badge_admin') : __('messages.pe_badge_user') }}
+                <div class="pt-16 pb-6 px-6 sm:px-8">
+                    <h3 class="text-xl font-black text-[#1B3B36] dark:text-white">{{ auth()->user()->name }}</h3>
+                    <p class="text-sm text-neutral-500 dark:text-neutral-400">{{ auth()->user()->email }}</p>
+                    <div class="mt-2 flex items-center gap-2 flex-wrap">
+                        <!-- Role Badge -->
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent dark:bg-accent/20">
+                            {{ auth()->user()->role === 'admin' ? __('messages.pe_badge_admin') : __('messages.pe_badge_user') }}
+                        </span>
+                        <!-- ID Validation Status -->
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                            {{ auth()->user()->id_validation_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                               (auth()->user()->id_validation_status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                               'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400') }}">
+                            {{ __('messages.pe_badge_id', ['status' => ucfirst(auth()->user()->id_validation_status)]) }}
+                        </span>
+                        @if(auth()->user()->isSitter())
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                                {{ __('messages.pf_badge_level', ['level' => auth()->user()->sitter_level]) }}
                             </span>
-                            <!-- ID Validation Status -->
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ auth()->user()->id_validation_status === 'verified' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                   (auth()->user()->id_validation_status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400') }}">
-                                {{ __('messages.pe_badge_id', ['status' => ucfirst(auth()->user()->id_validation_status)]) }}
-                            </span>
-                            @if(auth()->user()->isSitter())
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                                    {{ __('messages.pf_badge_level', ['level' => auth()->user()->sitter_level]) }}
-                                </span>
-                            @endif
-                        </div>
+                        @endif
                     </div>
-
-                    @if(auth()->user()->profile_photo)
-                        <div>
-                            <button type="button"
-                                id="removeProfilePhotoBtn"
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                                Remove photo
-                            </button>
-                        </div>
-                    @endif
                 </div>
             </div>
 
@@ -273,8 +301,15 @@
             const cancelBtn = document.getElementById('cropCancel');
             const saveBtn   = document.getElementById('cropSave');
 
-            const removeProfileBtn = document.getElementById('removeProfilePhotoBtn');
-            const removeCoverBtn   = document.getElementById('removeCoverBtn');
+            const profileCameraBtn = document.getElementById('profileCameraBtn');
+            const profilePhotoMenu = document.getElementById('profilePhotoMenu');
+            const profilePickOption = document.getElementById('profilePickOption');
+            const removeProfileOption = document.getElementById('removeProfileOption');
+
+            const coverCameraBtn = document.getElementById('coverCameraBtn');
+            const coverPhotoMenu = document.getElementById('coverPhotoMenu');
+            const coverPickOption = document.getElementById('coverPickOption');
+            const removeCoverOption = document.getElementById('removeCoverOption');
 
             const MAX_ZOOM = 4;
             let cropper    = null;
@@ -286,6 +321,61 @@
                 profile_photo: { title: 'Adjust profile photo', aspect: 1,     round: true,  maxSize: 800  },
                 cover_photo:   { title: 'Adjust cover photo',   aspect: 3 / 1, round: false, maxSize: 1800 }
             };
+
+            function closeMenus(exceptMenu) {
+                [profilePhotoMenu, coverPhotoMenu].forEach(menu => {
+                    if (menu && menu !== exceptMenu) {
+                        menu.classList.add('hidden');
+                    }
+                });
+                if (profileCameraBtn) profileCameraBtn.setAttribute('aria-expanded', String(profilePhotoMenu && !profilePhotoMenu.classList.contains('hidden')));
+                if (coverCameraBtn) coverCameraBtn.setAttribute('aria-expanded', String(coverPhotoMenu && !coverPhotoMenu.classList.contains('hidden')));
+            }
+
+            function toggleMenu(btn, menu, inputId, hasPhoto) {
+                if (!hasPhoto) {
+                    closeMenus(null);
+                    document.getElementById(inputId)?.click();
+                    return;
+                }
+                const isHidden = menu.classList.contains('hidden');
+                closeMenus(isHidden ? menu : null);
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                    btn?.setAttribute('aria-expanded', 'true');
+                } else {
+                    menu.classList.add('hidden');
+                    btn?.setAttribute('aria-expanded', 'false');
+                }
+            }
+
+            profileCameraBtn?.addEventListener('click', function (e) {
+                e.stopPropagation();
+                toggleMenu(profileCameraBtn, profilePhotoMenu, 'profile_photo', {{ auth()->user()->profile_photo ? 'true' : 'false' }});
+            });
+
+            coverCameraBtn?.addEventListener('click', function (e) {
+                e.stopPropagation();
+                toggleMenu(coverCameraBtn, coverPhotoMenu, 'cover_photo', {{ auth()->user()->cover_photo ? 'true' : 'false' }});
+            });
+
+            profilePickOption?.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeMenus(null);
+                document.getElementById('profile_photo')?.click();
+            });
+
+            coverPickOption?.addEventListener('click', function (e) {
+                e.stopPropagation();
+                closeMenus(null);
+                document.getElementById('cover_photo')?.click();
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!profilePhotoMenu?.contains(e.target) && !coverPhotoMenu?.contains(e.target)) {
+                    closeMenus(null);
+                }
+            });
 
             function openModal()  { modal.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
             function closeModal() {
@@ -383,7 +473,10 @@
             cancelBtn.addEventListener('click', closeModal);
             modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
             document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+                if (e.key === 'Escape') {
+                    closeMenus(null);
+                    if (!modal.classList.contains('hidden')) closeModal();
+                }
             });
 
             saveBtn.addEventListener('click', async function () {
@@ -454,6 +547,7 @@
             }
 
             async function removePhoto(url, confirmMessage) {
+                closeMenus(null);
                 if (!confirm(confirmMessage)) return;
 
                 try {
@@ -470,18 +564,20 @@
                     if (res.ok && data.success) {
                         location.reload();
                     } else {
-                        alert('Failed to remove photo: ' + (data.error || data.message || 'Unknown error'));
+                        alert('Failed to remove photo: ' + (data.error || data.message || 'Server Error'));
                     }
                 } catch (err) {
-                    alert('Failed to remove photo.');
+                    alert('Failed to remove photo: Server Error');
                 }
             }
 
-            removeProfileBtn?.addEventListener('click', function () {
+            removeProfileOption?.addEventListener('click', function (e) {
+                e.stopPropagation();
                 removePhoto('{{ route('profile.photo.remove') }}', 'Remove your profile photo and revert to the default icon?');
             });
 
-            removeCoverBtn?.addEventListener('click', function () {
+            removeCoverOption?.addEventListener('click', function (e) {
+                e.stopPropagation();
                 removePhoto('{{ route('profile.cover.remove') }}', 'Remove your cover photo and revert to the default cover?');
             });
 

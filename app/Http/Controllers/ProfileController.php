@@ -185,6 +185,40 @@ class ProfileController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function removePhoto(Request $request)
+{
+    $user = $request->user();
+
+    try {
+        $this->deleteOldImage($user->profile_photo, $user->profile_photo_public_id);
+    } catch (\Throwable $e) {
+        \Log::warning('Failed to delete old profile photo on remove', ['error' => $e->getMessage()]);
+    }
+
+    $user->profile_photo           = null;
+    $user->profile_photo_public_id = null;
+    $user->save();
+
+    return response()->json(['success' => true]);
+}
+
+    public function removeCover(Request $request)
+    {
+        $user = $request->user();
+
+        try {
+            $this->deleteOldImage($user->cover_photo, $user->cover_photo_public_id);
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to delete old cover photo on remove', ['error' => $e->getMessage()]);
+        }
+
+        $user->cover_photo           = null;
+        $user->cover_photo_public_id = null;
+        $user->save();
+
+        return response()->json(['success' => true]);
+    }
+
     public function updateLocation(Request $request)
     {
         $request->validate([
